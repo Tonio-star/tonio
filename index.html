@@ -28,10 +28,11 @@
     --shadow-card: 0 2px 8px rgba(15,23,42,0.10), 0 8px 32px rgba(15,23,42,0.07);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-  /* SIDEBAR */
-  .sidebar { width: 230px; min-height: 100vh; background: var(--sidebar-bg); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; transition: width .3s; overflow: hidden; }
+  /* ══ MOBILE SIDEBAR (≤768px) ══ */
+  .sidebar { width: 230px; min-height: 100vh; background: var(--sidebar-bg); display: none; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 200; transition: transform .3s; overflow: hidden; transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
   .sidebar-logo { padding: 24px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); white-space: nowrap; }
   .sidebar-logo .logo-text { font-size: 22px; font-weight: 700; letter-spacing: 3px; background: linear-gradient(135deg,#60a5fa,#818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .sidebar-logo .logo-sub { font-size: 10px; color: var(--text-light); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
@@ -41,16 +42,42 @@
   .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
   .nav-item.active { color: #60a5fa; background: rgba(37,99,235,0.15); border-left-color: #3b82f6; }
   .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 199; }
+  .sidebar-overlay.open { display: block; }
 
-  /* MAIN */
-  .main { margin-left: 230px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  /* ══ DESKTOP NAV (>768px) ══ */
+  /* Row 1: logo + main menu */
+  .desk-nav { display: none; background: var(--sidebar-bg); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+  .desk-nav-row1 { display: flex; align-items: center; padding: 0 24px; height: 54px; gap: 4px; }
+  .desk-logo { display: flex; align-items: baseline; gap: 10px; margin-right: 28px; flex-shrink: 0; }
+  .desk-logo-text { font-size: 20px; font-weight: 700; letter-spacing: 3px; background: linear-gradient(135deg,#60a5fa,#818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .desk-logo-sub { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 1.5px; text-transform: uppercase; }
+  .desk-logo-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.12); margin-right: 8px; }
+  /* Main menu items */
+  .dmenu-item { display: flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 8px; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; border: 1.5px solid transparent; user-select: none; }
+  .dmenu-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.07); }
+  .dmenu-item.active { color: #fff; background: rgba(37,99,235,0.35); border-color: rgba(59,130,246,0.5); font-weight: 600; }
+  .dmenu-item .dmenu-icon { font-size: 14px; }
+  /* Row 1 right actions */
+  .desk-nav-row1-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  /* Row 2: submenu */
+  .desk-nav-row2 { display: flex; align-items: center; padding: 0 24px; height: 40px; background: #162032; border-top: 1px solid rgba(255,255,255,0.06); gap: 2px; overflow-x: auto; }
+  .desk-nav-row2::-webkit-scrollbar { display: none; }
+  .dsubmenu-item { display: flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 6px; color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; user-select: none; }
+  .dsubmenu-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06); }
+  .dsubmenu-item.active { color: #60a5fa; font-weight: 600; border-bottom-color: #3b82f6; background: rgba(37,99,235,0.12); }
+  /* row2 right actions */
+  .desk-nav-row2-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-  /* TOPBAR */
-  .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 28px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; gap: 12px; }
-  .topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); min-width: 0; }
-  .topbar-left .page-title { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; }
-  .topbar-left .sep { color: var(--border); }
-  .topbar-left .sub-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* ══ MAIN ══ */
+  .main { display: flex; flex-direction: column; min-height: 100vh; width: 100%; }
+
+  /* Old topbar — hidden on desktop, shown on mobile */
+  .topbar { background: var(--sidebar-bg); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 16px; height: 52px; display: none; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; gap: 12px; }
+  .topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.6); min-width: 0; }
+  .topbar-left .page-title { font-size: 15px; font-weight: 700; color: #fff; white-space: nowrap; letter-spacing: 2px; }
+  .topbar-left .sep { color: rgba(255,255,255,0.2); }
+  .topbar-left .sub-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
   .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
   /* BUTTONS */
@@ -234,27 +261,36 @@
   .empty-row { padding: 32px; text-align: center; color: var(--text-light); font-size: 13px; }
 
   /* RESPONSIVE */
-  @media (max-width: 1100px) {
-    .form-grid-4 { grid-template-columns: repeat(2,1fr); }
-    .form-grid-5 { grid-template-columns: repeat(2,1fr); }
-    .form-grid-3 { grid-template-columns: repeat(2,1fr); }
-    .sub-thead, .sub-row { grid-template-columns: 44px 80px 1fr 150px 64px; }
+  @media (min-width: 769px) {
+    .desk-nav { display: block; }
+    .topbar { display: none !important; }
+    .sidebar { display: none !important; }
+    .sidebar-overlay { display: none !important; }
+    .mobile-nav-btn { display: none !important; }
+    .main { margin-left: 0; }
+    .content { padding: 24px 32px; }
   }
   @media (max-width: 768px) {
-    .sidebar { width: 0; }
+    .sidebar { display: flex; }
+    .desk-nav { display: none !important; }
+    .topbar { display: flex; }
     .main { margin-left: 0; }
     .content { padding: 16px; }
-    .topbar { padding: 0 16px; }
     .form-grid-2,.form-grid-3,.form-grid-4,.form-grid-5 { grid-template-columns: 1fr; }
     .col-span-2,.col-span-3 { grid-column: span 1; }
     .sub-thead, .sub-row { grid-template-columns: 40px 70px 1fr 120px 56px; }
   }
   @media (max-width: 520px) {
-    .topbar-right { gap: 4px; }
     .btn-sm { padding: 5px 8px; font-size: 11px; }
     .sub-thead, .sub-row { grid-template-columns: 36px 60px 1fr 100px 50px; }
   }
-  .mobile-nav-btn { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text); padding: 4px; }
+  @media (max-width: 1100px) and (min-width: 769px) {
+    .form-grid-4 { grid-template-columns: repeat(2,1fr); }
+    .form-grid-5 { grid-template-columns: repeat(2,1fr); }
+    .form-grid-3 { grid-template-columns: repeat(2,1fr); }
+    .sub-thead, .sub-row { grid-template-columns: 44px 80px 1fr 150px 64px; }
+  }
+  .mobile-nav-btn { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: #fff; padding: 4px; }
   @media (max-width: 768px) { .mobile-nav-btn { display: flex; } }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .tab-content.active { animation: fadeIn .2s ease; }
@@ -262,7 +298,39 @@
 </head>
 <body>
 
-<!-- SIDEBAR -->
+<!-- ══ DESKTOP NAV (PC / Tablet) ══ -->
+<nav class="desk-nav" id="deskNav">
+  <!-- Row 1: Logo + Main Menu + Actions -->
+  <div class="desk-nav-row1">
+    <div class="desk-logo">
+      <span class="desk-logo-text">TONIO</span>
+      <div class="desk-logo-divider"></div>
+      <span class="desk-logo-sub">Gestionale</span>
+    </div>
+    <!-- Main menu items -->
+    <div class="dmenu-item active" id="dm-anagrafiche" onclick="activateMainMenu('anagrafiche')">
+      <span class="dmenu-icon">👥</span> Anagrafiche
+    </div>
+    <div class="dmenu-item" id="dm-operativo" onclick="activateMainMenu('operativo')">
+      <span class="dmenu-icon">📋</span> Operativo
+    </div>
+    <div class="dmenu-item" id="dm-contabilita" onclick="activateMainMenu('contabilita')">
+      <span class="dmenu-icon">💰</span> Contabilità
+    </div>
+    <div class="dmenu-item" id="dm-gestione" onclick="activateMainMenu('gestione')">
+      <span class="dmenu-icon">🔧</span> Gestione
+    </div>
+    <!-- Right side actions -->
+    <div class="desk-nav-row1-right" id="deskNavActions"></div>
+  </div>
+  <!-- Row 2: Contextual submenu -->
+  <div class="desk-nav-row2" id="deskSubMenu">
+    <!-- filled by JS -->
+  </div>
+</nav>
+
+<!-- ══ MOBILE SIDEBAR (Smartphone) ══ -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <div class="logo-text">TONIO</div>
@@ -270,30 +338,31 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Anagrafiche</div>
-    <a class="nav-item active" href="#" onclick="showPage('page-clienti');return false"><span class="icon">👥</span> Clienti</a>
-    <a class="nav-item" href="#"><span class="icon">🧑</span> Ospiti</a>
-    <a class="nav-item" href="#"><span class="icon">🏠</span> Immobili</a>
+    <a class="nav-item active" href="#" onclick="showPage('page-clienti');closeSidebar();return false"><span class="icon">👥</span> Clienti</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">🧑</span> Ospiti</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">🏠</span> Immobili</a>
     <div class="nav-section">Operativo</div>
-    <a class="nav-item" href="#"><span class="icon">📋</span> Prenotazioni</a>
-    <a class="nav-item" href="#"><span class="icon">📄</span> Preventivi</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">📋</span> Prenotazioni</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">📄</span> Preventivi</a>
     <div class="nav-section">Contabilità</div>
-    <a class="nav-item" href="#"><span class="icon">💰</span> Entrate / Uscite</a>
-    <a class="nav-item" href="#"><span class="icon">📊</span> Budget</a>
-    <a class="nav-item" href="#"><span class="icon">📈</span> Statistiche</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">💰</span> Entrate / Uscite</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">📊</span> Budget</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">📈</span> Statistiche</a>
     <div class="nav-section">Gestione</div>
-    <a class="nav-item" href="#"><span class="icon">🔧</span> Manutenzioni</a>
-    <a class="nav-item" href="#"><span class="icon">📦</span> Magazzino</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">🔧</span> Manutenzioni</a>
+    <a class="nav-item" href="#" onclick="closeSidebar()"><span class="icon">📦</span> Magazzino</a>
   </nav>
 </aside>
 
 <!-- MAIN -->
 <div class="main">
+  <!-- Mobile topbar -->
   <div class="topbar">
     <div class="topbar-left">
-      <button class="mobile-nav-btn" onclick="toggleSidebar()">☰</button>
-      <span class="page-title" id="topbarTitle">Msk_Clienti_Anagrafica</span>
+      <button class="mobile-nav-btn" onclick="openSidebar()">☰</button>
+      <span class="page-title">TONIO</span>
       <span class="sep">·</span>
-      <span class="sub-label" id="topbarSub">Gestione Clienti</span>
+      <span class="sub-label" id="topbarSub">Clienti</span>
     </div>
     <div class="topbar-right" id="topbarActions"></div>
   </div>
@@ -346,7 +415,7 @@
                 <td><span class="badge badge-blue"><span class="badge-dot"></span>Agenzia Viaggi</span></td>
                 <td><span class="badge badge-success"><span class="badge-dot"></span>Contrattualizzato</span></td>
                 <td><div style="font-size:13px">+39 06 123456789</div><div class="sub">📱 +39 333 123456789</div></td>
-                <td style="font-size:12px;color:var(--text-muted)">prossi@gmail.com</td>
+                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="95e5e7fae6e6fcd5f2f8f4fcf9bbf6faf8">[email&#160;protected]</a></td>
                 <td><div class="note-cell">Agenzia molto importante e molto esigente. Sconto concordato 12%.</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -355,7 +424,7 @@
                 <td><span class="badge badge-indigo"><span class="badge-dot"></span>OTA</span></td>
                 <td><span class="badge badge-warning"><span class="badge-dot"></span>Prospect</span></td>
                 <td><div style="font-size:13px">+39 02 987654321</div></td>
-                <td style="font-size:12px;color:var(--text-muted)">italia@booking.com</td>
+                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="98f1ecf9f4f1f9d8faf7f7f3f1f6ffb6fbf7f5">[email&#160;protected]</a></td>
                 <td><div class="note-cell">—</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -364,7 +433,7 @@
                 <td><span class="badge badge-gray"><span class="badge-dot"></span>Privato</span></td>
                 <td><span class="badge" style="background:rgba(124,58,237,.1);color:#7c3aed"><span class="badge-dot" style="background:#8b5cf6"></span>VIP</span></td>
                 <td><div style="font-size:13px">📱 +39 333 111222333</div></td>
-                <td style="font-size:12px;color:var(--text-muted)">mario.rossi@gmail.com</td>
+                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="036e62716a6c2d716c70706a43646e626a6f2d606c6e">[email&#160;protected]</a></td>
                 <td><div class="note-cell">Cliente fidelizzato dal 2018. Prenota sempre ad agosto.</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -373,7 +442,7 @@
                 <td><span class="badge badge-blue"><span class="badge-dot"></span>Tour Operator</span></td>
                 <td><span class="badge badge-danger"><span class="badge-dot"></span>Blacklist</span></td>
                 <td><div style="font-size:13px">+39 055 444555666</div></td>
-                <td style="font-size:12px;color:var(--text-muted)">info@acmetravel.it</td>
+                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="147d7a727b54757779716066756271783a7d60">[email&#160;protected]</a></td>
                 <td><div class="note-cell">Inserita in blacklist per mancati pagamenti.</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -648,9 +717,158 @@
   </div><!-- /content -->
 </div><!-- /main -->
 
-<script>
-// DATA
-let tipologie = [
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ═══════════════════════════════════════
+//  NAVIGATION STRUCTURE
+// ═══════════════════════════════════════
+const NAV = {
+  anagrafiche: {
+    label: 'Anagrafiche', icon: '👥',
+    sub: [
+      { id: 'page-clienti',   label: '👥 Clienti',      page: 'page-clienti'   },
+      { id: 'page-ospiti',    label: '🧑 Ospiti',        page: null             },
+      { id: 'page-immobili',  label: '🏠 Immobili',      page: null             },
+    ]
+  },
+  operativo: {
+    label: 'Operativo', icon: '📋',
+    sub: [
+      { id: 'page-prenotazioni', label: '📋 Prenotazioni', page: null },
+      { id: 'page-preventivi',   label: '📄 Preventivi',   page: null },
+    ]
+  },
+  contabilita: {
+    label: 'Contabilità', icon: '💰',
+    sub: [
+      { id: 'page-entrate',    label: '💰 Entrate / Uscite', page: null },
+      { id: 'page-budget',     label: '📊 Budget',            page: null },
+      { id: 'page-statistiche',label: '📈 Statistiche',       page: null },
+    ]
+  },
+  gestione: {
+    label: 'Gestione', icon: '🔧',
+    sub: [
+      { id: 'page-manutenzioni', label: '🔧 Manutenzioni', page: null },
+      { id: 'page-magazzino',    label: '📦 Magazzino',     page: null },
+    ]
+  },
+};
+
+// Which sub-item maps to each page
+const PAGE_TO_MENU = {
+  'page-clienti':   { main: 'anagrafiche', sub: 'page-clienti'   },
+  'page-ospiti':    { main: 'anagrafiche', sub: 'page-ospiti'     },
+  'page-tipologia': { main: 'anagrafiche', sub: 'page-clienti'    },
+  'page-stato':     { main: 'anagrafiche', sub: 'page-clienti'    },
+};
+
+let currentMainMenu = 'anagrafiche';
+let currentSubMenu  = 'page-clienti';
+let currentPage     = 'page-clienti';
+
+// ── Build submenu row ──
+function renderSubMenu(mainKey, activeSubId) {
+  const row  = document.getElementById('deskSubMenu');
+  const menu = NAV[mainKey];
+  if (!menu) { row.innerHTML = ''; return; }
+  row.innerHTML = menu.sub.map(s => `
+    <div class="dsubmenu-item ${s.id === activeSubId ? 'active' : ''}"
+         onclick="activateSubMenu('${mainKey}','${s.id}',${s.page ? "'"+s.page+"'" : 'null'})">
+      ${s.label}
+    </div>`).join('');
+}
+
+// ── Activate main menu ──
+function activateMainMenu(key) {
+  currentMainMenu = key;
+  document.querySelectorAll('.dmenu-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('dm-' + key);
+  if (el) el.classList.add('active');
+  // activate first sub by default
+  const firstSub = NAV[key].sub[0];
+  currentSubMenu = firstSub.id;
+  renderSubMenu(key, firstSub.id);
+  if (firstSub.page) showPageContent(firstSub.page);
+}
+
+// ── Activate sub menu ──
+function activateSubMenu(mainKey, subId, pageId) {
+  currentSubMenu = subId;
+  renderSubMenu(mainKey, subId);
+  if (pageId) showPageContent(pageId);
+}
+
+// ── Core page switcher ──
+function showPageContent(pageId) {
+  currentPage = pageId;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById(pageId);
+  if (pg) pg.classList.add('active');
+
+  // Update mobile topbar subtitle
+  const subLabels = {
+    'page-clienti':   'Clienti',
+    'page-tipologia': 'Tipologie Clienti',
+    'page-stato':     'Stati Clienti',
+  };
+  const mSub = document.getElementById('topbarSub');
+  if (mSub) mSub.textContent = subLabels[pageId] || pageId;
+
+  // Render contextual action buttons in both bars
+  renderActionButtons(pageId);
+
+  if (pageId === 'page-tipologia') renderTipologie();
+  if (pageId === 'page-stato')     renderStati();
+}
+
+// ── Action buttons (right side of desk row2 + mobile topbar) ──
+function renderActionButtons(pageId) {
+  let html = '';
+  if (pageId === 'page-clienti') {
+    html = `
+      <button class="btn btn-outline btn-sm" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)">⬇ Esporta</button>
+      <button class="btn btn-teal btn-sm" onclick="showPage('page-tipologia')">🏷️ Tipologie</button>
+      <button class="btn btn-violet btn-sm" onclick="showPage('page-stato')">🔵 Stati</button>
+      <button class="btn btn-primary btn-sm" onclick="openNewClient()">＋ Nuovo Cliente</button>`;
+  } else if (pageId === 'page-tipologia' || pageId === 'page-stato') {
+    html = `<button class="btn btn-outline btn-sm" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)" onclick="showPage('page-clienti')">← Torna ai Clienti</button>`;
+  }
+  const deskRight = document.getElementById('deskNavActions');
+  if (deskRight) deskRight.innerHTML = html;
+  const mobRight = document.getElementById('topbarActions');
+  if (mobRight) mobRight.innerHTML = html;
+}
+
+// ── Public showPage (called from buttons) ──
+function showPage(pageId) {
+  // keep menu state consistent
+  const mapping = PAGE_TO_MENU[pageId];
+  if (mapping) {
+    currentMainMenu = mapping.main;
+    currentSubMenu  = mapping.sub;
+    document.querySelectorAll('.dmenu-item').forEach(el => el.classList.remove('active'));
+    const mainEl = document.getElementById('dm-' + mapping.main);
+    if (mainEl) mainEl.classList.add('active');
+    renderSubMenu(mapping.main, mapping.sub);
+  }
+  showPageContent(pageId);
+}
+
+// ── Mobile sidebar ──
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Init
+renderSubMenu('anagrafiche', 'page-clienti');
+renderActionButtons('page-clienti');
   {id:1,order:1,label:'Agenzia Viaggi',color:'#2563eb'},
   {id:2,order:2,label:'Tour Operator', color:'#7c3aed'},
   {id:3,order:3,label:'OTA',           color:'#6366f1'},
@@ -666,31 +884,7 @@ let stati = [
 ];
 let tipoNextId=6, statoNextId=6;
 
-// NAVIGATION
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  const map = {
-    'page-clienti':  ['Msk_Clienti_Anagrafica','Gestione Clienti'],
-    'page-tipologia':['Tab_Clienti_Tipologie',  'Impostazioni Tipologie'],
-    'page-stato':    ['Tab_Clienti_Stati',       'Impostazioni Stati'],
-  };
-  const [t,s] = map[id]||['TONIO',''];
-  document.getElementById('topbarTitle').textContent = t;
-  document.getElementById('topbarSub').textContent   = s;
-  const bar = document.getElementById('topbarActions');
-  if (id === 'page-clienti') {
-    bar.innerHTML = `
-      <button class="btn btn-outline btn-sm">⬇ Esporta</button>
-      <button class="btn btn-teal btn-sm" onclick="showPage('page-tipologia')">🏷️ Tipologie</button>
-      <button class="btn btn-violet btn-sm" onclick="showPage('page-stato')">🔵 Stati</button>
-      <button class="btn btn-primary btn-sm" onclick="openNewClient()">＋ Nuovo Cliente</button>`;
-  } else {
-    bar.innerHTML = `<button class="btn btn-outline btn-sm" onclick="showPage('page-clienti')">← Torna ai Clienti</button>`;
-  }
-  if (id==='page-tipologia') renderTipologie();
-  if (id==='page-stato')     renderStati();
-}
+// Init page
 showPage('page-clienti');
 
 // TIPOLOGIE
@@ -834,19 +1028,4 @@ function removeCollab(btn) { btn.closest('.collab-card').remove(); }
 function moveCollab(btn,dir) {
   const card=btn.closest('.collab-card'),list=document.getElementById('collabList');
   if(dir===-1&&card.previousElementSibling) list.insertBefore(card,card.previousElementSibling);
-  else if(dir===1&&card.nextElementSibling) list.insertBefore(card.nextElementSibling,card);
-}
-function openNewClient() {
-  document.getElementById('clientNameHeader').textContent='Nuovo Cliente';
-  document.getElementById('clientAvatar').textContent='NC';
-  document.querySelectorAll('.field-input').forEach(f=>{if(f.tagName!=='SELECT')f.value='';});
-  document.querySelectorAll('.status-chip').forEach(c=>c.classList.remove('active-chip'));
-  document.getElementById('detailPanel').scrollIntoView({behavior:'smooth'});
-}
-function toggleSidebar() {
-  const s=document.getElementById('sidebar');
-  s.style.width=s.style.width==='230px'?'0':'230px';
-}
-</script>
-</body>
-</html>
+  else if(dir===1&&card.nextElementSibling) list.insertBefore(card.nextElementSiblin
