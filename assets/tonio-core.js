@@ -1,9 +1,7 @@
 /* ================================================================
-   TONIO — tonio-core.js
-   Navigazione condivisa e utility comuni
+   TONIO — tonio-core.js  |  Navigazione e utility comuni
    ================================================================ */
 
-/* ---- CONFIG NAVIGAZIONE ---- */
 var TONIO_NAV = {
   anagrafiche: {
     label: '👤 Anagrafiche',
@@ -39,26 +37,21 @@ var TONIO_NAV = {
   }
 };
 
-/* ---- AZIONI PER PAGINA (toolbar destra riga 2) ---- */
+/* Pulsanti toolbar per pagina */
 var TONIO_PAGE_ACTIONS = {
-  clienti: `
-    <button class="nav-action-btn green"  onclick="MSK_Clienti.openModalTipologie()">🏷️ Tipologie</button>
-    <button class="nav-action-btn purple" onclick="MSK_Clienti.openModalStati()">🔵 Stati</button>
-    <button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>
-  `
+  clienti: '<button class="nav-action-btn green"  onclick="MSK_Clienti.openModalTipologie()">🏷️ Tipologie</button>'
+         + '<button class="nav-action-btn purple" onclick="MSK_Clienti.openModalStati()">🔵 Stati</button>'
+         + '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>'
 };
 
-/* ---- STATE ---- */
 var TONIO_currentModule = 'anagrafiche';
 var TONIO_currentPage   = 'clienti';
 
-/* ---- INIT ---- */
 document.addEventListener('DOMContentLoaded', function() {
   TONIO_setModule('anagrafiche', false);
   TONIO_showPage('clienti');
 });
 
-/* ---- SET MODULE ---- */
 function TONIO_setModule(mod, navigate) {
   if (navigate === undefined) navigate = true;
   TONIO_currentModule = mod;
@@ -67,18 +60,14 @@ function TONIO_setModule(mod, navigate) {
   if (mb) mb.classList.add('active');
   TONIO_buildRow2(TONIO_currentPage);
   if (navigate) {
-    var first = TONIO_NAV[mod].subs[0].page;
-    TONIO_showPage(first);
+    TONIO_showPage(TONIO_NAV[mod].subs[0].page);
   }
 }
 
-/* ---- SHOW PAGE ---- */
 function TONIO_showPage(pageId) {
   TONIO_currentPage = pageId;
-  // find module
   for (var mod in TONIO_NAV) {
-    var found = TONIO_NAV[mod].subs.find(function(s) { return s.page === pageId; });
-    if (found) {
+    if (TONIO_NAV[mod].subs.find(function(s) { return s.page === pageId; })) {
       if (mod !== TONIO_currentModule) {
         TONIO_currentModule = mod;
         document.querySelectorAll('.nav-main-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -94,7 +83,6 @@ function TONIO_showPage(pageId) {
   if (target) target.classList.add('active');
 }
 
-/* ---- BUILD ROW2 ---- */
 function TONIO_buildRow2(activePage) {
   var row2 = document.getElementById('nav-r2');
   if (!row2) return;
@@ -105,12 +93,10 @@ function TONIO_buildRow2(activePage) {
     html += '<button class="nav-sub-btn ' + cls + '" onclick="TONIO_showPage(\'' + s.page + '\')">' + s.label + '</button>';
   });
   html += '<div style="flex:1"></div>';
-  var actions = TONIO_PAGE_ACTIONS[activePage];
-  if (actions) html += actions;
+  if (TONIO_PAGE_ACTIONS[activePage]) html += TONIO_PAGE_ACTIONS[activePage];
   row2.innerHTML = html;
 }
 
-/* ---- MOBILE SIDEBAR ---- */
 function TONIO_toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebar-overlay').classList.toggle('open');
@@ -120,7 +106,7 @@ function TONIO_closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('open');
 }
 
-/* ---- TABS (generico) ---- */
+/* Tab generici — containerId è l'id del wrapper dei tab */
 function TONIO_setTab(containerId, tabId, btn) {
   var container = document.getElementById(containerId);
   if (!container) return;
@@ -131,7 +117,6 @@ function TONIO_setTab(containerId, tabId, btn) {
   if (panel) panel.classList.add('active');
 }
 
-/* ---- UTILITY ---- */
 function TONIO_escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -142,7 +127,5 @@ function TONIO_escapeHtml(str) {
 }
 
 function TONIO_makeBadge(nome, colore) {
-  var bg  = colore + '22';
-  var brd = colore + '55';
-  return '<span class="badge" style="background:' + bg + ';color:' + colore + ';border:1px solid ' + brd + '">' + nome + '</span>';
+  return '<span class="badge" style="background:' + colore + '22;color:' + colore + ';border:1px solid ' + colore + '44">' + nome + '</span>';
 }
