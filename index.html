@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -7,7 +6,460 @@
 <title>TONIO — Gestionale Immobiliare</title>
 
 <!-- CORE STYLES -->
-<link rel="stylesheet" href="assets/tonio-core.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+/* ================================================================
+   TONIO — tonio-core.css
+   Stili condivisi da tutti i moduli
+   ================================================================ */
+
+
+
+/* ---- VARIABILI ---- */
+:root {
+  --font:        'Plus Jakarta Sans', sans-serif;
+
+  /* NAV (scuro) */
+  --nav-bg1:     #0d1120;
+  --nav-bg2:     #111827;
+  --nav-border:  rgba(255,255,255,0.08);
+  --nav-text:    #cbd5e1;
+  --nav-text-off:#64748b;
+  --nav-active:  #3b82f6;
+  --nav-active-glow: rgba(59,130,246,0.30);
+  --nav-h1:      54px;
+  --nav-h2:      42px;
+
+  /* CORPO (chiaro) */
+  --body-bg:     #f1f5f9;
+  --surface:     #ffffff;
+  --surface2:    #f8fafc;
+  --border:      #e2e8f0;
+  --border2:     #cbd5e1;
+  --text:        #0f172a;
+  --text2:       #334155;
+  --text3:       #64748b;
+  --text4:       #94a3b8;
+
+  /* ACCENTI */
+  --blue:        #2563eb;
+  --blue-light:  #eff6ff;
+  --blue-border: #bfdbfe;
+  --green:       #059669;
+  --green-light: #ecfdf5;
+  --yellow:      #d97706;
+  --yellow-light:#fffbeb;
+  --red:         #dc2626;
+  --red-light:   #fef2f2;
+  --purple:      #7c3aed;
+  --purple-light:#f5f3ff;
+
+  --radius:      10px;
+  --radius-lg:   14px;
+  --shadow:      0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* ---- RESET ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--body-bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ================================================================
+   NAVBAR DESKTOP (2 righe)
+   ================================================================ */
+#desk-nav { display: none; }
+
+@media (min-width: 769px) {
+  #desk-nav { display: block; position: sticky; top: 0; z-index: 900; }
+
+  .nav-r1 {
+    height: var(--nav-h1);
+    background: var(--nav-bg1);
+    border-bottom: 1px solid var(--nav-border);
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    gap: 6px;
+  }
+  .nav-logo {
+    font-size: 21px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+  .nav-logo span { color: var(--nav-active); }
+  .nav-logo small {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--nav-text-off);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .nav-sep { width: 1px; height: 26px; background: var(--nav-border); margin: 0 8px; }
+  .nav-main-btn {
+    height: 34px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--nav-text-off);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .nav-main-btn:hover { background: rgba(255,255,255,0.07); color: var(--nav-text); }
+  .nav-main-btn.active {
+    background: var(--nav-active);
+    color: #fff;
+    box-shadow: 0 0 14px var(--nav-active-glow);
+  }
+  .nav-spacer { flex: 1; }
+
+  .nav-r2 {
+    height: var(--nav-h2);
+    background: var(--nav-bg2);
+    border-bottom: 1px solid var(--nav-border);
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    gap: 2px;
+  }
+  .nav-sub-btn {
+    height: 30px;
+    padding: 0 13px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--nav-text-off);
+    font-family: var(--font);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .nav-sub-btn:hover { background: rgba(255,255,255,0.06); color: var(--nav-text); }
+  .nav-sub-btn.active { color: #60a5fa; font-weight: 700; }
+  .nav-sub-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: #60a5fa;
+    border-radius: 2px;
+  }
+  .nav-action-btn {
+    height: 30px;
+    padding: 0 13px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .nav-action-btn.primary { background: var(--blue); color: #fff; }
+  .nav-action-btn.primary:hover { background: #1d4ed8; }
+  .nav-action-btn.green  { background: var(--green-light); color: var(--green); border: 1px solid #a7f3d0; }
+  .nav-action-btn.green:hover { background: #d1fae5; }
+  .nav-action-btn.purple { background: var(--purple-light); color: var(--purple); border: 1px solid #ddd6fe; }
+  .nav-action-btn.purple:hover { background: #ede9fe; }
+
+  #mob-topbar, #sidebar, #sidebar-overlay { display: none !important; }
+}
+
+/* ================================================================
+   NAVBAR MOBILE
+   ================================================================ */
+@media (max-width: 768px) {
+  #desk-nav { display: none !important; }
+  #mob-topbar {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    background: var(--nav-bg1);
+    border-bottom: 1px solid var(--nav-border);
+    padding: 0 16px;
+    position: sticky; top: 0; z-index: 900;
+  }
+  .mob-logo { font-size: 19px; font-weight: 800; color: #fff; flex: 1; }
+  .mob-logo span { color: var(--nav-active); }
+  #mob-menu-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--nav-border);
+    color: #fff;
+    width: 34px; height: 34px;
+    border-radius: 7px;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 1000;
+  }
+  #sidebar-overlay.open { display: block; }
+  #sidebar {
+    display: block !important;
+    position: fixed;
+    top: 0; left: -270px;
+    width: 270px; height: 100%;
+    background: var(--nav-bg1);
+    border-right: 1px solid var(--nav-border);
+    z-index: 1100;
+    transition: left 0.28s ease;
+    overflow-y: auto;
+    padding: 18px 0 40px;
+  }
+  #sidebar.open { left: 0; }
+  .sb-logo { font-size: 20px; font-weight: 800; color: #fff; padding: 0 18px 16px; border-bottom: 1px solid var(--nav-border); margin-bottom: 10px; }
+  .sb-logo span { color: var(--nav-active); }
+  .sb-section { padding: 8px 10px 2px; }
+  .sb-section-title { font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--nav-text-off); padding: 0 8px; margin-bottom: 4px; }
+  .sb-btn { display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px 11px; border: none; border-radius: 7px; background: transparent; color: var(--nav-text-off); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.14s; text-align: left; margin-bottom: 2px; }
+  .sb-btn:hover { background: rgba(255,255,255,0.07); color: var(--nav-text); }
+  .sb-btn.active { background: rgba(59,130,246,0.18); color: #60a5fa; font-weight: 700; }
+}
+
+/* ================================================================
+   LAYOUT PRINCIPALE
+   ================================================================ */
+#main { padding: 24px; }
+@media (max-width: 768px) { #main { padding: 14px; } }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ================================================================
+   COMPONENTI CONDIVISI
+   ================================================================ */
+
+/* Panel */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #fff 0%, var(--surface2) 100%);
+}
+.panel-header-icon {
+  width: 38px; height: 38px;
+  background: var(--blue-light);
+  border: 1px solid var(--blue-border);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+}
+.panel-header-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.panel-header-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.panel-header-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Table */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--text3);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.14s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f8faff; }
+tbody tr.selected { background: var(--blue-light); }
+tbody td { padding: 12px 16px; vertical-align: top; }
+.td-name { font-weight: 700; color: var(--text); font-size: 14px; }
+.td-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.td-contact { font-size: 12.5px; color: var(--text2); }
+.td-note { font-size: 12px; color: var(--text3); white-space: pre-line; max-width: 200px; }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 16px;
+  border: none; border-radius: 8px;
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.btn-primary { background: var(--blue); color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.25); }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { background: var(--border); color: var(--text); }
+.btn-danger { background: var(--red-light); color: var(--red); border: 1px solid #fecaca; }
+.btn-danger:hover { background: #fee2e2; }
+.btn-sm { height: 28px; padding: 0 10px; font-size: 12px; border-radius: 6px; }
+
+/* Form */
+.form-grid { display: grid; gap: 14px; }
+.form-grid-2 { grid-template-columns: 1fr 1fr; }
+.form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 600px) { .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; } }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
+.form-input, .form-select, .form-textarea {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13.5px;
+  padding: 9px 12px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+.form-select { appearance: none; cursor: pointer; }
+.form-textarea { resize: vertical; min-height: 82px; }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text4); }
+
+/* Tabs */
+.tabs-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 22px;
+  gap: 2px;
+  background: var(--surface2);
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 11px 14px 9px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text3);
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+  margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+.tab-panel { display: none; padding: 22px; }
+.tab-panel.active { display: block; }
+
+/* Collaboratori */
+.collab-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.collab-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.collab-order-btns { display: flex; flex-direction: column; gap: 2px; }
+.collab-order-btn {
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--text3); width: 22px; height: 18px; border-radius: 4px;
+  font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.14s;
+}
+.collab-order-btn:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+.collab-badge-ref {
+  background: var(--blue-light); color: var(--blue); border: 1px solid var(--blue-border);
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+}
+.collab-remove-btn { margin-left: auto; background: none; border: none; color: var(--text4); cursor: pointer; font-size: 16px; transition: color 0.18s; }
+.collab-remove-btn:hover { color: var(--red); }
+.collab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 500px) { .collab-grid { grid-template-columns: 1fr; } }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 580px; max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+.modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-close { margin-left: auto; background: none; border: none; color: var(--text3); font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.18s; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 22px; }
+.modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Lookup table (inside modal) */
+.lookup-table { width: 100%; border-collapse: collapse; }
+.lookup-table th { padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); }
+.lookup-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.lookup-table tr:last-child td { border-bottom: none; }
+.lookup-input { background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--font); font-size: 13px; padding: 6px 10px; width: 100%; }
+.lookup-input:focus { outline: none; border-color: var(--blue); }
+.color-swatch { width: 30px; height: 30px; border-radius: 6px; border: 2px solid var(--border2); cursor: pointer; padding: 0; }
+
+/* Coming soon placeholder */
+.coming-soon { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; gap: 10px; color: var(--text3); }
+.coming-soon .cs-icon { font-size: 50px; opacity: 0.25; }
+.coming-soon h2 { font-size: 20px; font-weight: 700; color: var(--text2); }
+.coming-soon p { font-size: 13px; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 70px 20px; color: var(--text3); }
+.empty-state .es-icon { font-size: 44px; opacity: 0.3; margin-bottom: 14px; }
+.empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text4); }
+
+</style>
 </head>
 <body>
 
@@ -142,9 +594,835 @@
      2. Core (navigazione e utility)
      3. Moduli (uno per modulo)
      ============================================================ -->
-<script src="dati/Dati_Clienti.js"></script>
-<script src="assets/tonio-core.js"></script>
-<script src="moduli/Msk_Clienti.js"></script>
+<script>
+/* ================================================================
+   TONIO — Dati_Clienti.js
+   ================================================================
+   QUESTO FILE CONTIENE SOLO I TUOI DATI.
+   NON modificare questo file quando si aggiorna la struttura.
+   Aggiungi/modifica clienti qui senza rischio di perdere nulla.
+   ================================================================ */
+
+var TONIO_TIPOLOGIE = [
+  { id: 1, ordine: 1, nome: 'Privato',     colore: '#1a6fc4' },
+  { id: 2, ordine: 2, nome: 'Azienda',     colore: '#0e9c6a' },
+  { id: 3, ordine: 3, nome: 'Agenzia',     colore: '#c47a1a' },
+  { id: 4, ordine: 4, nome: 'Istituzione', colore: '#7c3aed' },
+];
+
+var TONIO_STATI = [
+  { id: 1, ordine: 1, nome: 'Attivo',     colore: '#0e9c6a' },
+  { id: 2, ordine: 2, nome: 'Potenziale', colore: '#c47a1a' },
+  { id: 3, ordine: 3, nome: 'Inattivo',   colore: '#6b7280' },
+  { id: 4, ordine: 4, nome: 'Bloccato',   colore: '#dc2626' },
+];
+
+var TONIO_CLIENTI = [
+  {
+    id: 1,
+    nominativo:   'Rossi Mario',
+    tipologia:    'Privato',
+    stato:        'Attivo',
+    cellulare:    '+39 333 1234567',
+    telefono:     '',
+    mail:         'mario.rossi@email.it',
+    web:          '',
+    note:         'Cliente storico',
+    cf:           'RSSMRA80A01H501Z',
+    piva:         '',
+    indirizzo:    'Via Roma 1',
+    cap:          '00100',
+    citta:        'Roma',
+    prov:         'RM',
+    paese:        'Italia',
+    sdi:          '',
+    banca:        '',
+    iban:         '',
+    bic:          '',
+    intestatario: '',
+    annotazioni:  '',
+    collaboratori: [
+      {
+        ordine:    1,
+        nome:      'Laura Rossi',
+        ruolo:     'Referente',
+        cellulare: '+39 333 9876543',
+        telefono:  '',
+        mail:      'laura@email.it',
+        note:      'Contatto principale'
+      }
+    ]
+  },
+  {
+    id: 2,
+    nominativo:   'Bianchi Srl',
+    tipologia:    'Azienda',
+    stato:        'Potenziale',
+    cellulare:    '',
+    telefono:     '+39 06 1234567',
+    mail:         'info@bianchi.it',
+    web:          'https://www.bianchi.it',
+    note:         '',
+    cf:           '',
+    piva:         '01234567890',
+    indirizzo:    'Via Veneto 50',
+    cap:          '00187',
+    citta:        'Roma',
+    prov:         'RM',
+    paese:        'Italia',
+    sdi:          'ABCDE12',
+    banca:        'UniCredit',
+    iban:         'IT60 X054 2811 1010 0000 0123 456',
+    bic:          'UNCRITMM',
+    intestatario: 'Bianchi Srl',
+    annotazioni:  'Primo contatto febbraio 2026',
+    collaboratori: [
+      {
+        ordine:    1,
+        nome:      'Marco Bianchi',
+        ruolo:     'Referente',
+        cellulare: '+39 347 1111111',
+        telefono:  '',
+        mail:      'marco@bianchi.it',
+        note:      'CEO'
+      }
+    ]
+  }
+];
+
+</script>
+<script>
+/* ================================================================
+   TONIO — tonio-core.js
+   Navigazione condivisa e utility comuni
+   ================================================================ */
+
+/* ---- CONFIG NAVIGAZIONE ---- */
+var TONIO_NAV = {
+  anagrafiche: {
+    label: '👤 Anagrafiche',
+    subs: [
+      { label: '👥 Clienti',   page: 'clienti' },
+      { label: '🧑 Ospiti',    page: 'ospiti' },
+      { label: '🏠 Immobili',  page: 'immobili' },
+      { label: '🔧 Fornitori', page: 'fornitori' },
+    ]
+  },
+  operativo: {
+    label: '📅 Operativo',
+    subs: [
+      { label: '📅 Prenotazioni', page: 'prenotazioni' },
+      { label: '📄 Contratti',    page: 'contratti' },
+    ]
+  },
+  contabilita: {
+    label: '💰 Contabilità',
+    subs: [
+      { label: '💰 Incassi', page: 'incassi' },
+      { label: '📊 Spese',   page: 'spese' },
+      { label: '📈 Budget',  page: 'budget' },
+    ]
+  },
+  gestione: {
+    label: '⚙️ Gestione',
+    subs: [
+      { label: '🔨 Manutenzioni', page: 'manutenzioni' },
+      { label: '📁 Documenti',    page: 'documenti' },
+      { label: '⚙️ Impostazioni', page: 'impostazioni' },
+    ]
+  }
+};
+
+/* ---- AZIONI PER PAGINA (toolbar destra riga 2) ---- */
+var TONIO_PAGE_ACTIONS = {
+  clienti: `
+    <button class="nav-action-btn green"  onclick="MSK_Clienti.openModalTipologie()">🏷️ Tipologie</button>
+    <button class="nav-action-btn purple" onclick="MSK_Clienti.openModalStati()">🔵 Stati</button>
+    <button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>
+  `
+};
+
+/* ---- STATE ---- */
+var TONIO_currentModule = 'anagrafiche';
+var TONIO_currentPage   = 'clienti';
+
+/* ---- INIT ---- */
+document.addEventListener('DOMContentLoaded', function() {
+  TONIO_setModule('anagrafiche', false);
+  TONIO_showPage('clienti');
+});
+
+/* ---- SET MODULE ---- */
+function TONIO_setModule(mod, navigate) {
+  if (navigate === undefined) navigate = true;
+  TONIO_currentModule = mod;
+  document.querySelectorAll('.nav-main-btn').forEach(function(b) { b.classList.remove('active'); });
+  var mb = document.getElementById('nav-main-' + mod);
+  if (mb) mb.classList.add('active');
+  TONIO_buildRow2(TONIO_currentPage);
+  if (navigate) {
+    var first = TONIO_NAV[mod].subs[0].page;
+    TONIO_showPage(first);
+  }
+}
+
+/* ---- SHOW PAGE ---- */
+function TONIO_showPage(pageId) {
+  TONIO_currentPage = pageId;
+  // find module
+  for (var mod in TONIO_NAV) {
+    var found = TONIO_NAV[mod].subs.find(function(s) { return s.page === pageId; });
+    if (found) {
+      if (mod !== TONIO_currentModule) {
+        TONIO_currentModule = mod;
+        document.querySelectorAll('.nav-main-btn').forEach(function(b) { b.classList.remove('active'); });
+        var mb = document.getElementById('nav-main-' + mod);
+        if (mb) mb.classList.add('active');
+      }
+      break;
+    }
+  }
+  TONIO_buildRow2(pageId);
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var target = document.getElementById('page-' + pageId);
+  if (target) target.classList.add('active');
+}
+
+/* ---- BUILD ROW2 ---- */
+function TONIO_buildRow2(activePage) {
+  var row2 = document.getElementById('nav-r2');
+  if (!row2) return;
+  var cfg = TONIO_NAV[TONIO_currentModule];
+  var html = '';
+  cfg.subs.forEach(function(s) {
+    var cls = s.page === activePage ? 'active' : '';
+    html += '<button class="nav-sub-btn ' + cls + '" onclick="TONIO_showPage(\'' + s.page + '\')">' + s.label + '</button>';
+  });
+  html += '<div style="flex:1"></div>';
+  var actions = TONIO_PAGE_ACTIONS[activePage];
+  if (actions) html += actions;
+  row2.innerHTML = html;
+}
+
+/* ---- MOBILE SIDEBAR ---- */
+function TONIO_toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function TONIO_closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+/* ---- TABS (generico) ---- */
+function TONIO_setTab(containerId, tabId, btn) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  container.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  container.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var panel = document.getElementById(containerId + '-tab-' + tabId);
+  if (panel) panel.classList.add('active');
+}
+
+/* ---- UTILITY ---- */
+function TONIO_escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function TONIO_makeBadge(nome, colore) {
+  var bg  = colore + '22';
+  var brd = colore + '55';
+  return '<span class="badge" style="background:' + bg + ';color:' + colore + ';border:1px solid ' + brd + '">' + nome + '</span>';
+}
+
+</script>
+<script>
+/* ================================================================
+   TONIO — Msk_Clienti.js
+   Logica del modulo Anagrafica Clienti
+   ================================================================ */
+
+var MSK_Clienti = (function() {
+
+  /* ---- stato locale ---- */
+  var tipologie    = [];
+  var stati        = [];
+  var clienti      = [];
+  var currentId    = null;
+  var collabCnt    = 0;
+  var viewMode     = 'lista'; // 'lista' | 'scheda'
+
+  /* ================================================================
+     INIT — carica dati dal file separato
+     ================================================================ */
+  function init() {
+    // copia da Dati_Clienti.js
+    tipologie = (window.TONIO_TIPOLOGIE || []).map(function(x) { return Object.assign({}, x); });
+    stati     = (window.TONIO_STATI     || []).map(function(x) { return Object.assign({}, x); });
+    clienti   = (window.TONIO_CLIENTI   || []).map(function(x) { return Object.assign({}, x); });
+    renderLista();
+  }
+
+  /* ================================================================
+     VISTA LISTA
+     ================================================================ */
+  function renderLista() {
+    viewMode = 'lista';
+    var page = document.getElementById('page-clienti');
+    if (!page) return;
+
+    var count = clienti.length;
+
+    var rows = '';
+    if (count === 0) {
+      rows = '<tr><td colspan="6"><div class="empty-state"><div class="es-icon">👥</div><h3>Nessun cliente</h3><p>Clicca "+ Nuovo Cliente" per iniziare</p></div></td></tr>';
+    } else {
+      clienti.forEach(function(c) {
+        var ref = c.collaboratori && c.collaboratori.length > 0 ? c.collaboratori[0] : null;
+        var refHtml = ref
+          ? '<div class="td-sub">👤 ' + TONIO_escapeHtml(ref.nome) + (ref.ruolo ? ' · ' + TONIO_escapeHtml(ref.ruolo) : '') + '</div>'
+          : '';
+        var tipoBadge  = c.tipologia ? TONIO_makeBadge(c.tipologia, _tipoColore(c.tipologia)) : '—';
+        var statoBadge = c.stato     ? TONIO_makeBadge(c.stato,     _statoColore(c.stato))    : '—';
+        var tel = c.cellulare || c.telefono || '—';
+        var mailHtml = c.mail
+          ? '<div class="td-contact">' + c.mail.replace('@','&#64;') + '</div>'
+          : '';
+        var noteHtml = c.note ? '<div class="td-note">' + TONIO_escapeHtml(c.note) + '</div>' : '—';
+        var sel = c.id === currentId ? 'selected' : '';
+        rows += '<tr class="' + sel + '" onclick="MSK_Clienti.apriCliente(' + c.id + ')">'
+          + '<td><div class="td-name">' + TONIO_escapeHtml(c.nominativo) + '</div>' + refHtml + '</td>'
+          + '<td>' + tipoBadge + '</td>'
+          + '<td>' + statoBadge + '</td>'
+          + '<td><div class="td-contact">' + TONIO_escapeHtml(tel) + '</div>' + mailHtml + '</td>'
+          + '<td>' + noteHtml + '</td>'
+          + '<td><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();MSK_Clienti.eliminaCliente(' + c.id + ')">🗑</button></td>'
+          + '</tr>';
+      });
+    }
+
+    page.innerHTML = ''
+      + '<div class="panel">'
+      +   '<div class="panel-header">'
+      +     '<div class="panel-header-icon">👥</div>'
+      +     '<div>'
+      +       '<div class="panel-header-title">Clienti</div>'
+      +       '<div class="panel-header-sub">' + count + ' client' + (count === 1 ? 'e' : 'i') + '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="tbl-wrap">'
+      +     '<table>'
+      +       '<thead><tr>'
+      +         '<th>Nominativo / Referente</th>'
+      +         '<th>Tipologia</th>'
+      +         '<th>Stato</th>'
+      +         '<th>Contatti</th>'
+      +         '<th>Note</th>'
+      +         '<th></th>'
+      +       '</tr></thead>'
+      +       '<tbody>' + rows + '</tbody>'
+      +     '</table>'
+      +   '</div>'
+      + '</div>';
+  }
+
+  /* ================================================================
+     VISTA SCHEDA (pagina intera)
+     ================================================================ */
+  function renderScheda(c, isNew) {
+    viewMode = 'scheda';
+    var page = document.getElementById('page-clienti');
+    if (!page) return;
+
+    var nom = c ? TONIO_escapeHtml(c.nominativo) : 'Nuovo Cliente';
+    var sub = c ? ((c.tipologia || '') + (c.stato ? ' · ' + c.stato : '')) : 'Inserimento nuovo cliente';
+
+    /* ---- build tipologie options ---- */
+    var tipoOpts = '<option value="">— Seleziona —</option>';
+    tipologie.slice().sort(function(a,b){return a.ordine-b.ordine;}).forEach(function(t){
+      var sel = c && c.tipologia === t.nome ? 'selected' : '';
+      tipoOpts += '<option value="' + TONIO_escapeHtml(t.nome) + '" ' + sel + '>' + TONIO_escapeHtml(t.nome) + '</option>';
+    });
+    var statoOpts = '<option value="">— Seleziona —</option>';
+    stati.slice().sort(function(a,b){return a.ordine-b.ordine;}).forEach(function(s){
+      var sel = c && c.stato === s.nome ? 'selected' : '';
+      statoOpts += '<option value="' + TONIO_escapeHtml(s.nome) + '" ' + sel + '>' + TONIO_escapeHtml(s.nome) + '</option>';
+    });
+
+    var v = function(field) { return c ? TONIO_escapeHtml(c[field] || '') : ''; };
+
+    page.innerHTML = ''
+      + '<div class="panel">'
+
+      /* HEADER SCHEDA con gradiente blu */
+      + '<div class="panel-header" style="background:linear-gradient(135deg,#1e3a6e 0%,#1a4080 50%,#1e3a6e 100%);border-bottom:none;">'
+      +   '<button class="btn btn-ghost btn-sm" onclick="MSK_Clienti.tornaLista()" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);color:#fff;">← Lista</button>'
+      +   '<div class="panel-header-icon" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2)">👤</div>'
+      +   '<div>'
+      +     '<div class="panel-header-title" id="scheda-nome" style="color:#fff;font-size:19px">' + nom + '</div>'
+      +     '<div class="panel-header-sub" id="scheda-sub" style="color:rgba(255,255,255,0.6)">' + sub + '</div>'
+      +   '</div>'
+      +   '<div class="panel-header-actions">'
+      +     '<button class="btn btn-sm" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff" onclick="MSK_Clienti.tornaLista()">✕ Annulla</button>'
+      +     '<button class="btn btn-primary btn-sm" onclick="MSK_Clienti.salva()">💾 Salva</button>'
+      +   '</div>'
+      + '</div>'
+
+      /* TABS */
+      + '<div class="tabs-bar" id="scheda-tabs">'
+      +   '<button class="tab-btn active" onclick="TONIO_setTab(\'scheda-tabs-body\',\'principale\',this)">📋 Principale</button>'
+      +   '<button class="tab-btn" onclick="TONIO_setTab(\'scheda-tabs-body\',\'fiscali\',this)">🏦 Dati Fiscali</button>'
+      +   '<button class="tab-btn" onclick="TONIO_setTab(\'scheda-tabs-body\',\'bancari\',this)">💳 Dati Bancari</button>'
+      +   '<button class="tab-btn" onclick="TONIO_setTab(\'scheda-tabs-body\',\'collaboratori\',this)">👥 Collaboratori</button>'
+      +   '<button class="tab-btn" onclick="TONIO_setTab(\'scheda-tabs-body\',\'annotazioni\',this)">📝 Annotazioni</button>'
+      + '</div>'
+
+      + '<div id="scheda-tabs-body">'
+
+      /* TAB PRINCIPALE */
+      + '<div class="tab-panel active" id="scheda-tabs-body-tab-principale">'
+      +   '<div class="form-grid">'
+      +     '<div class="form-grid form-grid-2">'
+      +       '<div class="form-group"><label class="form-label">Tipologia</label>'
+      +         '<select class="form-select" id="f-tipo" onchange="MSK_Clienti.aggiornaHeader()">' + tipoOpts + '</select></div>'
+      +       '<div class="form-group"><label class="form-label">Stato</label>'
+      +         '<select class="form-select" id="f-stato" onchange="MSK_Clienti.aggiornaHeader()">' + statoOpts + '</select></div>'
+      +     '</div>'
+      +     '<div class="form-group"><label class="form-label">Ragione Sociale / Nominativo *</label>'
+      +       '<input class="form-input" id="f-nominativo" value="' + v('nominativo') + '" placeholder="Es. Rossi Mario / Azienda Srl" oninput="MSK_Clienti.aggiornaHeader()"></div>'
+      +     '<div class="form-grid form-grid-2">'
+      +       '<div class="form-group"><label class="form-label">Cellulare</label>'
+      +         '<input class="form-input" id="f-cellulare" value="' + v('cellulare') + '" placeholder="+39 …"></div>'
+      +       '<div class="form-group"><label class="form-label">Telefono</label>'
+      +         '<input class="form-input" id="f-telefono" value="' + v('telefono') + '" placeholder="+39 …"></div>'
+      +     '</div>'
+      +     '<div class="form-group"><label class="form-label">E-Mail</label>'
+      +       '<input class="form-input" id="f-mail" type="email" value="' + v('mail') + '" placeholder="esempio@mail.it"></div>'
+      +     '<div class="form-group"><label class="form-label">Sito Web</label>'
+      +       '<input class="form-input" id="f-web" value="' + v('web') + '" placeholder="https://…"></div>'
+      +     '<div class="form-group"><label class="form-label">Note</label>'
+      +       '<textarea class="form-textarea" id="f-note" placeholder="Note libere…">' + v('note') + '</textarea></div>'
+      +   '</div>'
+      + '</div>'
+
+      /* TAB FISCALI */
+      + '<div class="tab-panel" id="scheda-tabs-body-tab-fiscali">'
+      +   '<div class="form-grid">'
+      +     '<div class="form-group"><label class="form-label">Codice Fiscale</label><input class="form-input" id="f-cf" value="' + v('cf') + '" placeholder="RSSMRA80A01H501Z"></div>'
+      +     '<div class="form-group"><label class="form-label">Partita IVA</label><input class="form-input" id="f-piva" value="' + v('piva') + '" placeholder="01234567890"></div>'
+      +     '<div class="form-group"><label class="form-label">Indirizzo</label><input class="form-input" id="f-indirizzo" value="' + v('indirizzo') + '" placeholder="Via …"></div>'
+      +     '<div class="form-grid form-grid-3">'
+      +       '<div class="form-group"><label class="form-label">CAP</label><input class="form-input" id="f-cap" value="' + v('cap') + '" placeholder="00100"></div>'
+      +       '<div class="form-group"><label class="form-label">Città</label><input class="form-input" id="f-citta" value="' + v('citta') + '" placeholder="Roma"></div>'
+      +       '<div class="form-group"><label class="form-label">Prov.</label><input class="form-input" id="f-prov" value="' + v('prov') + '" placeholder="RM" maxlength="3"></div>'
+      +     '</div>'
+      +     '<div class="form-group"><label class="form-label">Paese</label><input class="form-input" id="f-paese" value="' + (c && c.paese ? TONIO_escapeHtml(c.paese) : 'Italia') + '"></div>'
+      +     '<div class="form-group"><label class="form-label">Codice SDI / PEC</label><input class="form-input" id="f-sdi" value="' + v('sdi') + '" placeholder="Codice SDI o PEC"></div>'
+      +   '</div>'
+      + '</div>'
+
+      /* TAB BANCARI */
+      + '<div class="tab-panel" id="scheda-tabs-body-tab-bancari">'
+      +   '<div class="form-grid">'
+      +     '<div class="form-group"><label class="form-label">Banca</label><input class="form-input" id="f-banca" value="' + v('banca') + '" placeholder="Nome banca"></div>'
+      +     '<div class="form-group"><label class="form-label">IBAN</label><input class="form-input" id="f-iban" value="' + v('iban') + '" placeholder="IT60 X054 …"></div>'
+      +     '<div class="form-grid form-grid-2">'
+      +       '<div class="form-group"><label class="form-label">BIC / SWIFT</label><input class="form-input" id="f-bic" value="' + v('bic') + '" placeholder="UNCRITM1…"></div>'
+      +       '<div class="form-group"><label class="form-label">Intestatario conto</label><input class="form-input" id="f-intestatario" value="' + v('intestatario') + '" placeholder="Nome…"></div>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>'
+
+      /* TAB COLLABORATORI */
+      + '<div class="tab-panel" id="scheda-tabs-body-tab-collaboratori">'
+      +   '<div id="collab-list"></div>'
+      +   '<button class="btn btn-ghost" style="width:100%;margin-top:4px" onclick="MSK_Clienti.addCollab()">＋ Aggiungi Collaboratore</button>'
+      + '</div>'
+
+      /* TAB ANNOTAZIONI */
+      + '<div class="tab-panel" id="scheda-tabs-body-tab-annotazioni">'
+      +   '<div class="form-group"><label class="form-label">Annotazioni interne</label>'
+      +     '<textarea class="form-textarea" id="f-annotazioni" style="min-height:220px" placeholder="Annotazioni private, promemoria…">' + v('annotazioni') + '</textarea></div>'
+      + '</div>'
+
+      + '</div>' // scheda-tabs-body
+      + '</div>'; // panel
+
+    /* collaboratori */
+    collabCnt = 0;
+    if (c && c.collaboratori) {
+      c.collaboratori.forEach(function(col) { addCollab(col); });
+    }
+  }
+
+  /* ================================================================
+     AZIONI LISTA
+     ================================================================ */
+  function nuovoCliente() {
+    currentId = null;
+    renderScheda(null, true);
+    TONIO_showPage('clienti');
+  }
+
+  function apriCliente(id) {
+    currentId = id;
+    var c = clienti.find(function(x) { return x.id === id; });
+    if (!c) return;
+    renderScheda(c, false);
+    TONIO_showPage('clienti');
+  }
+
+  function tornaLista() {
+    currentId = null;
+    renderLista();
+    TONIO_showPage('clienti');
+  }
+
+  function eliminaCliente(id) {
+    if (!confirm('Eliminare questo cliente?')) return;
+    clienti = clienti.filter(function(x) { return x.id !== id; });
+    renderLista();
+  }
+
+  /* ================================================================
+     SALVA
+     ================================================================ */
+  function salva() {
+    var nom = (document.getElementById('f-nominativo') || {}).value || '';
+    nom = nom.trim();
+    if (!nom) { alert('Il campo Nominativo è obbligatorio'); return; }
+
+    var data = {
+      nominativo:   nom,
+      tipologia:    _val('f-tipo'),
+      stato:        _val('f-stato'),
+      cellulare:    _val('f-cellulare'),
+      telefono:     _val('f-telefono'),
+      mail:         _val('f-mail'),
+      web:          _val('f-web'),
+      note:         _val('f-note'),
+      cf:           _val('f-cf'),
+      piva:         _val('f-piva'),
+      indirizzo:    _val('f-indirizzo'),
+      cap:          _val('f-cap'),
+      citta:        _val('f-citta'),
+      prov:         _val('f-prov'),
+      paese:        _val('f-paese'),
+      sdi:          _val('f-sdi'),
+      banca:        _val('f-banca'),
+      iban:         _val('f-iban'),
+      bic:          _val('f-bic'),
+      intestatario: _val('f-intestatario'),
+      annotazioni:  _val('f-annotazioni'),
+      collaboratori: _collectCollabs()
+    };
+
+    if (currentId) {
+      var idx = clienti.findIndex(function(x) { return x.id === currentId; });
+      if (idx > -1) clienti[idx] = Object.assign(clienti[idx], data);
+    } else {
+      var newId = clienti.length > 0 ? Math.max.apply(null, clienti.map(function(x){return x.id;})) + 1 : 1;
+      data.id = newId;
+      clienti.push(data);
+      currentId = newId;
+    }
+
+    /* aggiorna header scheda */
+    var hn = document.getElementById('scheda-nome');
+    var hs = document.getElementById('scheda-sub');
+    if (hn) hn.textContent = nom;
+    if (hs) hs.textContent = [data.tipologia, data.stato].filter(Boolean).join(' · ') || 'Scheda cliente';
+  }
+
+  /* ================================================================
+     COLLABORATORI
+     ================================================================ */
+  function addCollab(data) {
+    collabCnt++;
+    var idx = collabCnt;
+    var d = data || {};
+    var list = document.getElementById('collab-list');
+    if (!list) return;
+
+    var isFirst = list.children.length === 0;
+    var div = document.createElement('div');
+    div.className = 'collab-card';
+    div.id = 'collab-' + idx;
+    div.innerHTML = ''
+      + '<div class="collab-card-header">'
+      +   '<div class="collab-order-btns">'
+      +     '<button class="collab-order-btn" onclick="MSK_Clienti.moveCollab(' + idx + ',-1)">▲</button>'
+      +     '<button class="collab-order-btn" onclick="MSK_Clienti.moveCollab(' + idx + ',1)">▼</button>'
+      +   '</div>'
+      +   '<span class="collab-badge-ref" id="collab-badge-' + idx + '">' + (isFirst ? 'REFERENTE' : '#' + idx) + '</span>'
+      +   '<button class="collab-remove-btn" onclick="MSK_Clienti.removeCollab(' + idx + ')">🗑</button>'
+      + '</div>'
+      + '<div class="collab-grid">'
+      +   '<div class="form-group" style="grid-column:1/-1"><label class="form-label">Nome e Cognome</label>'
+      +     '<input class="form-input" id="collab-nome-' + idx + '" value="' + TONIO_escapeHtml(d.nome||'') + '" placeholder="Nome Cognome"></div>'
+      +   '<div class="form-group"><label class="form-label">Ruolo / Qualifica</label>'
+      +     '<input class="form-input" id="collab-ruolo-' + idx + '" value="' + TONIO_escapeHtml(d.ruolo||'') + '" placeholder="Es. Referente"></div>'
+      +   '<div class="form-group"><label class="form-label">Cellulare</label>'
+      +     '<input class="form-input" id="collab-cell-' + idx + '" value="' + TONIO_escapeHtml(d.cellulare||'') + '" placeholder="+39 …"></div>'
+      +   '<div class="form-group"><label class="form-label">Telefono</label>'
+      +     '<input class="form-input" id="collab-tel-' + idx + '" value="' + TONIO_escapeHtml(d.telefono||'') + '" placeholder="+39 …"></div>'
+      +   '<div class="form-group"><label class="form-label">E-Mail</label>'
+      +     '<input class="form-input" id="collab-mail-' + idx + '" value="' + TONIO_escapeHtml(d.mail||'') + '" placeholder="mail&#64;…"></div>'
+      +   '<div class="form-group" style="grid-column:1/-1"><label class="form-label">Note</label>'
+      +     '<textarea class="form-textarea" id="collab-note-' + idx + '" style="min-height:58px" placeholder="Note…">' + TONIO_escapeHtml(d.note||'') + '</textarea></div>'
+      + '</div>';
+    list.appendChild(div);
+    _updateCollabBadges();
+  }
+
+  function removeCollab(idx) {
+    var el = document.getElementById('collab-' + idx);
+    if (el) el.remove();
+    _updateCollabBadges();
+  }
+
+  function moveCollab(idx, dir) {
+    var list = document.getElementById('collab-list');
+    var el = document.getElementById('collab-' + idx);
+    if (!el || !list) return;
+    if (dir === -1 && el.previousElementSibling) list.insertBefore(el, el.previousElementSibling);
+    else if (dir === 1 && el.nextElementSibling) list.insertBefore(el.nextElementSibling, el);
+    _updateCollabBadges();
+  }
+
+  function _updateCollabBadges() {
+    var list = document.getElementById('collab-list');
+    if (!list) return;
+    Array.from(list.children).forEach(function(card, i) {
+      var n = card.id.replace('collab-', '');
+      var badge = document.getElementById('collab-badge-' + n);
+      if (badge) badge.textContent = i === 0 ? 'REFERENTE' : '#' + (i + 1);
+    });
+  }
+
+  function _collectCollabs() {
+    var list = document.getElementById('collab-list');
+    if (!list) return [];
+    return Array.from(list.children).map(function(card, i) {
+      var n = card.id.replace('collab-', '');
+      var g = function(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+      return {
+        ordine: i + 1,
+        nome: g('collab-nome-' + n),
+        ruolo: g('collab-ruolo-' + n),
+        cellulare: g('collab-cell-' + n),
+        telefono: g('collab-tel-' + n),
+        mail: g('collab-mail-' + n),
+        note: g('collab-note-' + n)
+      };
+    });
+  }
+
+  /* ================================================================
+     MODAL TIPOLOGIE
+     ================================================================ */
+  function openModalTipologie() {
+    _renderTipologieModal();
+    document.getElementById('modal-tipologie').classList.add('open');
+  }
+
+  function _renderTipologieModal() {
+    var tbody = document.getElementById('tipo-tbody');
+    tbody.innerHTML = tipologie.slice().sort(function(a,b){return a.ordine-b.ordine;}).map(function(t,i){
+      return '<tr>'
+        + '<td style="color:var(--text3);font-size:12px;width:30px">' + t.id + '</td>'
+        + '<td style="width:70px">'
+        +   '<button class="btn btn-ghost btn-sm" onclick="MSK_Clienti._moveTipo(' + i + ',-1)">▲</button> '
+        +   '<button class="btn btn-ghost btn-sm" onclick="MSK_Clienti._moveTipo(' + i + ',1)">▼</button>'
+        + '</td>'
+        + '<td><input class="lookup-input" id="tipo-nome-' + t.id + '" value="' + TONIO_escapeHtml(t.nome) + '"></td>'
+        + '<td style="width:110px;display:flex;align-items:center;gap:8px;padding-top:13px">'
+        +   '<input type="color" class="color-swatch" id="tipo-col-' + t.id + '" value="' + t.colore + '">'
+        +   '<span id="tipo-preview-' + t.id + '" class="badge" style="background:' + t.colore + '22;color:' + t.colore + ';border:1px solid ' + t.colore + '44">' + TONIO_escapeHtml(t.nome) + '</span>'
+        + '</td>'
+        + '<td style="width:40px"><button class="btn btn-danger btn-sm" onclick="MSK_Clienti._delTipo(' + t.id + ')">🗑</button></td>'
+        + '</tr>';
+    }).join('');
+
+    tipologie.forEach(function(t) {
+      var col = document.getElementById('tipo-col-' + t.id);
+      var nom = document.getElementById('tipo-nome-' + t.id);
+      var prev = document.getElementById('tipo-preview-' + t.id);
+      if (col) col.addEventListener('input', function() {
+        if (prev) { prev.style.background = this.value+'22'; prev.style.color = this.value; prev.style.borderColor = this.value+'44'; }
+      });
+      if (nom) nom.addEventListener('input', function() { if (prev) prev.textContent = this.value; });
+    });
+  }
+
+  function _moveTipo(idx, dir) {
+    var sorted = tipologie.slice().sort(function(a,b){return a.ordine-b.ordine;});
+    var ni = idx + dir;
+    if (ni < 0 || ni >= sorted.length) return;
+    var tmp = sorted[idx].ordine; sorted[idx].ordine = sorted[ni].ordine; sorted[ni].ordine = tmp;
+    _renderTipologieModal();
+  }
+
+  function _delTipo(id) {
+    if (!confirm('Eliminare?')) return;
+    tipologie = tipologie.filter(function(x){return x.id!==id;});
+    _renderTipologieModal();
+  }
+
+  function addTipologia() {
+    var newId = tipologie.length > 0 ? Math.max.apply(null,tipologie.map(function(x){return x.id;})) + 1 : 1;
+    tipologie.push({ id: newId, ordine: tipologie.length+1, nome: 'Nuova Tipologia', colore: '#2563eb' });
+    _renderTipologieModal();
+  }
+
+  function saveTipologie() {
+    tipologie = tipologie.map(function(t){
+      return Object.assign({}, t, {
+        nome:   (document.getElementById('tipo-nome-'+t.id)||{}).value || t.nome,
+        colore: (document.getElementById('tipo-col-'+t.id)||{}).value  || t.colore
+      });
+    });
+    document.getElementById('modal-tipologie').classList.remove('open');
+  }
+
+  /* ================================================================
+     MODAL STATI
+     ================================================================ */
+  function openModalStati() {
+    _renderStatiModal();
+    document.getElementById('modal-stati').classList.add('open');
+  }
+
+  function _renderStatiModal() {
+    var tbody = document.getElementById('stati-tbody');
+    tbody.innerHTML = stati.slice().sort(function(a,b){return a.ordine-b.ordine;}).map(function(s,i){
+      return '<tr>'
+        + '<td style="color:var(--text3);font-size:12px;width:30px">' + s.id + '</td>'
+        + '<td style="width:70px">'
+        +   '<button class="btn btn-ghost btn-sm" onclick="MSK_Clienti._moveStato(' + i + ',-1)">▲</button> '
+        +   '<button class="btn btn-ghost btn-sm" onclick="MSK_Clienti._moveStato(' + i + ',1)">▼</button>'
+        + '</td>'
+        + '<td><input class="lookup-input" id="stato-nome-' + s.id + '" value="' + TONIO_escapeHtml(s.nome) + '"></td>'
+        + '<td style="width:110px;display:flex;align-items:center;gap:8px;padding-top:13px">'
+        +   '<input type="color" class="color-swatch" id="stato-col-' + s.id + '" value="' + s.colore + '">'
+        +   '<span id="stato-preview-' + s.id + '" class="badge" style="background:' + s.colore + '22;color:' + s.colore + ';border:1px solid ' + s.colore + '44">' + TONIO_escapeHtml(s.nome) + '</span>'
+        + '</td>'
+        + '<td style="width:40px"><button class="btn btn-danger btn-sm" onclick="MSK_Clienti._delStato(' + s.id + ')">🗑</button></td>'
+        + '</tr>';
+    }).join('');
+
+    stati.forEach(function(s) {
+      var col = document.getElementById('stato-col-' + s.id);
+      var nom = document.getElementById('stato-nome-' + s.id);
+      var prev = document.getElementById('stato-preview-' + s.id);
+      if (col) col.addEventListener('input', function() {
+        if (prev) { prev.style.background=this.value+'22'; prev.style.color=this.value; prev.style.borderColor=this.value+'44'; }
+      });
+      if (nom) nom.addEventListener('input', function(){ if(prev) prev.textContent=this.value; });
+    });
+  }
+
+  function _moveStato(idx, dir) {
+    var sorted = stati.slice().sort(function(a,b){return a.ordine-b.ordine;});
+    var ni = idx + dir;
+    if (ni < 0 || ni >= sorted.length) return;
+    var tmp = sorted[idx].ordine; sorted[idx].ordine = sorted[ni].ordine; sorted[ni].ordine = tmp;
+    _renderStatiModal();
+  }
+
+  function _delStato(id) {
+    if (!confirm('Eliminare?')) return;
+    stati = stati.filter(function(x){return x.id!==id;});
+    _renderStatiModal();
+  }
+
+  function addStato() {
+    var newId = stati.length > 0 ? Math.max.apply(null,stati.map(function(x){return x.id;})) + 1 : 1;
+    stati.push({ id: newId, ordine: stati.length+1, nome: 'Nuovo Stato', colore: '#059669' });
+    _renderStatiModal();
+  }
+
+  function saveStati() {
+    stati = stati.map(function(s){
+      return Object.assign({}, s, {
+        nome:   (document.getElementById('stato-nome-'+s.id)||{}).value || s.nome,
+        colore: (document.getElementById('stato-col-'+s.id)||{}).value  || s.colore
+      });
+    });
+    document.getElementById('modal-stati').classList.remove('open');
+  }
+
+  /* ================================================================
+     AGGIORNA HEADER SCHEDA (live mentre si digita)
+     ================================================================ */
+  function aggiornaHeader() {
+    var nom = (document.getElementById('f-nominativo')||{}).value || 'Nuovo Cliente';
+    var tipo = (document.getElementById('f-tipo')||{}).value || '';
+    var stato = (document.getElementById('f-stato')||{}).value || '';
+    var hn = document.getElementById('scheda-nome');
+    var hs = document.getElementById('scheda-sub');
+    if (hn) hn.textContent = nom;
+    if (hs) hs.textContent = [tipo, stato].filter(Boolean).join(' · ') || 'Scheda cliente';
+  }
+
+  /* ================================================================
+     HELPERS PRIVATI
+     ================================================================ */
+  function _val(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function _tipoColore(nome) {
+    var t = tipologie.find(function(x){return x.nome===nome;});
+    return t ? t.colore : '#64748b';
+  }
+
+  function _statoColore(nome) {
+    var s = stati.find(function(x){return x.nome===nome;});
+    return s ? s.colore : '#64748b';
+  }
+
+  /* ================================================================
+     API PUBBLICA
+     ================================================================ */
+  return {
+    init:               init,
+    nuovoCliente:       nuovoCliente,
+    apriCliente:        apriCliente,
+    tornaLista:         tornaLista,
+    eliminaCliente:     eliminaCliente,
+    salva:              salva,
+    aggiornaHeader:     aggiornaHeader,
+    addCollab:          function(d){ addCollab(d); },
+    removeCollab:       removeCollab,
+    moveCollab:         moveCollab,
+    openModalTipologie: openModalTipologie,
+    openModalStati:     openModalStati,
+    addTipologia:       addTipologia,
+    saveTipologie:      saveTipologie,
+    addStato:           addStato,
+    saveStati:          saveStati,
+    _moveTipo:          _moveTipo,
+    _delTipo:           _delTipo,
+    _moveStato:         _moveStato,
+    _delStato:          _delStato
+  };
+
+})();
+
+/* ---- auto-init quando il DOM è pronto ---- */
+document.addEventListener('DOMContentLoaded', function() {
+  MSK_Clienti.init();
+});
+
+</script>
 
 </body>
 </html>
