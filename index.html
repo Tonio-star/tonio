@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TONIO — Gestionale Immobiliare</title>
+
+<!-- CORE STYLES -->
+<link rel="stylesheet" href="assets/tonio-core.css">
+</head>
+<body>
+
+<!-- ============================================================
+     MOBILE TOPBAR
+     ============================================================ -->
+<div id="mob-topbar">
+  <div class="mob-logo">T<span>O</span>NIO</div>
+  <button id="mob-menu-btn" onclick="TONIO_toggleSidebar()">☰</button>
+</div>
+
+<!-- MOBILE SIDEBAR -->
+<div id="sidebar-overlay" onclick="TONIO_closeSidebar()"></div>
+<nav id="sidebar">
+  <div class="sb-logo">T<span>O</span>NIO</div>
+  <div class="sb-section">
+    <div class="sb-section-title">Anagrafiche</div>
+    <button class="sb-btn" onclick="TONIO_showPage('clienti');TONIO_closeSidebar()">👥 Clienti</button>
+    <button class="sb-btn" onclick="TONIO_showPage('ospiti');TONIO_closeSidebar()">🧑 Ospiti</button>
+    <button class="sb-btn" onclick="TONIO_showPage('immobili');TONIO_closeSidebar()">🏠 Immobili</button>
+    <button class="sb-btn" onclick="TONIO_showPage('fornitori');TONIO_closeSidebar()">🔧 Fornitori</button>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Operativo</div>
+    <button class="sb-btn" onclick="TONIO_showPage('prenotazioni');TONIO_closeSidebar()">📅 Prenotazioni</button>
+    <button class="sb-btn" onclick="TONIO_showPage('contratti');TONIO_closeSidebar()">📄 Contratti</button>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Contabilità</div>
+    <button class="sb-btn" onclick="TONIO_showPage('incassi');TONIO_closeSidebar()">💰 Incassi</button>
+    <button class="sb-btn" onclick="TONIO_showPage('spese');TONIO_closeSidebar()">📊 Spese</button>
+    <button class="sb-btn" onclick="TONIO_showPage('budget');TONIO_closeSidebar()">📈 Budget</button>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Gestione</div>
+    <button class="sb-btn" onclick="TONIO_showPage('manutenzioni');TONIO_closeSidebar()">🔨 Manutenzioni</button>
+    <button class="sb-btn" onclick="TONIO_showPage('documenti');TONIO_closeSidebar()">📁 Documenti</button>
+    <button class="sb-btn" onclick="TONIO_showPage('impostazioni');TONIO_closeSidebar()">⚙️ Impostazioni</button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     DESKTOP NAV
+     ============================================================ -->
+<div id="desk-nav">
+  <div class="nav-r1">
+    <div class="nav-logo">T<span>O</span>NIO <small>GESTIONALE</small></div>
+    <div class="nav-sep"></div>
+    <button class="nav-main-btn active" id="nav-main-anagrafiche" onclick="TONIO_setModule('anagrafiche')">👤 Anagrafiche</button>
+    <button class="nav-main-btn" id="nav-main-operativo"    onclick="TONIO_setModule('operativo')">📅 Operativo</button>
+    <button class="nav-main-btn" id="nav-main-contabilita"  onclick="TONIO_setModule('contabilita')">💰 Contabilità</button>
+    <button class="nav-main-btn" id="nav-main-gestione"     onclick="TONIO_setModule('gestione')">⚙️ Gestione</button>
+    <div class="nav-spacer"></div>
+  </div>
+  <div class="nav-r2" id="nav-r2"><!-- built by JS --></div>
+</div>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main id="main">
+
+  <!-- CLIENTI — gestito da Msk_Clienti.js -->
+  <div id="page-clienti" class="page active"></div>
+
+  <!-- PLACEHOLDER PAGES (futuri moduli) -->
+  <div id="page-ospiti"       class="page"><div class="coming-soon"><div class="cs-icon">🧑</div><h2>Ospiti</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-immobili"     class="page"><div class="coming-soon"><div class="cs-icon">🏠</div><h2>Immobili</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-fornitori"    class="page"><div class="coming-soon"><div class="cs-icon">🔧</div><h2>Fornitori</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-prenotazioni" class="page"><div class="coming-soon"><div class="cs-icon">📅</div><h2>Prenotazioni</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-contratti"    class="page"><div class="coming-soon"><div class="cs-icon">📄</div><h2>Contratti</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-incassi"      class="page"><div class="coming-soon"><div class="cs-icon">💰</div><h2>Incassi</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-spese"        class="page"><div class="coming-soon"><div class="cs-icon">📊</div><h2>Spese</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-budget"       class="page"><div class="coming-soon"><div class="cs-icon">📈</div><h2>Budget</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-manutenzioni" class="page"><div class="coming-soon"><div class="cs-icon">🔨</div><h2>Manutenzioni</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-documenti"    class="page"><div class="coming-soon"><div class="cs-icon">📁</div><h2>Documenti</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-impostazioni" class="page"><div class="coming-soon"><div class="cs-icon">⚙️</div><h2>Impostazioni</h2><p>Modulo in sviluppo</p></div></div>
+
+</main>
+
+<!-- ============================================================
+     MODAL TIPOLOGIE
+     ============================================================ -->
+<div class="modal-overlay" id="modal-tipologie">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">🏷️</span>
+      <div class="modal-title">Tipologie Cliente</div>
+      <button class="modal-close" onclick="document.getElementById('modal-tipologie').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="tipo-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Clienti.addTipologia()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Clienti.saveTipologie()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-tipologie').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL STATI
+     ============================================================ -->
+<div class="modal-overlay" id="modal-stati">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">🔵</span>
+      <div class="modal-title">Stati Cliente</div>
+      <button class="modal-close" onclick="document.getElementById('modal-stati').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="stati-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Clienti.addStato()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Clienti.saveStati()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-stati').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPTS — ordine importante:
+     1. Dati (mai toccare)
+     2. Core (navigazione e utility)
+     3. Moduli (uno per modulo)
+     ============================================================ -->
+<script src="dati/Dati_Clienti.js"></script>
+<script src="assets/tonio-core.js"></script>
+<script src="moduli/Msk_Clienti.js"></script>
+
+</body>
+</html>
