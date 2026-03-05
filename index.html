@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="cf-2fa-verify" content="off">
 <title>TONIO — Msk_Clienti_Anagrafica</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -160,8 +161,8 @@
   .panel-header-right { display: flex; align-items: center; gap: 8px; }
 
   /* TABS */
-  .tabs-bar { display: flex; border-bottom: 2px solid var(--border); background: #fafbfd; padding: 0 24px; overflow-x: auto; }
-  .tab { padding: 12px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 7px; }
+  .tabs-bar { display: flex; border-bottom: 2px solid var(--border); background: #fafbfd; padding: 0 24px; overflow-x: auto; position: relative; z-index: 1; }
+  .tab { padding: 12px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 7px; position: relative; z-index: 2; }
   .tab:hover { color: var(--primary); }
   .tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
   .tab-content { display: none; padding: 24px; }
@@ -415,7 +416,7 @@
                 <td><span class="badge badge-blue"><span class="badge-dot"></span>Agenzia Viaggi</span></td>
                 <td><span class="badge badge-success"><span class="badge-dot"></span>Contrattualizzato</span></td>
                 <td><div style="font-size:13px">+39 06 123456789</div><div class="sub">📱 +39 333 123456789</div></td>
-                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="95e5e7fae6e6fcd5f2f8f4fcf9bbf6faf8">[email&#160;protected]</a></td>
+                <td style="font-size:12px;color:var(--text-muted)">prossi&#64;gmail&#46;com</td>
                 <td><div class="note-cell">Agenzia molto importante e molto esigente. Sconto concordato 12%.</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -424,7 +425,7 @@
                 <td><span class="badge badge-indigo"><span class="badge-dot"></span>OTA</span></td>
                 <td><span class="badge badge-warning"><span class="badge-dot"></span>Prospect</span></td>
                 <td><div style="font-size:13px">+39 02 987654321</div></td>
-                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="98f1ecf9f4f1f9d8faf7f7f3f1f6ffb6fbf7f5">[email&#160;protected]</a></td>
+                <td style="font-size:12px;color:var(--text-muted)">italia&#64;booking&#46;com</td>
                 <td><div class="note-cell">—</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -433,7 +434,7 @@
                 <td><span class="badge badge-gray"><span class="badge-dot"></span>Privato</span></td>
                 <td><span class="badge" style="background:rgba(124,58,237,.1);color:#7c3aed"><span class="badge-dot" style="background:#8b5cf6"></span>VIP</span></td>
                 <td><div style="font-size:13px">📱 +39 333 111222333</div></td>
-                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="036e62716a6c2d716c70706a43646e626a6f2d606c6e">[email&#160;protected]</a></td>
+                <td style="font-size:12px;color:var(--text-muted)">mario&#46;rossi&#64;gmail&#46;com</td>
                 <td><div class="note-cell">Cliente fidelizzato dal 2018. Prenota sempre ad agosto.</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -442,7 +443,7 @@
                 <td><span class="badge badge-blue"><span class="badge-dot"></span>Tour Operator</span></td>
                 <td><span class="badge badge-danger"><span class="badge-dot"></span>Blacklist</span></td>
                 <td><div style="font-size:13px">+39 055 444555666</div></td>
-                <td style="font-size:12px;color:var(--text-muted)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="147d7a727b54757779716066756271783a7d60">[email&#160;protected]</a></td>
+                <td style="font-size:12px;color:var(--text-muted)">info&#64;acmetravel&#46;it</td>
                 <td><div class="note-cell">Inserita in blacklist per mancati pagamenti.</div></td>
                 <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
               </tr>
@@ -717,7 +718,7 @@
   </div><!-- /content -->
 </div><!-- /main -->
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false">
 // ═══════════════════════════════════════
 //  NAVIGATION STRUCTURE
 // ═══════════════════════════════════════
@@ -869,6 +870,9 @@ function closeSidebar() {
 // Init
 renderSubMenu('anagrafiche', 'page-clienti');
 renderActionButtons('page-clienti');
+
+// DATA
+let tipologie = [
   {id:1,order:1,label:'Agenzia Viaggi',color:'#2563eb'},
   {id:2,order:2,label:'Tour Operator', color:'#7c3aed'},
   {id:3,order:3,label:'OTA',           color:'#6366f1'},
