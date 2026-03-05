@@ -9,18 +9,14 @@
   :root {
     --bg: #f0f2f7;
     --sidebar-bg: #0f1623;
-    --sidebar-accent: #1e2d45;
     --primary: #2563eb;
     --primary-light: #3b82f6;
     --primary-glow: rgba(37,99,235,0.18);
-    --accent: #0ea5e9;
-    --accent2: #6366f1;
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
     --card: #ffffff;
     --border: #e2e8f0;
-    --border-focus: #2563eb;
     --text: #0f172a;
     --text-muted: #64748b;
     --text-light: #94a3b8;
@@ -31,277 +27,88 @@
     --shadow: 0 1px 4px rgba(15,23,42,0.08), 0 4px 16px rgba(15,23,42,0.06);
     --shadow-card: 0 2px 8px rgba(15,23,42,0.10), 0 8px 32px rgba(15,23,42,0.07);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    overflow-x: hidden;
-  }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: 230px;
-    min-height: 100vh;
-    background: var(--sidebar-bg);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    left: 0; top: 0; bottom: 0;
-    z-index: 100;
-    transition: width .3s;
-  }
-  .sidebar-logo {
-    padding: 24px 20px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-  }
-  .sidebar-logo .logo-text {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    background: linear-gradient(135deg, #60a5fa, #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .sidebar-logo .logo-sub {
-    font-size: 10px;
-    color: var(--text-light);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
+  /* SIDEBAR */
+  .sidebar { width: 230px; min-height: 100vh; background: var(--sidebar-bg); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; transition: width .3s; overflow: hidden; }
+  .sidebar-logo { padding: 24px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); white-space: nowrap; }
+  .sidebar-logo .logo-text { font-size: 22px; font-weight: 700; letter-spacing: 3px; background: linear-gradient(135deg,#60a5fa,#818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sidebar-logo .logo-sub { font-size: 10px; color: var(--text-light); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
   .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
-  .nav-section {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.25);
-    padding: 14px 20px 6px;
-  }
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 20px;
-    color: rgba(255,255,255,0.55);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .2s;
-    border-left: 3px solid transparent;
-    text-decoration: none;
-  }
+  .nav-section { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 14px 20px 6px; white-space: nowrap; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; transition: all .2s; white-space: nowrap; }
   .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-  .nav-item.active {
-    color: #60a5fa;
-    background: rgba(37,99,235,0.15);
-    border-left-color: #3b82f6;
-  }
+  .nav-item.active { color: #60a5fa; background: rgba(37,99,235,0.15); border-left-color: #3b82f6; }
   .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
 
-  /* ── MAIN ── */
-  .main {
-    margin-left: 230px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+  /* MAIN */
+  .main { margin-left: 230px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
-  /* ── TOP BAR ── */
-  .topbar {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    padding: 0 28px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    box-shadow: 0 1px 0 var(--border);
-  }
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-  .topbar-left .page-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-  }
+  /* TOPBAR */
+  .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 28px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; gap: 12px; }
+  .topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); min-width: 0; }
+  .topbar-left .page-title { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; }
   .topbar-left .sep { color: var(--border); }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
-    border-radius: var(--radius);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    transition: all .2s;
-  }
-  .btn-primary {
-    background: var(--primary);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.3);
-  }
+  .topbar-left .sub-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all .2s; white-space: nowrap; }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
   .btn-primary:hover { background: var(--primary-light); box-shadow: 0 4px 16px rgba(37,99,235,0.4); transform: translateY(-1px); }
-  .btn-outline {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1.5px solid var(--border);
-  }
+  .btn-outline { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
   .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-glow); }
-  .btn-danger-outline {
-    background: transparent;
-    color: var(--danger);
-    border: 1.5px solid rgba(239,68,68,0.3);
-  }
+  .btn-teal { background: #0d9488; color: #fff; box-shadow: 0 2px 8px rgba(13,148,136,0.3); }
+  .btn-teal:hover { background: #0f766e; transform: translateY(-1px); }
+  .btn-violet { background: #7c3aed; color: #fff; box-shadow: 0 2px 8px rgba(124,58,237,0.3); }
+  .btn-violet:hover { background: #6d28d9; transform: translateY(-1px); }
+  .btn-danger-outline { background: transparent; color: var(--danger); border: 1.5px solid rgba(239,68,68,0.3); }
   .btn-danger-outline:hover { background: rgba(239,68,68,0.08); border-color: var(--danger); }
+  .btn-white { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+  .btn-white:hover { background: rgba(255,255,255,0.22); }
+  .btn-white-primary { background: #2563eb; color: #fff; border: none; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
+  .btn-white-primary:hover { background: #3b82f6; }
   .btn-sm { padding: 5px 11px; font-size: 12px; }
   .btn-icon { padding: 7px; border-radius: 8px; }
 
-  /* ── CONTENT ── */
+  /* CONTENT */
   .content { flex: 1; padding: 24px 28px; }
 
-  /* ── FILTER BAR ── */
-  .filter-bar {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow);
-  }
-  .filter-bar .filter-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    white-space: nowrap;
-  }
-  .search-input {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--input-bg);
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 12px;
-    flex: 1;
-    min-width: 180px;
-    transition: border-color .2s;
-  }
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn .2s ease; }
+
+  /* FILTER BAR */
+  .filter-bar { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; box-shadow: var(--shadow); }
+  .filter-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
+  .search-input { display: flex; align-items: center; gap: 8px; background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 12px; flex: 1; min-width: 180px; transition: border-color .2s; }
   .search-input:focus-within { border-color: var(--primary); background: #fff; }
-  .search-input input {
-    border: none;
-    background: transparent;
-    font-family: inherit;
-    font-size: 13px;
-    color: var(--text);
-    outline: none;
-    width: 100%;
-  }
+  .search-input input { border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text); outline: none; width: 100%; }
   .search-input input::placeholder { color: var(--text-light); }
-  .filter-select {
-    background: var(--input-bg);
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-family: inherit;
-    font-size: 13px;
-    color: var(--text);
-    cursor: pointer;
-    outline: none;
-    transition: border-color .2s;
-    min-width: 150px;
-  }
+  .filter-select { background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 12px; font-family: inherit; font-size: 13px; color: var(--text); cursor: pointer; outline: none; transition: border-color .2s; min-width: 150px; }
   .filter-select:focus { border-color: var(--primary); }
   .filter-divider { width: 1px; height: 24px; background: var(--border); }
 
-  /* ── TABLE ── */
-  .table-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    margin-bottom: 24px;
-  }
-  .table-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  }
+  /* TABLE */
+  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 24px; }
+  .table-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%); }
   .table-header h3 { font-size: 14px; font-weight: 600; color: var(--text); }
-  .table-count {
-    background: var(--primary);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 20px;
-    margin-left: 8px;
-  }
+  .table-count { background: var(--primary); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: 8px; }
   table { width: 100%; border-collapse: collapse; }
-  thead th {
-    padding: 10px 16px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-muted);
-    background: #f8fafc;
-    border-bottom: 2px solid var(--border);
-    white-space: nowrap;
-  }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background .15s;
-    cursor: pointer;
-  }
+  thead th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); background: #f8fafc; border-bottom: 2px solid var(--border); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; cursor: pointer; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: #f8faff; }
   tbody tr.selected { background: rgba(37,99,235,0.05); border-left: 3px solid var(--primary); }
-  td { padding: 11px 16px; font-size: 13px; }
+  td { padding: 11px 16px; font-size: 13px; vertical-align: top; }
   td .nome { font-weight: 600; color: var(--text); }
-  td .sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  td .sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  td .note-cell { font-size: 12px; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
 
-  /* ── BADGES ── */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .badge-success { background: rgba(16,185,129,0.12); color: #059669; }
   .badge-success .badge-dot { background: #10b981; }
   .badge-warning { background: rgba(245,158,11,0.12); color: #d97706; }
@@ -315,383 +122,140 @@
   .badge-danger { background: rgba(239,68,68,0.10); color: #dc2626; }
   .badge-danger .badge-dot { background: #ef4444; }
 
-  /* ── DETAIL PANEL ── */
-  .detail-panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
-    overflow: hidden;
-  }
-
-  /* ── PANEL HEADER ── */
-  .panel-header {
-    background: linear-gradient(135deg, #1e3a5f 0%, #1e2d45 60%, #0f1623 100%);
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
+  /* DETAIL PANEL */
+  .detail-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); overflow: hidden; }
+  .accent-line { height: 3px; background: linear-gradient(90deg,#2563eb,#6366f1,#0ea5e9); }
+  .panel-header { background: linear-gradient(135deg,#1e3a5f 0%,#1e2d45 60%,#0f1623 100%); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .panel-header-left { display: flex; align-items: center; gap: 16px; }
-  .client-avatar {
-    width: 48px; height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(59,130,246,0.4);
-  }
-  .panel-header-info .client-name {
-    font-size: 17px;
-    font-weight: 700;
-    color: #fff;
-  }
-  .panel-header-info .client-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 4px;
-    flex-wrap: wrap;
-  }
-  .panel-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .btn-white {
-    background: rgba(255,255,255,0.12);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(4px);
-  }
-  .btn-white:hover { background: rgba(255,255,255,0.22); }
-  .btn-white-primary {
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.4);
-  }
-  .btn-white-primary:hover { background: #3b82f6; }
+  .client-avatar { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg,#3b82f6,#6366f1); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
+  .panel-header-info .client-name { font-size: 17px; font-weight: 700; color: #fff; }
+  .panel-header-info .client-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+  .panel-header-right { display: flex; align-items: center; gap: 8px; }
 
-  /* ── TABS ── */
-  .tabs-bar {
-    display: flex;
-    border-bottom: 2px solid var(--border);
-    background: #fafbfd;
-    padding: 0 24px;
-    overflow-x: auto;
-    gap: 0;
-  }
-  .tab {
-    padding: 12px 20px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    white-space: nowrap;
-    transition: all .2s;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
+  /* TABS */
+  .tabs-bar { display: flex; border-bottom: 2px solid var(--border); background: #fafbfd; padding: 0 24px; overflow-x: auto; }
+  .tab { padding: 12px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 7px; }
   .tab:hover { color: var(--primary); }
   .tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
-  .tab .tab-icon { font-size: 14px; }
-
-  /* ── TAB CONTENT ── */
   .tab-content { display: none; padding: 24px; }
   .tab-content.active { display: block; }
 
-  /* ── SECTION BLOCKS ── */
-  .section-block {
-    margin-bottom: 24px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .section-title {
-    background: linear-gradient(90deg, var(--section-header) 0%, #1e3a5f 100%);
-    color: #fff;
-    padding: 8px 16px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-title .section-icon { font-size: 13px; opacity: 0.85; }
+  /* SECTION */
+  .section-block { margin-bottom: 24px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .section-title { background: linear-gradient(90deg,var(--section-header) 0%,#1e3a5f 100%); color: #fff; padding: 8px 16px; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
   .section-body { padding: 16px; }
 
-  /* ── FORM GRID ── */
-  .form-grid {
-    display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-  .form-grid-2 { grid-template-columns: repeat(2, 1fr); }
-  .form-grid-3 { grid-template-columns: repeat(3, 1fr); }
-  .form-grid-4 { grid-template-columns: repeat(4, 1fr); }
-  .form-grid-5 { grid-template-columns: repeat(5, 1fr); }
+  /* FORMS */
+  .form-grid { display: grid; gap: 14px; }
+  .form-grid-2 { grid-template-columns: repeat(2,1fr); }
+  .form-grid-3 { grid-template-columns: repeat(3,1fr); }
+  .form-grid-4 { grid-template-columns: repeat(4,1fr); }
+  .form-grid-5 { grid-template-columns: repeat(5,1fr); }
   .col-span-2 { grid-column: span 2; }
   .col-span-3 { grid-column: span 3; }
-  .col-span-full { grid-column: 1 / -1; }
-
   .field-group { display: flex; flex-direction: column; gap: 5px; }
-  .field-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .field-input {
-    background: var(--input-bg);
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-family: inherit;
-    font-size: 13px;
-    color: var(--text);
-    outline: none;
-    transition: all .2s;
-    width: 100%;
-  }
-  .field-input:focus {
-    border-color: var(--primary);
-    background: #fff;
-    box-shadow: 0 0 0 3px var(--primary-glow);
-  }
+  .field-label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); }
+  .field-input { background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: inherit; font-size: 13px; color: var(--text); outline: none; transition: all .2s; width: 100%; }
+  .field-input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-glow); }
   .field-input::placeholder { color: var(--text-light); }
   textarea.field-input { resize: vertical; min-height: 80px; line-height: 1.5; }
   select.field-input { cursor: pointer; }
 
-  /* ── STATUS CHIPS ── */
-  .status-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 4px 0;
-  }
-  .status-chip {
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1.5px solid var(--border);
-    color: var(--text-muted);
-    background: var(--input-bg);
-    transition: all .2s;
-    user-select: none;
-  }
+  /* STATUS CHIPS */
+  .status-group { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+  .status-chip { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); color: var(--text-muted); background: var(--input-bg); transition: all .2s; user-select: none; }
   .status-chip:hover { border-color: var(--primary); color: var(--primary); }
-  .status-chip.active-chip {
-    border-color: currentColor;
-    font-weight: 600;
-  }
+  .status-chip.active-chip { border-color: currentColor; font-weight: 600; }
   .chip-contrattualizzato.active-chip { color: #059669; background: rgba(16,185,129,0.10); border-color: #10b981; }
   .chip-prospect.active-chip { color: #d97706; background: rgba(245,158,11,0.10); border-color: #f59e0b; }
   .chip-blacklist.active-chip { color: #dc2626; background: rgba(239,68,68,0.10); border-color: #ef4444; }
   .chip-sospeso.active-chip { color: #475569; background: rgba(100,116,139,0.10); border-color: #94a3b8; }
   .chip-vip.active-chip { color: #7c3aed; background: rgba(124,58,237,0.10); border-color: #8b5cf6; }
 
-  /* ── TOGGLE ── */
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-  }
+  /* TOGGLE */
+  .toggle-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
   .toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
   .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider {
-    position: absolute; inset: 0;
-    background: var(--border);
-    border-radius: 22px;
-    cursor: pointer;
-    transition: .3s;
-  }
-  .toggle-slider:before {
-    content: '';
-    position: absolute;
-    width: 16px; height: 16px;
-    left: 3px; bottom: 3px;
-    background: #fff;
-    border-radius: 50%;
-    transition: .3s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
+  .toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 22px; cursor: pointer; transition: .3s; }
+  .toggle-slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
   .toggle input:checked + .toggle-slider { background: var(--primary); }
   .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
   .toggle-label { font-size: 13px; font-weight: 500; color: var(--text); }
 
-  /* ── COLLABORATORI ── */
+  /* COLLABORATORI */
   .collab-list { display: flex; flex-direction: column; gap: 14px; }
-  .collab-card {
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    transition: box-shadow .2s, border-color .2s;
-    background: #fafbfd;
-  }
+  .collab-card { border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; background: #fafbfd; transition: box-shadow .2s, border-color .2s; }
   .collab-card:hover { box-shadow: var(--shadow); border-color: #cbd5e1; }
-  .collab-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    background: linear-gradient(90deg, #f1f5f9 0%, #f8fafc 100%);
-    border-bottom: 1px solid var(--border);
-    gap: 12px;
-  }
-  .collab-card-header-left { display: flex; align-items: center; gap: 10px; }
-  .collab-order-badge {
-    width: 28px; height: 28px;
-    background: var(--primary);
-    color: #fff;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    flex-shrink: 0;
-    cursor: grab;
-  }
-  .collab-name-input {
-    border: none;
-    background: transparent;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    outline: none;
-    flex: 1;
-    min-width: 120px;
-  }
+  .collab-card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: linear-gradient(90deg,#f1f5f9 0%,#f8fafc 100%); border-bottom: 1px solid var(--border); gap: 12px; }
+  .collab-card-header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .collab-order-badge { width: 28px; height: 28px; background: var(--primary); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; cursor: grab; }
+  .collab-name-input { border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text); outline: none; flex: 1; min-width: 80px; }
   .collab-name-input::placeholder { color: var(--text-light); font-weight: 400; }
   .collab-card-header-right { display: flex; gap: 6px; flex-shrink: 0; }
   .collab-body { padding: 14px 16px; }
-
-  /* ── DRAG HANDLE AREA ── */
-  .order-input-group { display: flex; align-items: center; gap: 8px; }
   .order-arrows { display: flex; flex-direction: column; gap: 2px; }
-  .order-arrow {
-    width: 20px; height: 18px;
-    background: var(--input-bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 9px;
-    color: var(--text-muted);
-    transition: all .15s;
-  }
+  .order-arrow { width: 20px; height: 18px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 9px; color: var(--text-muted); transition: all .15s; }
   .order-arrow:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
-
-  /* ── DIVIDER ── */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
-    margin: 16px 0;
-  }
-
-  /* ── ADD BUTTON ROW ── */
-  .add-row {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 8px;
-  }
-  .btn-add {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: var(--primary-glow);
-    color: var(--primary);
-    border: 1.5px dashed rgba(37,99,235,0.4);
-    border-radius: var(--radius);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
-  }
+  .add-row { display: flex; justify-content: flex-start; margin-top: 8px; }
+  .btn-add { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--primary-glow); color: var(--primary); border: 1.5px dashed rgba(37,99,235,0.4); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
   .btn-add:hover { background: rgba(37,99,235,0.12); border-color: var(--primary); }
 
-  /* ── ANNOTATIONS ── */
-  .annotation-card {
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    background: #fafbfd;
-    margin-bottom: 10px;
-    transition: border-color .2s;
-  }
-  .annotation-card:hover { border-color: #cbd5e1; }
-  .annotation-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
+  /* ANNOTATION */
+  .annotation-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px 16px; background: #fafbfd; margin-bottom: 10px; }
+  .annotation-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .annotation-date { font-size: 11px; color: var(--text-light); font-family: 'DM Mono', monospace; }
+  .divider { height: 1px; background: linear-gradient(90deg,transparent,var(--border) 30%,var(--border) 70%,transparent); margin: 16px 0; }
 
-  /* ── ACCENT LINE ── */
-  .accent-line {
-    height: 3px;
-    background: linear-gradient(90deg, #2563eb, #6366f1, #0ea5e9);
-    border-radius: 0 0 0 0;
-  }
+  /* SUB PAGES */
+  .subpage-header { margin-bottom: 24px; }
+  .subpage-header h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .subpage-header p { font-size: 13px; color: var(--text-muted); }
+  .sub-table-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
+  .sub-table-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%); }
+  .sub-thead { display: grid; background: #f8fafc; border-bottom: 2px solid var(--border); grid-template-columns: 52px 90px 1fr 180px 80px; }
+  .sub-thead > span { padding: 10px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+  .sub-thead > span.center { text-align: center; }
+  .sub-row { display: grid; align-items: center; border-bottom: 1px solid var(--border); grid-template-columns: 52px 90px 1fr 180px 80px; transition: background .15s; }
+  .sub-row:last-child { border-bottom: none; }
+  .sub-row:hover { background: #f8faff; }
+  .sub-row > div { padding: 10px 14px; }
+  .row-id { font-family: 'DM Mono',monospace; font-size: 12px; color: var(--text-light); text-align: center; }
+  .row-order { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .order-num { font-size: 13px; font-weight: 600; color: var(--text-muted); min-width: 16px; text-align: center; }
+  .sub-input { border: 1.5px solid transparent; border-radius: 7px; padding: 6px 10px; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text); background: transparent; outline: none; width: 100%; transition: all .2s; }
+  .sub-input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-glow); }
+  .sub-input::placeholder { color: var(--text-light); font-weight: 400; }
+  .row-color-cell { display: flex; align-items: center; gap: 10px; }
+  .color-preview { width: 26px; height: 26px; border-radius: 7px; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+  .color-preview:hover { transform: scale(1.2); }
+  .color-input-hidden { width: 0; height: 0; opacity: 0; position: absolute; }
+  .badge-preview { padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .row-actions { display: flex; gap: 6px; justify-content: center; }
+  .empty-row { padding: 32px; text-align: center; color: var(--text-light); font-size: 13px; }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 1024px) {
-    .form-grid-4 { grid-template-columns: repeat(2, 1fr); }
-    .form-grid-5 { grid-template-columns: repeat(2, 1fr); }
-    .form-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    .form-grid-4 { grid-template-columns: repeat(2,1fr); }
+    .form-grid-5 { grid-template-columns: repeat(2,1fr); }
+    .form-grid-3 { grid-template-columns: repeat(2,1fr); }
+    .sub-thead, .sub-row { grid-template-columns: 44px 80px 1fr 150px 64px; }
   }
   @media (max-width: 768px) {
-    .sidebar { width: 0; overflow: hidden; }
+    .sidebar { width: 0; }
     .main { margin-left: 0; }
     .content { padding: 16px; }
     .topbar { padding: 0 16px; }
-    .form-grid, .form-grid-2, .form-grid-3, .form-grid-4, .form-grid-5 {
-      grid-template-columns: 1fr;
-    }
-    .col-span-2, .col-span-3 { grid-column: span 1; }
-    .panel-header { flex-direction: column; align-items: flex-start; }
-    .panel-header-right { width: 100%; justify-content: flex-end; }
+    .form-grid-2,.form-grid-3,.form-grid-4,.form-grid-5 { grid-template-columns: 1fr; }
+    .col-span-2,.col-span-3 { grid-column: span 1; }
+    .sub-thead, .sub-row { grid-template-columns: 40px 70px 1fr 120px 56px; }
   }
-  @media (max-width: 480px) {
-    .filter-bar { flex-direction: column; align-items: stretch; }
-    .filter-divider { display: none; }
-    .tabs-bar { padding: 0 12px; }
-    .tab { padding: 10px 14px; font-size: 12px; }
-    .tab-content { padding: 16px; }
-    .collab-card-header { flex-wrap: wrap; }
+  @media (max-width: 520px) {
+    .topbar-right { gap: 4px; }
+    .btn-sm { padding: 5px 8px; font-size: 11px; }
+    .sub-thead, .sub-row { grid-template-columns: 36px 60px 1fr 100px 50px; }
   }
-
-  /* ── MOBILE NAV TOGGLE ── */
-  .mobile-nav-btn {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: var(--text);
-    padding: 4px;
-  }
+  .mobile-nav-btn { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text); padding: 4px; }
   @media (max-width: 768px) { .mobile-nav-btn { display: flex; } }
-
-  /* ── ANIMATIONS ── */
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .tab-content.active { animation: fadeIn .2s ease; }
 </style>
@@ -706,7 +270,7 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Anagrafiche</div>
-    <a class="nav-item active" href="#"><span class="icon">👥</span> Clienti</a>
+    <a class="nav-item active" href="#" onclick="showPage('page-clienti');return false"><span class="icon">👥</span> Clienti</a>
     <a class="nav-item" href="#"><span class="icon">🧑</span> Ospiti</a>
     <a class="nav-item" href="#"><span class="icon">🏠</span> Immobili</a>
     <div class="nav-section">Operativo</div>
@@ -724,682 +288,565 @@
 
 <!-- MAIN -->
 <div class="main">
-
-  <!-- TOP BAR -->
   <div class="topbar">
     <div class="topbar-left">
-      <button class="mobile-nav-btn" onclick="document.getElementById('sidebar').style.width = document.getElementById('sidebar').style.width === '230px' ? '0' : '230px'">☰</button>
-      <span class="page-title">Msk_Clienti_Anagrafica</span>
+      <button class="mobile-nav-btn" onclick="toggleSidebar()">☰</button>
+      <span class="page-title" id="topbarTitle">Msk_Clienti_Anagrafica</span>
       <span class="sep">·</span>
-      <span>Gestione Clienti</span>
+      <span class="sub-label" id="topbarSub">Gestione Clienti</span>
     </div>
-    <div class="topbar-right">
-      <button class="btn btn-outline btn-sm">⬇ Esporta</button>
-      <button class="btn btn-primary btn-sm" onclick="openNewClient()">＋ Nuovo Cliente</button>
-    </div>
+    <div class="topbar-right" id="topbarActions"></div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
 
-    <!-- FILTER BAR -->
-    <div class="filter-bar">
-      <span class="filter-label">🔍 Ricerca</span>
-      <div class="search-input">
-        <span style="color:var(--text-light)">🔎</span>
-        <input type="text" placeholder="Cerca nominativo, email, telefono..." id="searchInput" oninput="filterTable()">
-      </div>
-      <div class="filter-divider"></div>
-      <select class="filter-select" id="filterTipologia" onchange="filterTable()">
-        <option value="">Tutte le tipologie</option>
-        <option>Agenzia Viaggi</option>
-        <option>Privato</option>
-        <option>Azienda</option>
-        <option>Tour Operator</option>
-        <option>OTA</option>
-      </select>
-      <select class="filter-select" id="filterStato" onchange="filterTable()">
-        <option value="">Tutti gli stati</option>
-        <option>Contrattualizzato</option>
-        <option>Prospect</option>
-        <option>VIP</option>
-        <option>Sospeso</option>
-        <option>Blacklist</option>
-      </select>
-      <div class="filter-divider"></div>
-      <button class="btn btn-outline btn-sm" onclick="clearFilters()">✕ No Filtri</button>
-    </div>
-
-    <!-- TABLE -->
-    <div class="table-card">
-      <div class="table-header">
-        <div style="display:flex;align-items:center">
-          <h3>Clienti</h3>
-          <span class="table-count" id="rowCount">4</span>
+    <!-- PAGE CLIENTI -->
+    <div class="page active" id="page-clienti">
+      <div class="filter-bar">
+        <span class="filter-label">🔍 Ricerca</span>
+        <div class="search-input">
+          <span style="color:var(--text-light)">🔎</span>
+          <input type="text" placeholder="Cerca nominativo, email, telefono..." id="searchInput" oninput="filterTable()">
         </div>
+        <div class="filter-divider"></div>
+        <select class="filter-select" id="filterTipologia" onchange="filterTable()">
+          <option value="">Tutte le tipologie</option>
+          <option>Agenzia Viaggi</option><option>Privato</option><option>Azienda</option><option>Tour Operator</option><option>OTA</option>
+        </select>
+        <select class="filter-select" id="filterStato" onchange="filterTable()">
+          <option value="">Tutti gli stati</option>
+          <option>Contrattualizzato</option><option>Prospect</option><option>VIP</option><option>Sospeso</option><option>Blacklist</option>
+        </select>
+        <div class="filter-divider"></div>
+        <button class="btn btn-outline btn-sm" onclick="clearFilters()">✕ No Filtri</button>
       </div>
-      <div style="overflow-x:auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Nominativo</th>
-              <th>Tipologia</th>
-              <th>Stato</th>
-              <th>Telefono</th>
-              <th>Email</th>
-              <th>Città</th>
-              <th>Azioni</th>
-            </tr>
-          </thead>
-          <tbody id="clientTable">
-            <tr onclick="selectClient(this)" class="selected">
-              <td><div class="nome">Alpitour S.p.A.</div><div class="sub">Firmatario: Tizio Caio Sempronio</div></td>
-              <td><span class="badge badge-blue"><span class="badge-dot"></span>Agenzia Viaggi</span></td>
-              <td><span class="badge badge-success"><span class="badge-dot"></span>Contrattualizzato</span></td>
-              <td>+39 06 123456789</td>
-              <td>prossi@gmail.com</td>
-              <td>Roma</td>
-              <td><button class="btn btn-outline btn-sm btn-icon">✏️</button></td>
-            </tr>
-            <tr onclick="selectClient(this)">
-              <td><div class="nome">Booking.com Italia</div><div class="sub">Firmatario: —</div></td>
-              <td><span class="badge badge-indigo"><span class="badge-dot"></span>OTA</span></td>
-              <td><span class="badge badge-warning"><span class="badge-dot"></span>Prospect</span></td>
-              <td>+39 02 987654321</td>
-              <td>italia@booking.com</td>
-              <td>Milano</td>
-              <td><button class="btn btn-outline btn-sm btn-icon">✏️</button></td>
-            </tr>
-            <tr onclick="selectClient(this)">
-              <td><div class="nome">Mario Rossi</div><div class="sub">Firmatario: Mario Rossi</div></td>
-              <td><span class="badge badge-gray"><span class="badge-dot"></span>Privato</span></td>
-              <td><span class="badge badge-indigo" style="color:#7c3aed;background:rgba(124,58,237,.1)"><span class="badge-dot" style="background:#8b5cf6"></span>VIP</span></td>
-              <td>+39 333 111222333</td>
-              <td>mario.rossi@gmail.com</td>
-              <td>Napoli</td>
-              <td><button class="btn btn-outline btn-sm btn-icon">✏️</button></td>
-            </tr>
-            <tr onclick="selectClient(this)">
-              <td><div class="nome">Acme Travel S.r.l.</div><div class="sub">Firmatario: —</div></td>
-              <td><span class="badge badge-blue"><span class="badge-dot"></span>Tour Operator</span></td>
-              <td><span class="badge badge-danger"><span class="badge-dot"></span>Blacklist</span></td>
-              <td>+39 055 444555666</td>
-              <td>info@acmetravel.it</td>
-              <td>Firenze</td>
-              <td><button class="btn btn-outline btn-sm btn-icon">✏️</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- DETAIL PANEL -->
-    <div class="detail-panel" id="detailPanel">
-      <div class="accent-line"></div>
-
-      <!-- PANEL HEADER -->
-      <div class="panel-header">
-        <div class="panel-header-left">
-          <div class="client-avatar" id="clientAvatar">AL</div>
-          <div class="panel-header-info">
-            <div class="client-name" id="clientNameHeader">Alpitour S.p.A.</div>
-            <div class="client-meta">
-              <span class="badge badge-blue" style="background:rgba(59,130,246,.2);color:#93c5fd"><span class="badge-dot" style="background:#60a5fa"></span>Agenzia Viaggi</span>
-              <span class="badge badge-success" style="background:rgba(16,185,129,.2);color:#6ee7b7"><span class="badge-dot" style="background:#34d399"></span>Contrattualizzato</span>
-            </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div style="display:flex;align-items:center">
+            <h3>Clienti</h3><span class="table-count" id="rowCount">4</span>
           </div>
         </div>
-        <div class="panel-header-right">
-          <button class="btn btn-white btn-sm">🗑 Elimina</button>
-          <button class="btn btn-white btn-sm">❌ Annulla</button>
-          <button class="btn btn-white-primary btn-sm">💾 Salva</button>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Nominativo / Referente</th>
+                <th>Tipologia</th>
+                <th>Stato</th>
+                <th>Telefono / Cellulare</th>
+                <th>e-Mail</th>
+                <th>Note</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="clientTable">
+              <tr onclick="selectClient(this)" class="selected">
+                <td><div class="nome">Alpitour S.p.A.</div><div class="sub">👤 Maria Bianchi &nbsp;<span style="color:var(--text-light)">(Resp. Prenotazioni)</span></div></td>
+                <td><span class="badge badge-blue"><span class="badge-dot"></span>Agenzia Viaggi</span></td>
+                <td><span class="badge badge-success"><span class="badge-dot"></span>Contrattualizzato</span></td>
+                <td><div style="font-size:13px">+39 06 123456789</div><div class="sub">📱 +39 333 123456789</div></td>
+                <td style="font-size:12px;color:var(--text-muted)">prossi@gmail.com</td>
+                <td><div class="note-cell">Agenzia molto importante e molto esigente. Sconto concordato 12%.</div></td>
+                <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+              </tr>
+              <tr onclick="selectClient(this)">
+                <td><div class="nome">Booking.com Italia</div><div class="sub" style="color:var(--text-light);font-style:italic">— nessun referente —</div></td>
+                <td><span class="badge badge-indigo"><span class="badge-dot"></span>OTA</span></td>
+                <td><span class="badge badge-warning"><span class="badge-dot"></span>Prospect</span></td>
+                <td><div style="font-size:13px">+39 02 987654321</div></td>
+                <td style="font-size:12px;color:var(--text-muted)">italia@booking.com</td>
+                <td><div class="note-cell">—</div></td>
+                <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+              </tr>
+              <tr onclick="selectClient(this)">
+                <td><div class="nome">Mario Rossi</div><div class="sub">👤 Mario Rossi</div></td>
+                <td><span class="badge badge-gray"><span class="badge-dot"></span>Privato</span></td>
+                <td><span class="badge" style="background:rgba(124,58,237,.1);color:#7c3aed"><span class="badge-dot" style="background:#8b5cf6"></span>VIP</span></td>
+                <td><div style="font-size:13px">📱 +39 333 111222333</div></td>
+                <td style="font-size:12px;color:var(--text-muted)">mario.rossi@gmail.com</td>
+                <td><div class="note-cell">Cliente fidelizzato dal 2018. Prenota sempre ad agosto.</div></td>
+                <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+              </tr>
+              <tr onclick="selectClient(this)">
+                <td><div class="nome">Acme Travel S.r.l.</div><div class="sub" style="color:var(--text-light);font-style:italic">— nessun referente —</div></td>
+                <td><span class="badge badge-blue"><span class="badge-dot"></span>Tour Operator</span></td>
+                <td><span class="badge badge-danger"><span class="badge-dot"></span>Blacklist</span></td>
+                <td><div style="font-size:13px">+39 055 444555666</div></td>
+                <td style="font-size:12px;color:var(--text-muted)">info@acmetravel.it</td>
+                <td><div class="note-cell">Inserita in blacklist per mancati pagamenti.</div></td>
+                <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- TABS -->
-      <div class="tabs-bar">
-        <div class="tab active" onclick="switchTab(this,'tab-dati')" ><span class="tab-icon">📋</span> Dati Generali</div>
-        <div class="tab" onclick="switchTab(this,'tab-fiscali')"><span class="tab-icon">🧾</span> Dati Fiscali & Fatturazione</div>
-        <div class="tab" onclick="switchTab(this,'tab-banca')"><span class="tab-icon">🏦</span> Dati Bancari</div>
-        <div class="tab" onclick="switchTab(this,'tab-collab')"><span class="tab-icon">🤝</span> Collaboratori</div>
-        <div class="tab" onclick="switchTab(this,'tab-note')"><span class="tab-icon">📝</span> Annotazioni</div>
-      </div>
-
-      <!-- TAB: DATI GENERALI -->
-      <div class="tab-content active" id="tab-dati">
-
-        <!-- Identificazione -->
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">🏢</span> Identificazione</div>
-          <div class="section-body">
-            <div class="form-grid form-grid-3" style="margin-bottom:14px">
-              <div class="field-group col-span-2">
-                <label class="field-label">Nominativo *</label>
-                <input class="field-input" type="text" value="Alpitour S.p.A." placeholder="Ragione sociale o nome">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Tipologia</label>
-                <select class="field-input">
-                  <option selected>Agenzia Viaggi</option>
-                  <option>Tour Operator</option>
-                  <option>OTA</option>
-                  <option>Privato</option>
-                  <option>Azienda</option>
-                </select>
-              </div>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Stato</label>
-              <div class="status-group">
-                <span class="status-chip chip-contrattualizzato active-chip" onclick="toggleChip(this,'contrattualizzato')">✔ Contrattualizzato</span>
-                <span class="status-chip chip-prospect" onclick="toggleChip(this,'prospect')">Prospect</span>
-                <span class="status-chip chip-vip" onclick="toggleChip(this,'vip')">⭐ VIP</span>
-                <span class="status-chip chip-sospeso" onclick="toggleChip(this,'sospeso')">Sospeso</span>
-                <span class="status-chip chip-blacklist" onclick="toggleChip(this,'blacklist')">⛔ Blacklist</span>
+      <!-- DETAIL PANEL -->
+      <div class="detail-panel" id="detailPanel">
+        <div class="accent-line"></div>
+        <div class="panel-header">
+          <div class="panel-header-left">
+            <div class="client-avatar" id="clientAvatar">AL</div>
+            <div class="panel-header-info">
+              <div class="client-name" id="clientNameHeader">Alpitour S.p.A.</div>
+              <div class="client-meta">
+                <span class="badge" style="background:rgba(59,130,246,.2);color:#93c5fd"><span class="badge-dot" style="background:#60a5fa"></span>Agenzia Viaggi</span>
+                <span class="badge" style="background:rgba(16,185,129,.2);color:#6ee7b7"><span class="badge-dot" style="background:#34d399"></span>Contrattualizzato</span>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Note -->
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">📝</span> Note</div>
-          <div class="section-body">
-            <div class="field-group">
-              <textarea class="field-input" rows="3" placeholder="Note generali sul cliente...">Agenzia molto importante e molto esigente. Preferisce comunicazioni via PEC. Sconto concordato 12%.</textarea>
-            </div>
+          <div class="panel-header-right">
+            <button class="btn btn-white btn-sm">🗑 Elimina</button>
+            <button class="btn btn-white btn-sm">❌ Annulla</button>
+            <button class="btn btn-white-primary btn-sm">💾 Salva</button>
           </div>
         </div>
-
-        <!-- Contatti -->
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">📞</span> Contatti</div>
-          <div class="section-body">
-            <div class="form-grid form-grid-4">
-              <div class="field-group">
-                <label class="field-label">Cellulare 1</label>
-                <input class="field-input" type="tel" value="+39 333 123456789">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Cellulare 2</label>
-                <input class="field-input" type="tel" value="+39 333 987654321">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Telefono 1</label>
-                <input class="field-input" type="tel" value="+39 06 123456789">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Telefono 2</label>
-                <input class="field-input" type="tel" value="+39 06 987654321">
-              </div>
-              <div class="field-group col-span-2">
-                <label class="field-label">e-Mail 1</label>
-                <input class="field-input" type="email" value="prossi@gmail.com">
-              </div>
-              <div class="field-group col-span-2">
-                <label class="field-label">e-Mail 2</label>
-                <input class="field-input" type="email" value="r.verdi@gmail.com">
-              </div>
-              <div class="field-group col-span-2">
-                <label class="field-label">PEC</label>
-                <input class="field-input" type="email" value="pec@pec.pincopallino.it">
-              </div>
-              <div class="field-group col-span-2">
-                <label class="field-label">Home Page</label>
-                <input class="field-input" type="url" value="www.alpitour.it">
-              </div>
-            </div>
-          </div>
+        <div class="tabs-bar">
+          <div class="tab active" onclick="switchTab(this,'tab-dati')"><span>📋</span> Dati Generali</div>
+          <div class="tab" onclick="switchTab(this,'tab-fiscali')"><span>🧾</span> Dati Fiscali & Fatturazione</div>
+          <div class="tab" onclick="switchTab(this,'tab-banca')"><span>🏦</span> Dati Bancari</div>
+          <div class="tab" onclick="switchTab(this,'tab-collab')"><span>🤝</span> Collaboratori</div>
+          <div class="tab" onclick="switchTab(this,'tab-note')"><span>📝</span> Annotazioni</div>
         </div>
 
-        <!-- Indirizzo -->
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">📍</span> Indirizzo</div>
-          <div class="section-body">
-            <div class="form-grid form-grid-5">
-              <div class="field-group col-span-2">
-                <label class="field-label">Via / Indirizzo</label>
-                <input class="field-input" type="text" value="Via della Tiburtina, 23">
-              </div>
-              <div class="field-group">
-                <label class="field-label">CAP</label>
-                <input class="field-input" type="text" value="00159">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Città</label>
-                <input class="field-input" type="text" value="Roma">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Provincia</label>
-                <input class="field-input" type="text" value="RM">
-              </div>
-              <div class="field-group col-span-2">
-                <label class="field-label">Stato / Nazione</label>
-                <input class="field-input" type="text" value="Italia">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Firmatario -->
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">✍️</span> Firmatario Contratto</div>
-          <div class="section-body">
-            <div class="form-grid form-grid-4">
-              <div class="field-group col-span-2">
-                <label class="field-label">Nominativo Firmatario</label>
-                <input class="field-input" type="text" value="Tizio Caio Sempronio">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Città di Nascita</label>
-                <input class="field-input" type="text" value="Livorno">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Data di Nascita</label>
-                <input class="field-input" type="date" value="1980-01-13">
-              </div>
-              <div class="field-group col-span-2">
-                <label class="field-label">Codice Fiscale Firmatario</label>
-                <input class="field-input" type="text" value="AAABBB99C77D959S" style="font-family:'DM Mono',monospace;letter-spacing:1px">
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /tab-dati -->
-
-      <!-- TAB: DATI FISCALI -->
-      <div class="tab-content" id="tab-fiscali">
-
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">🏢</span> Dati Fiscali</div>
-          <div class="section-body">
-            <div class="form-grid form-grid-3">
-              <div class="field-group">
-                <label class="field-label">Partita IVA</label>
-                <input class="field-input" type="text" value="IT 123456789123" style="font-family:'DM Mono',monospace;letter-spacing:1px">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Codice Fiscale</label>
-                <input class="field-input" type="text" value="AAABBB99C77D959S" style="font-family:'DM Mono',monospace;letter-spacing:1px">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Codice SDI / Univoco</label>
-                <input class="field-input" type="text" value="URIM9CA" style="font-family:'DM Mono',monospace;letter-spacing:1px">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">📄</span> Dati Fatturazione</div>
-          <div class="section-body">
-            <div class="toggle-row" style="margin-bottom:16px">
-              <label class="toggle">
-                <input type="checkbox" id="toggleFatt" onchange="toggleFatturazione()">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="toggle-label">Dati fatturazione diversi da dati generali</span>
-            </div>
-            <div id="fattFields" style="display:none">
+        <div class="tab-content active" id="tab-dati">
+          <div class="section-block">
+            <div class="section-title"><span>🏢</span> Identificazione</div>
+            <div class="section-body">
               <div class="form-grid form-grid-3" style="margin-bottom:14px">
-                <div class="field-group col-span-2">
-                  <label class="field-label">Nominativo Fatturazione</label>
-                  <input class="field-input" type="text" placeholder="Ragione sociale fattura">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">P.IVA Fatturazione</label>
-                  <input class="field-input" type="text" placeholder="IT ..." style="font-family:'DM Mono',monospace">
-                </div>
-                <div class="field-group col-span-2">
-                  <label class="field-label">Via / Indirizzo</label>
-                  <input class="field-input" type="text" placeholder="Via...">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">CAP</label>
-                  <input class="field-input" type="text">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Città</label>
-                  <input class="field-input" type="text">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Provincia</label>
-                  <input class="field-input" type="text">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Stato / Nazione</label>
-                  <input class="field-input" type="text">
+                <div class="field-group col-span-2"><label class="field-label">Nominativo *</label><input class="field-input" type="text" value="Alpitour S.p.A."></div>
+                <div class="field-group"><label class="field-label">Tipologia</label><select class="field-input"><option selected>Agenzia Viaggi</option><option>Tour Operator</option><option>OTA</option><option>Privato</option><option>Azienda</option></select></div>
+              </div>
+              <div class="field-group"><label class="field-label">Stato</label>
+                <div class="status-group">
+                  <span class="status-chip chip-contrattualizzato active-chip" onclick="toggleChip(this)">✔ Contrattualizzato</span>
+                  <span class="status-chip chip-prospect" onclick="toggleChip(this)">Prospect</span>
+                  <span class="status-chip chip-vip" onclick="toggleChip(this)">⭐ VIP</span>
+                  <span class="status-chip chip-sospeso" onclick="toggleChip(this)">Sospeso</span>
+                  <span class="status-chip chip-blacklist" onclick="toggleChip(this)">⛔ Blacklist</span>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="section-block">
+            <div class="section-title"><span>📝</span> Note</div>
+            <div class="section-body"><textarea class="field-input" rows="3">Agenzia molto importante e molto esigente. Preferisce comunicazioni via PEC. Sconto concordato 12%.</textarea></div>
+          </div>
+          <div class="section-block">
+            <div class="section-title"><span>📞</span> Contatti</div>
+            <div class="section-body">
               <div class="form-grid form-grid-4">
-                <div class="field-group">
-                  <label class="field-label">Telefono</label>
-                  <input class="field-input" type="tel">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Cellulare</label>
-                  <input class="field-input" type="tel">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">e-Mail</label>
-                  <input class="field-input" type="email">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">PEC</label>
-                  <input class="field-input" type="email">
-                </div>
+                <div class="field-group"><label class="field-label">Cellulare 1</label><input class="field-input" type="tel" value="+39 333 123456789"></div>
+                <div class="field-group"><label class="field-label">Cellulare 2</label><input class="field-input" type="tel" value="+39 333 987654321"></div>
+                <div class="field-group"><label class="field-label">Telefono 1</label><input class="field-input" type="tel" value="+39 06 123456789"></div>
+                <div class="field-group"><label class="field-label">Telefono 2</label><input class="field-input" type="tel" value="+39 06 987654321"></div>
+                <div class="field-group col-span-2"><label class="field-label">e-Mail 1</label><input class="field-input" type="email" value="prossi@gmail.com"></div>
+                <div class="field-group col-span-2"><label class="field-label">e-Mail 2</label><input class="field-input" type="email" value="r.verdi@gmail.com"></div>
+                <div class="field-group col-span-2"><label class="field-label">PEC</label><input class="field-input" type="email" value="pec@pec.pincopallino.it"></div>
+                <div class="field-group col-span-2"><label class="field-label">Home Page</label><input class="field-input" type="url" value="www.alpitour.it"></div>
               </div>
             </div>
-            <div id="fattSame" style="display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px">
-              <span style="font-size:20px">✅</span> I dati di fatturazione coincidono con i dati generali del cliente.
+          </div>
+          <div class="section-block">
+            <div class="section-title"><span>📍</span> Indirizzo</div>
+            <div class="section-body">
+              <div class="form-grid form-grid-5">
+                <div class="field-group col-span-2"><label class="field-label">Via / Indirizzo</label><input class="field-input" type="text" value="Via della Tiburtina, 23"></div>
+                <div class="field-group"><label class="field-label">CAP</label><input class="field-input" type="text" value="00159"></div>
+                <div class="field-group"><label class="field-label">Città</label><input class="field-input" type="text" value="Roma"></div>
+                <div class="field-group"><label class="field-label">Provincia</label><input class="field-input" type="text" value="RM"></div>
+                <div class="field-group col-span-2"><label class="field-label">Stato / Nazione</label><input class="field-input" type="text" value="Italia"></div>
+              </div>
+            </div>
+          </div>
+          <div class="section-block">
+            <div class="section-title"><span>✍️</span> Firmatario Contratto</div>
+            <div class="section-body">
+              <div class="form-grid form-grid-4">
+                <div class="field-group col-span-2"><label class="field-label">Nominativo Firmatario</label><input class="field-input" type="text" value="Tizio Caio Sempronio"></div>
+                <div class="field-group"><label class="field-label">Città di Nascita</label><input class="field-input" type="text" value="Livorno"></div>
+                <div class="field-group"><label class="field-label">Data di Nascita</label><input class="field-input" type="date" value="1980-01-13"></div>
+                <div class="field-group col-span-2"><label class="field-label">Codice Fiscale Firmatario</label><input class="field-input" type="text" value="AAABBB99C77D959S" style="font-family:'DM Mono',monospace;letter-spacing:1px"></div>
+              </div>
             </div>
           </div>
         </div>
 
-      </div><!-- /tab-fiscali -->
-
-      <!-- TAB: DATI BANCARI -->
-      <div class="tab-content" id="tab-banca">
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">🏦</span> Coordinate Bancarie</div>
-          <div class="section-body">
-            <div class="form-grid form-grid-2" style="margin-bottom:14px">
-              <div class="field-group">
-                <label class="field-label">Intestatario Conto</label>
-                <input class="field-input" type="text" value="Alpitour S.p.A.">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Banca</label>
-                <input class="field-input" type="text" value="Banca di Credito Industriale">
+        <div class="tab-content" id="tab-fiscali">
+          <div class="section-block">
+            <div class="section-title"><span>🏢</span> Dati Fiscali</div>
+            <div class="section-body">
+              <div class="form-grid form-grid-3">
+                <div class="field-group"><label class="field-label">Partita IVA</label><input class="field-input" type="text" value="IT 123456789123" style="font-family:'DM Mono',monospace"></div>
+                <div class="field-group"><label class="field-label">Codice Fiscale</label><input class="field-input" type="text" value="AAABBB99C77D959S" style="font-family:'DM Mono',monospace"></div>
+                <div class="field-group"><label class="field-label">Codice SDI / Univoco</label><input class="field-input" type="text" value="URIM9CA" style="font-family:'DM Mono',monospace"></div>
               </div>
             </div>
-            <div class="form-grid form-grid-2">
-              <div class="field-group col-span-2">
-                <label class="field-label">IBAN</label>
-                <input class="field-input" type="text" value="IT71 H010 1585 4970 0000 1234 5678" style="font-family:'DM Mono',monospace;letter-spacing:1.5px">
+          </div>
+          <div class="section-block">
+            <div class="section-title"><span>📄</span> Dati Fatturazione</div>
+            <div class="section-body">
+              <div class="toggle-row" style="margin-bottom:16px">
+                <label class="toggle"><input type="checkbox" id="toggleFatt" onchange="toggleFatturazione()"><span class="toggle-slider"></span></label>
+                <span class="toggle-label">Dati fatturazione diversi da dati generali</span>
               </div>
-              <div class="field-group">
-                <label class="field-label">SWIFT / BIC</label>
-                <input class="field-input" type="text" value="URCM97ITA" style="font-family:'DM Mono',monospace;letter-spacing:1.5px">
+              <div id="fattFields" style="display:none">
+                <div class="form-grid form-grid-3" style="margin-bottom:14px">
+                  <div class="field-group col-span-2"><label class="field-label">Nominativo Fatturazione</label><input class="field-input" type="text" placeholder="Ragione sociale fattura"></div>
+                  <div class="field-group"><label class="field-label">P.IVA</label><input class="field-input" type="text" style="font-family:'DM Mono',monospace"></div>
+                  <div class="field-group col-span-2"><label class="field-label">Via / Indirizzo</label><input class="field-input" type="text"></div>
+                  <div class="field-group"><label class="field-label">CAP</label><input class="field-input" type="text"></div>
+                  <div class="field-group"><label class="field-label">Città</label><input class="field-input" type="text"></div>
+                  <div class="field-group"><label class="field-label">Provincia</label><input class="field-input" type="text"></div>
+                  <div class="field-group"><label class="field-label">Stato</label><input class="field-input" type="text"></div>
+                </div>
+                <div class="form-grid form-grid-4">
+                  <div class="field-group"><label class="field-label">Telefono</label><input class="field-input" type="tel"></div>
+                  <div class="field-group"><label class="field-label">Cellulare</label><input class="field-input" type="tel"></div>
+                  <div class="field-group"><label class="field-label">e-Mail</label><input class="field-input" type="email"></div>
+                  <div class="field-group"><label class="field-label">PEC</label><input class="field-input" type="email"></div>
+                </div>
+              </div>
+              <div id="fattSame" style="display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px">
+                <span style="font-size:20px">✅</span> I dati di fatturazione coincidono con i dati generali.
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- TAB: COLLABORATORI -->
-      <div class="tab-content" id="tab-collab">
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">🤝</span> Collaboratori</div>
-          <div class="section-body">
-            <div class="collab-list" id="collabList">
-
-              <!-- Collaboratore 1 -->
-              <div class="collab-card" draggable="true">
-                <div class="collab-card-header">
-                  <div class="collab-card-header-left">
-                    <div class="collab-order-badge" title="Trascina per riordinare">⠿</div>
-                    <div class="order-arrows">
-                      <div class="order-arrow" onclick="moveCollab(this,-1)">▲</div>
-                      <div class="order-arrow" onclick="moveCollab(this,1)">▼</div>
-                    </div>
-                    <input class="collab-name-input" type="text" value="Maria Bianchi" placeholder="Nome collaboratore...">
-                  </div>
-                  <div class="collab-card-header-right">
-                    <span class="badge badge-blue"><span class="badge-dot"></span>Referente</span>
-                    <button class="btn btn-danger-outline btn-sm btn-icon" onclick="removeCollab(this)" title="Rimuovi">🗑</button>
-                  </div>
-                </div>
-                <div class="collab-body">
-                  <div class="form-grid form-grid-4" style="margin-bottom:12px">
-                    <div class="field-group">
-                      <label class="field-label">Ruolo / Qualifica</label>
-                      <input class="field-input" type="text" value="Responsabile Prenotazioni" placeholder="es. Account Manager">
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Cellulare</label>
-                      <input class="field-input" type="tel" value="+39 347 111222333" placeholder="+39 ...">
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Telefono</label>
-                      <input class="field-input" type="tel" value="+39 06 1234567" placeholder="+39 ...">
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">e-Mail</label>
-                      <input class="field-input" type="email" value="m.bianchi@alpitour.it" placeholder="email@...">
-                    </div>
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Note</label>
-                    <textarea class="field-input" rows="2" placeholder="Note su questo collaboratore...">Referente principale per prenotazioni gruppi. Risponde sempre rapidamente.</textarea>
-                  </div>
-                </div>
+        <div class="tab-content" id="tab-banca">
+          <div class="section-block">
+            <div class="section-title"><span>🏦</span> Coordinate Bancarie</div>
+            <div class="section-body">
+              <div class="form-grid form-grid-2" style="margin-bottom:14px">
+                <div class="field-group"><label class="field-label">Intestatario Conto</label><input class="field-input" type="text" value="Alpitour S.p.A."></div>
+                <div class="field-group"><label class="field-label">Banca</label><input class="field-input" type="text" value="Banca di Credito Industriale"></div>
               </div>
-
-              <!-- Collaboratore 2 -->
-              <div class="collab-card" draggable="true">
-                <div class="collab-card-header">
-                  <div class="collab-card-header-left">
-                    <div class="collab-order-badge" title="Trascina per riordinare">⠿</div>
-                    <div class="order-arrows">
-                      <div class="order-arrow" onclick="moveCollab(this,-1)">▲</div>
-                      <div class="order-arrow" onclick="moveCollab(this,1)">▼</div>
-                    </div>
-                    <input class="collab-name-input" type="text" value="Luca Ferrari" placeholder="Nome collaboratore...">
-                  </div>
-                  <div class="collab-card-header-right">
-                    <span class="badge badge-gray"><span class="badge-dot"></span>Contatto</span>
-                    <button class="btn btn-danger-outline btn-sm btn-icon" onclick="removeCollab(this)" title="Rimuovi">🗑</button>
-                  </div>
-                </div>
-                <div class="collab-body">
-                  <div class="form-grid form-grid-4" style="margin-bottom:12px">
-                    <div class="field-group">
-                      <label class="field-label">Ruolo / Qualifica</label>
-                      <input class="field-input" type="text" value="Amministrazione" placeholder="es. Account Manager">
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Cellulare</label>
-                      <input class="field-input" type="tel" value="+39 338 444555666" placeholder="+39 ...">
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Telefono</label>
-                      <input class="field-input" type="tel" placeholder="+39 ...">
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">e-Mail</label>
-                      <input class="field-input" type="email" value="l.ferrari@alpitour.it" placeholder="email@...">
-                    </div>
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Note</label>
-                    <textarea class="field-input" rows="2" placeholder="Note su questo collaboratore..."></textarea>
-                  </div>
-                </div>
+              <div class="form-grid form-grid-2">
+                <div class="field-group col-span-2"><label class="field-label">IBAN</label><input class="field-input" type="text" value="IT71 H010 1585 4970 0000 1234 5678" style="font-family:'DM Mono',monospace;letter-spacing:1.5px"></div>
+                <div class="field-group"><label class="field-label">SWIFT / BIC</label><input class="field-input" type="text" value="URCM97ITA" style="font-family:'DM Mono',monospace;letter-spacing:1.5px"></div>
               </div>
-
-            </div><!-- /collab-list -->
-            <div class="add-row">
-              <button class="btn-add" onclick="addCollab()">＋ Aggiungi Collaboratore</button>
             </div>
           </div>
         </div>
-      </div><!-- /tab-collab -->
 
-      <!-- TAB: ANNOTAZIONI -->
-      <div class="tab-content" id="tab-note">
-        <div class="section-block">
-          <div class="section-title"><span class="section-icon">📝</span> Annotazioni</div>
-          <div class="section-body">
-
-            <div class="annotation-card">
-              <div class="annotation-meta">
-                <strong style="font-size:13px">Accordo sconto 2024</strong>
-                <span class="annotation-date">04/03/2026 — 14:30</span>
+        <div class="tab-content" id="tab-collab">
+          <div class="section-block">
+            <div class="section-title"><span>🤝</span> Collaboratori</div>
+            <div class="section-body">
+              <div class="collab-list" id="collabList">
+                <div class="collab-card" draggable="true">
+                  <div class="collab-card-header">
+                    <div class="collab-card-header-left">
+                      <div class="collab-order-badge">⠿</div>
+                      <div class="order-arrows"><div class="order-arrow" onclick="moveCollab(this,-1)">▲</div><div class="order-arrow" onclick="moveCollab(this,1)">▼</div></div>
+                      <input class="collab-name-input" type="text" value="Maria Bianchi">
+                    </div>
+                    <div class="collab-card-header-right">
+                      <span class="badge badge-blue"><span class="badge-dot"></span>Referente</span>
+                      <button class="btn btn-danger-outline btn-sm btn-icon" onclick="removeCollab(this)">🗑</button>
+                    </div>
+                  </div>
+                  <div class="collab-body">
+                    <div class="form-grid form-grid-4" style="margin-bottom:12px">
+                      <div class="field-group"><label class="field-label">Ruolo / Qualifica</label><input class="field-input" type="text" value="Resp. Prenotazioni"></div>
+                      <div class="field-group"><label class="field-label">Cellulare</label><input class="field-input" type="tel" value="+39 347 111222333"></div>
+                      <div class="field-group"><label class="field-label">Telefono</label><input class="field-input" type="tel" value="+39 06 1234567"></div>
+                      <div class="field-group"><label class="field-label">e-Mail</label><input class="field-input" type="email" value="m.bianchi@alpitour.it"></div>
+                    </div>
+                    <div class="field-group"><label class="field-label">Note</label><textarea class="field-input" rows="2">Referente principale per prenotazioni gruppi.</textarea></div>
+                  </div>
+                </div>
+                <div class="collab-card" draggable="true">
+                  <div class="collab-card-header">
+                    <div class="collab-card-header-left">
+                      <div class="collab-order-badge">⠿</div>
+                      <div class="order-arrows"><div class="order-arrow" onclick="moveCollab(this,-1)">▲</div><div class="order-arrow" onclick="moveCollab(this,1)">▼</div></div>
+                      <input class="collab-name-input" type="text" value="Luca Ferrari">
+                    </div>
+                    <div class="collab-card-header-right">
+                      <span class="badge badge-gray"><span class="badge-dot"></span>Contatto</span>
+                      <button class="btn btn-danger-outline btn-sm btn-icon" onclick="removeCollab(this)">🗑</button>
+                    </div>
+                  </div>
+                  <div class="collab-body">
+                    <div class="form-grid form-grid-4" style="margin-bottom:12px">
+                      <div class="field-group"><label class="field-label">Ruolo / Qualifica</label><input class="field-input" type="text" value="Amministrazione"></div>
+                      <div class="field-group"><label class="field-label">Cellulare</label><input class="field-input" type="tel" value="+39 338 444555666"></div>
+                      <div class="field-group"><label class="field-label">Telefono</label><input class="field-input" type="tel" placeholder="+39 ..."></div>
+                      <div class="field-group"><label class="field-label">e-Mail</label><input class="field-input" type="email" value="l.ferrari@alpitour.it"></div>
+                    </div>
+                    <div class="field-group"><label class="field-label">Note</label><textarea class="field-input" rows="2" placeholder="Note..."></textarea></div>
+                  </div>
+                </div>
               </div>
-              <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Concordato sconto del 12% su tutte le prenotazioni del Q1 2026. Confermato via email da Maria Bianchi.</div>
+              <div class="add-row"><button class="btn-add" onclick="addCollab()">＋ Aggiungi Collaboratore</button></div>
             </div>
+          </div>
+        </div>
 
-            <div class="annotation-card">
-              <div class="annotation-meta">
-                <strong style="font-size:13px">Reclamo pulizie</strong>
-                <span class="annotation-date">01/02/2026 — 10:15</span>
+        <div class="tab-content" id="tab-note">
+          <div class="section-block">
+            <div class="section-title"><span>📝</span> Annotazioni</div>
+            <div class="section-body">
+              <div class="annotation-card">
+                <div class="annotation-meta"><strong style="font-size:13px">Accordo sconto 2026</strong><span class="annotation-date">04/03/2026 — 14:30</span></div>
+                <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Concordato sconto del 12%. Confermato via email da Maria Bianchi.</div>
               </div>
-              <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Lamentela per le condizioni di pulizia dell'appartamento 3A. Gestita e risolta con rimborso parziale.</div>
+              <div class="annotation-card">
+                <div class="annotation-meta"><strong style="font-size:13px">Reclamo pulizie</strong><span class="annotation-date">01/02/2026 — 10:15</span></div>
+                <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Appartamento 3A. Gestita e risolta con rimborso parziale.</div>
+              </div>
+              <div class="divider"></div>
+              <div class="field-group" style="margin-bottom:10px"><label class="field-label">Nuova Annotazione</label><textarea class="field-input" rows="3" placeholder="Scrivi una nuova annotazione..."></textarea></div>
+              <button class="btn btn-primary btn-sm">＋ Aggiungi Annotazione</button>
             </div>
-
-            <div class="divider"></div>
-            <div class="field-group" style="margin-bottom:10px">
-              <label class="field-label">Nuova Annotazione</label>
-              <textarea class="field-input" rows="3" placeholder="Scrivi una nuova annotazione..."></textarea>
-            </div>
-            <button class="btn btn-primary btn-sm">＋ Aggiungi Annotazione</button>
-
           </div>
         </div>
       </div>
+    </div><!-- /page-clienti -->
 
-    </div><!-- /detail-panel -->
+
+    <!-- PAGE TIPOLOGIA -->
+    <div class="page" id="page-tipologia">
+      <div class="subpage-header">
+        <h2>🏷️ Tab_Clienti_Tipologie</h2>
+        <p>Gestisci le tipologie clienti. Assegna un colore e l'ordine di visualizzazione.</p>
+      </div>
+      <div class="sub-table-card">
+        <div class="sub-table-header">
+          <div style="display:flex;align-items:center"><h3 style="font-size:14px;font-weight:600">Tipologie</h3><span class="table-count" id="tipoCount">5</span></div>
+          <button class="btn btn-primary btn-sm" onclick="addTipologia()">＋ Nuova Tipologia</button>
+        </div>
+        <div class="sub-thead">
+          <span class="center">ID</span><span class="center">Ordine</span><span>Tipologia</span><span>Colore / Anteprima</span><span class="center">Azioni</span>
+        </div>
+        <div id="tipoList"></div>
+      </div>
+    </div>
+
+
+    <!-- PAGE STATO -->
+    <div class="page" id="page-stato">
+      <div class="subpage-header">
+        <h2>🔵 Tab_Clienti_Stati</h2>
+        <p>Gestisci gli stati clienti. Assegna un colore e l'ordine di visualizzazione.</p>
+      </div>
+      <div class="sub-table-card">
+        <div class="sub-table-header">
+          <div style="display:flex;align-items:center"><h3 style="font-size:14px;font-weight:600">Stati</h3><span class="table-count" id="statoCount">5</span></div>
+          <button class="btn btn-primary btn-sm" onclick="addStato()">＋ Nuovo Stato</button>
+        </div>
+        <div class="sub-thead">
+          <span class="center">ID</span><span class="center">Ordine</span><span>Stato</span><span>Colore / Anteprima</span><span class="center">Azioni</span>
+        </div>
+        <div id="statoList"></div>
+      </div>
+    </div>
 
   </div><!-- /content -->
 </div><!-- /main -->
 
 <script>
-  // ── TABS ──
-  function switchTab(el, tabId) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById(tabId).classList.add('active');
-  }
+// DATA
+let tipologie = [
+  {id:1,order:1,label:'Agenzia Viaggi',color:'#2563eb'},
+  {id:2,order:2,label:'Tour Operator', color:'#7c3aed'},
+  {id:3,order:3,label:'OTA',           color:'#6366f1'},
+  {id:4,order:4,label:'Privato',       color:'#64748b'},
+  {id:5,order:5,label:'Azienda',       color:'#0d9488'},
+];
+let stati = [
+  {id:1,order:1,label:'Contrattualizzato',color:'#10b981'},
+  {id:2,order:2,label:'Prospect',         color:'#f59e0b'},
+  {id:3,order:3,label:'VIP',              color:'#8b5cf6'},
+  {id:4,order:4,label:'Sospeso',          color:'#94a3b8'},
+  {id:5,order:5,label:'Blacklist',        color:'#ef4444'},
+];
+let tipoNextId=6, statoNextId=6;
 
-  // ── STATUS CHIPS ──
-  function toggleChip(el) {
-    el.classList.toggle('active-chip');
+// NAVIGATION
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const map = {
+    'page-clienti':  ['Msk_Clienti_Anagrafica','Gestione Clienti'],
+    'page-tipologia':['Tab_Clienti_Tipologie',  'Impostazioni Tipologie'],
+    'page-stato':    ['Tab_Clienti_Stati',       'Impostazioni Stati'],
+  };
+  const [t,s] = map[id]||['TONIO',''];
+  document.getElementById('topbarTitle').textContent = t;
+  document.getElementById('topbarSub').textContent   = s;
+  const bar = document.getElementById('topbarActions');
+  if (id === 'page-clienti') {
+    bar.innerHTML = `
+      <button class="btn btn-outline btn-sm">⬇ Esporta</button>
+      <button class="btn btn-teal btn-sm" onclick="showPage('page-tipologia')">🏷️ Tipologie</button>
+      <button class="btn btn-violet btn-sm" onclick="showPage('page-stato')">🔵 Stati</button>
+      <button class="btn btn-primary btn-sm" onclick="openNewClient()">＋ Nuovo Cliente</button>`;
+  } else {
+    bar.innerHTML = `<button class="btn btn-outline btn-sm" onclick="showPage('page-clienti')">← Torna ai Clienti</button>`;
   }
+  if (id==='page-tipologia') renderTipologie();
+  if (id==='page-stato')     renderStati();
+}
+showPage('page-clienti');
 
-  // ── TOGGLE FATTURAZIONE ──
-  function toggleFatturazione() {
-    const checked = document.getElementById('toggleFatt').checked;
-    document.getElementById('fattFields').style.display = checked ? 'block' : 'none';
-    document.getElementById('fattSame').style.display = checked ? 'none' : 'flex';
-  }
-
-  // ── SELECT ROW ──
-  function selectClient(row) {
-    document.querySelectorAll('#clientTable tr').forEach(r => r.classList.remove('selected'));
-    row.classList.add('selected');
-    const nome = row.querySelector('.nome').textContent;
-    document.getElementById('clientNameHeader').textContent = nome;
-    document.getElementById('clientAvatar').textContent = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  }
-
-  // ── FILTER ──
-  function filterTable() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const tipo = document.getElementById('filterTipologia').value.toLowerCase();
-    const stato = document.getElementById('filterStato').value.toLowerCase();
-    const rows = document.querySelectorAll('#clientTable tr');
-    let count = 0;
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      const match = (!search || text.includes(search))
-        && (!tipo || text.includes(tipo))
-        && (!stato || text.includes(stato));
-      row.style.display = match ? '' : 'none';
-      if (match) count++;
-    });
-    document.getElementById('rowCount').textContent = count;
-  }
-
-  function clearFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterTipologia').value = '';
-    document.getElementById('filterStato').value = '';
-    filterTable();
-  }
-
-  // ── ADD COLLABORATOR ──
-  function addCollab() {
-    const list = document.getElementById('collabList');
-    const num = list.children.length + 1;
-    const div = document.createElement('div');
-    div.className = 'collab-card';
-    div.draggable = true;
-    div.innerHTML = `
-      <div class="collab-card-header">
-        <div class="collab-card-header-left">
-          <div class="collab-order-badge" title="Trascina per riordinare">⠿</div>
-          <div class="order-arrows">
-            <div class="order-arrow" onclick="moveCollab(this,-1)">▲</div>
-            <div class="order-arrow" onclick="moveCollab(this,1)">▼</div>
-          </div>
-          <input class="collab-name-input" type="text" placeholder="Nome collaboratore...">
+// TIPOLOGIE
+function renderTipologie() {
+  const list = document.getElementById('tipoList');
+  document.getElementById('tipoCount').textContent = tipologie.length;
+  if (!tipologie.length) { list.innerHTML='<div class="empty-row">Nessuna tipologia.</div>'; return; }
+  list.innerHTML = tipologie.map((t,i)=>`
+    <div class="sub-row" data-id="${t.id}">
+      <div class="row-id">#${t.id}</div>
+      <div class="row-order">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div class="order-arrow" onclick="moveTipo(${i},-1)">▲</div>
+          <div class="order-arrow" onclick="moveTipo(${i},1)">▼</div>
         </div>
-        <div class="collab-card-header-right">
-          <button class="btn btn-danger-outline btn-sm btn-icon" onclick="removeCollab(this)" title="Rimuovi">🗑</button>
-        </div>
+        <span class="order-num">${t.order}</span>
       </div>
-      <div class="collab-body">
-        <div class="form-grid form-grid-4" style="margin-bottom:12px">
-          <div class="field-group">
-            <label class="field-label">Ruolo / Qualifica</label>
-            <input class="field-input" type="text" placeholder="es. Account Manager">
-          </div>
-          <div class="field-group">
-            <label class="field-label">Cellulare</label>
-            <input class="field-input" type="tel" placeholder="+39 ...">
-          </div>
-          <div class="field-group">
-            <label class="field-label">Telefono</label>
-            <input class="field-input" type="tel" placeholder="+39 ...">
-          </div>
-          <div class="field-group">
-            <label class="field-label">e-Mail</label>
-            <input class="field-input" type="email" placeholder="email@...">
-          </div>
+      <div><input class="sub-input" type="text" value="${t.label}" placeholder="Nome tipologia..." onchange="tipologie[${i}].label=this.value;renderTipologie()"></div>
+      <div class="row-color-cell">
+        <div class="color-preview" style="background:${t.color}" onclick="document.getElementById('tc-${t.id}').click()"></div>
+        <input class="color-input-hidden" type="color" id="tc-${t.id}" value="${t.color}" onchange="tipologie[${i}].color=this.value;renderTipologie()">
+        <span class="badge-preview" style="background:${t.color}22;color:${t.color};border:1.5px solid ${t.color}66">${t.label||'Anteprima'}</span>
+      </div>
+      <div class="row-actions"><button class="btn btn-danger-outline btn-sm btn-icon" onclick="deleteTipo(${i})">🗑</button></div>
+    </div>`).join('');
+}
+function addTipologia() {
+  tipologie.push({id:tipoNextId++,order:tipologie.length+1,label:'',color:'#2563eb'});
+  renderTipologie();
+  setTimeout(()=>{ const a=document.querySelectorAll('#tipoList .sub-input'); if(a.length) a[a.length-1].focus(); },50);
+}
+function deleteTipo(i) { tipologie.splice(i,1); tipologie.forEach((t,idx)=>t.order=idx+1); renderTipologie(); }
+function moveTipo(i,dir) {
+  const j=i+dir; if(j<0||j>=tipologie.length) return;
+  [tipologie[i],tipologie[j]]=[tipologie[j],tipologie[i]];
+  tipologie.forEach((t,idx)=>t.order=idx+1); renderTipologie();
+}
+
+// STATI
+function renderStati() {
+  const list = document.getElementById('statoList');
+  document.getElementById('statoCount').textContent = stati.length;
+  if (!stati.length) { list.innerHTML='<div class="empty-row">Nessuno stato.</div>'; return; }
+  list.innerHTML = stati.map((s,i)=>`
+    <div class="sub-row" data-id="${s.id}">
+      <div class="row-id">#${s.id}</div>
+      <div class="row-order">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div class="order-arrow" onclick="moveStato(${i},-1)">▲</div>
+          <div class="order-arrow" onclick="moveStato(${i},1)">▼</div>
         </div>
-        <div class="field-group">
-          <label class="field-label">Note</label>
-          <textarea class="field-input" rows="2" placeholder="Note su questo collaboratore..."></textarea>
-        </div>
-      </div>`;
-    list.appendChild(div);
-    div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    updateOrderBadges();
-  }
+        <span class="order-num">${s.order}</span>
+      </div>
+      <div><input class="sub-input" type="text" value="${s.label}" placeholder="Nome stato..." onchange="stati[${i}].label=this.value;renderStati()"></div>
+      <div class="row-color-cell">
+        <div class="color-preview" style="background:${s.color}" onclick="document.getElementById('sc-${s.id}').click()"></div>
+        <input class="color-input-hidden" type="color" id="sc-${s.id}" value="${s.color}" onchange="stati[${i}].color=this.value;renderStati()">
+        <span class="badge-preview" style="background:${s.color}22;color:${s.color};border:1.5px solid ${s.color}66">${s.label||'Anteprima'}</span>
+      </div>
+      <div class="row-actions"><button class="btn btn-danger-outline btn-sm btn-icon" onclick="deleteStato(${i})">🗑</button></div>
+    </div>`).join('');
+}
+function addStato() {
+  stati.push({id:statoNextId++,order:stati.length+1,label:'',color:'#10b981'});
+  renderStati();
+  setTimeout(()=>{ const a=document.querySelectorAll('#statoList .sub-input'); if(a.length) a[a.length-1].focus(); },50);
+}
+function deleteStato(i) { stati.splice(i,1); stati.forEach((s,idx)=>s.order=idx+1); renderStati(); }
+function moveStato(i,dir) {
+  const j=i+dir; if(j<0||j>=stati.length) return;
+  [stati[i],stati[j]]=[stati[j],stati[i]];
+  stati.forEach((s,idx)=>s.order=idx+1); renderStati();
+}
 
-  function removeCollab(btn) {
-    btn.closest('.collab-card').remove();
-    updateOrderBadges();
-  }
-
-  function moveCollab(btn, dir) {
-    const card = btn.closest('.collab-card');
-    const list = document.getElementById('collabList');
-    if (dir === -1 && card.previousElementSibling) {
-      list.insertBefore(card, card.previousElementSibling);
-    } else if (dir === 1 && card.nextElementSibling) {
-      list.insertBefore(card.nextElementSibling, card);
-    }
-    updateOrderBadges();
-  }
-
-  function updateOrderBadges() {
-    document.querySelectorAll('#collabList .collab-order-badge').forEach((b, i) => {
-      b.textContent = '⠿';
-    });
-  }
-
-  // ── NEW CLIENT ──
-  function openNewClient() {
-    document.getElementById('clientNameHeader').textContent = 'Nuovo Cliente';
-    document.getElementById('clientAvatar').textContent = 'NC';
-    document.querySelectorAll('.field-input').forEach(f => { if(f.tagName !== 'SELECT') f.value = ''; });
-    document.querySelectorAll('.status-chip').forEach(c => c.classList.remove('active-chip'));
-    document.getElementById('detailPanel').scrollIntoView({ behavior: 'smooth' });
-  }
+// CLIENTI MISC
+function switchTab(el,tabId) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+function toggleChip(el) { el.classList.toggle('active-chip'); }
+function toggleFatturazione() {
+  const c=document.getElementById('toggleFatt').checked;
+  document.getElementById('fattFields').style.display=c?'block':'none';
+  document.getElementById('fattSame').style.display=c?'none':'flex';
+}
+function selectClient(row) {
+  document.querySelectorAll('#clientTable tr').forEach(r=>r.classList.remove('selected'));
+  row.classList.add('selected');
+  const n=row.querySelector('.nome').textContent;
+  document.getElementById('clientNameHeader').textContent=n;
+  document.getElementById('clientAvatar').textContent=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+function filterTable() {
+  const s=document.getElementById('searchInput').value.toLowerCase();
+  const t=document.getElementById('filterTipologia').value.toLowerCase();
+  const st=document.getElementById('filterStato').value.toLowerCase();
+  let c=0;
+  document.querySelectorAll('#clientTable tr').forEach(r=>{
+    const tx=r.textContent.toLowerCase();
+    const ok=(!s||tx.includes(s))&&(!t||tx.includes(t))&&(!st||tx.includes(st));
+    r.style.display=ok?'':'none'; if(ok)c++;
+  });
+  document.getElementById('rowCount').textContent=c;
+}
+function clearFilters() {
+  document.getElementById('searchInput').value='';
+  document.getElementById('filterTipologia').value='';
+  document.getElementById('filterStato').value='';
+  filterTable();
+}
+function addCollab() {
+  const list=document.getElementById('collabList');
+  const div=document.createElement('div');
+  div.className='collab-card'; div.draggable=true;
+  div.innerHTML=`
+    <div class="collab-card-header">
+      <div class="collab-card-header-left">
+        <div class="collab-order-badge">⠿</div>
+        <div class="order-arrows"><div class="order-arrow" onclick="moveCollab(this,-1)">▲</div><div class="order-arrow" onclick="moveCollab(this,1)">▼</div></div>
+        <input class="collab-name-input" type="text" placeholder="Nome collaboratore...">
+      </div>
+      <div class="collab-card-header-right">
+        <button class="btn btn-danger-outline btn-sm btn-icon" onclick="removeCollab(this)">🗑</button>
+      </div>
+    </div>
+    <div class="collab-body">
+      <div class="form-grid form-grid-4" style="margin-bottom:12px">
+        <div class="field-group"><label class="field-label">Ruolo / Qualifica</label><input class="field-input" type="text" placeholder="es. Account Manager"></div>
+        <div class="field-group"><label class="field-label">Cellulare</label><input class="field-input" type="tel" placeholder="+39 ..."></div>
+        <div class="field-group"><label class="field-label">Telefono</label><input class="field-input" type="tel" placeholder="+39 ..."></div>
+        <div class="field-group"><label class="field-label">e-Mail</label><input class="field-input" type="email" placeholder="email@..."></div>
+      </div>
+      <div class="field-group"><label class="field-label">Note</label><textarea class="field-input" rows="2" placeholder="Note..."></textarea></div>
+    </div>`;
+  list.appendChild(div);
+  div.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function removeCollab(btn) { btn.closest('.collab-card').remove(); }
+function moveCollab(btn,dir) {
+  const card=btn.closest('.collab-card'),list=document.getElementById('collabList');
+  if(dir===-1&&card.previousElementSibling) list.insertBefore(card,card.previousElementSibling);
+  else if(dir===1&&card.nextElementSibling) list.insertBefore(card.nextElementSibling,card);
+}
+function openNewClient() {
+  document.getElementById('clientNameHeader').textContent='Nuovo Cliente';
+  document.getElementById('clientAvatar').textContent='NC';
+  document.querySelectorAll('.field-input').forEach(f=>{if(f.tagName!=='SELECT')f.value='';});
+  document.querySelectorAll('.status-chip').forEach(c=>c.classList.remove('active-chip'));
+  document.getElementById('detailPanel').scrollIntoView({behavior:'smooth'});
+}
+function toggleSidebar() {
+  const s=document.getElementById('sidebar');
+  s.style.width=s.style.width==='230px'?'0':'230px';
+}
 </script>
 </body>
 </html>
