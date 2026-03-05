@@ -1,1 +1,564 @@
+<!-- ═══════════════════════════════════════════════════════
+     TONIO — moduli/Msk_Clienti.html
+     Modulo Anagrafica Clienti completo.
+     Dipende da: assets/tonio-core.css, assets/tonio-core.js
+     Versione: 1.0  —  2026-03-05
+═══════════════════════════════════════════════════════ -->
 
+<!-- PAGE: CLIENTI -->
+<div class="page on" id="pg-clienti">
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <span class="filter-label">🔍 Ricerca</span>
+    <div class="search-wrap">
+      <span style="color:var(--light)">🔎</span>
+      <input type="text" placeholder="Cerca nominativo, email, telefono..." id="srch" oninput="filterRows()">
+    </div>
+    <div class="fdiv"></div>
+    <select class="fsel" id="fTipo" onchange="filterRows()">
+      <option value="">Tutte le tipologie</option>
+      <option>Agenzia Viaggi</option><option>Privato</option>
+      <option>Azienda</option><option>Tour Operator</option><option>OTA</option>
+    </select>
+    <select class="fsel" id="fStato" onchange="filterRows()">
+      <option value="">Tutti gli stati</option>
+      <option>Contrattualizzato</option><option>Prospect</option>
+      <option>VIP</option><option>Sospeso</option><option>Blacklist</option>
+    </select>
+    <div class="fdiv"></div>
+    <button class="btn btn-outline btn-sm" onclick="clearF()">✕ No Filtri</button>
+  </div>
+
+  <!-- Tabella clienti -->
+  <div class="tcard">
+    <div class="thead-bar">
+      <div style="display:flex;align-items:center">
+        <h3>Clienti</h3><span class="tcnt" id="rowCnt">4</span>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Nominativo / Referente</th>
+            <th>Tipologia</th>
+            <th>Stato</th>
+            <th>Telefono / Cellulare</th>
+            <th>e-Mail</th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="clientTable">
+          <tr onclick="selClient(this)" class="sel">
+            <td><div class="t-nome">Alpitour S.p.A.</div><div class="t-sub">👤 Maria Bianchi <span style="color:var(--light)">(Resp. Prenotazioni)</span></div></td>
+            <td><span class="badge b-blue"><span class="bdot"></span>Agenzia Viaggi</span></td>
+            <td><span class="badge b-green"><span class="bdot"></span>Contrattualizzato</span></td>
+            <td><div style="font-size:13px">+39 06 123456789</div><div class="t-sub">📱 +39 333 123456789</div></td>
+            <td style="font-size:12px;color:var(--muted)">prossi [at] gmail.com</td>
+            <td><div class="t-note">Agenzia molto importante. Sconto 12%.</div></td>
+            <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+          </tr>
+          <tr onclick="selClient(this)">
+            <td><div class="t-nome">Booking.com Italia</div><div class="t-sub" style="font-style:italic;color:var(--light)">— nessun referente —</div></td>
+            <td><span class="badge b-indigo"><span class="bdot"></span>OTA</span></td>
+            <td><span class="badge b-yellow"><span class="bdot"></span>Prospect</span></td>
+            <td><div style="font-size:13px">+39 02 987654321</div></td>
+            <td style="font-size:12px;color:var(--muted)">italia [at] booking.com</td>
+            <td><div class="t-note">—</div></td>
+            <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+          </tr>
+          <tr onclick="selClient(this)">
+            <td><div class="t-nome">Mario Rossi</div><div class="t-sub">👤 Mario Rossi</div></td>
+            <td><span class="badge b-gray"><span class="bdot"></span>Privato</span></td>
+            <td><span class="badge" style="background:rgba(124,58,237,.1);color:#7c3aed"><span class="bdot" style="background:#8b5cf6"></span>VIP</span></td>
+            <td><div style="font-size:13px">📱 +39 333 111222333</div></td>
+            <td style="font-size:12px;color:var(--muted)">mario.rossi [at] gmail.com</td>
+            <td><div class="t-note">Cliente dal 2018. Prenota sempre ad agosto.</div></td>
+            <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+          </tr>
+          <tr onclick="selClient(this)">
+            <td><div class="t-nome">Acme Travel S.r.l.</div><div class="t-sub" style="font-style:italic;color:var(--light)">— nessun referente —</div></td>
+            <td><span class="badge b-blue"><span class="bdot"></span>Tour Operator</span></td>
+            <td><span class="badge b-red"><span class="bdot"></span>Blacklist</span></td>
+            <td><div style="font-size:13px">+39 055 444555666</div></td>
+            <td style="font-size:12px;color:var(--muted)">info [at] acmetravel.it</td>
+            <td><div class="t-note">Blacklist per mancati pagamenti.</div></td>
+            <td><button class="btn btn-outline btn-sm btn-icon" onclick="event.stopPropagation()">✏️</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pannello dettaglio -->
+  <div class="dpanel">
+    <div class="daccent"></div>
+    <div class="dhead">
+      <div class="dhead-l">
+        <div class="davatar" id="dAvatar">AL</div>
+        <div>
+          <div class="dhead-name" id="dName">Alpitour S.p.A.</div>
+          <div class="dhead-meta">
+            <span class="badge" style="background:rgba(59,130,246,.2);color:#93c5fd"><span class="bdot" style="background:#60a5fa"></span>Agenzia Viaggi</span>
+            <span class="badge" style="background:rgba(16,185,129,.2);color:#6ee7b7"><span class="bdot" style="background:#34d399"></span>Contrattualizzato</span>
+          </div>
+        </div>
+      </div>
+      <div class="dhead-r">
+        <button class="btn btn-white btn-sm">🗑 Elimina</button>
+        <button class="btn btn-white btn-sm">❌ Annulla</button>
+        <button class="btn btn-wp btn-sm">💾 Salva</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <div class="tab on" onclick="setTab(this,'tp-dati')">📋 Dati Generali</div>
+      <div class="tab"    onclick="setTab(this,'tp-fisc')">🧾 Dati Fiscali &amp; Fatturazione</div>
+      <div class="tab"    onclick="setTab(this,'tp-bank')">🏦 Dati Bancari</div>
+      <div class="tab"    onclick="setTab(this,'tp-coll')">🤝 Collaboratori</div>
+      <div class="tab"    onclick="setTab(this,'tp-note')">📝 Annotazioni</div>
+    </div>
+
+    <!-- Pane: Dati Generali -->
+    <div class="tpane on" id="tp-dati">
+      <div class="sblock">
+        <div class="stitle">🏢 Identificazione</div>
+        <div class="sbody">
+          <div class="fg fg3" style="margin-bottom:14px">
+            <div class="field cs2"><label class="flabel">Nominativo *</label><input class="finput" type="text" value="Alpitour S.p.A."></div>
+            <div class="field"><label class="flabel">Tipologia</label>
+              <select class="finput"><option selected>Agenzia Viaggi</option><option>Tour Operator</option><option>OTA</option><option>Privato</option><option>Azienda</option></select>
+            </div>
+          </div>
+          <div class="field"><label class="flabel">Stato</label>
+            <div class="chips">
+              <span class="chip c-green on" onclick="this.classList.toggle('on')">✔ Contrattualizzato</span>
+              <span class="chip c-yellow"   onclick="this.classList.toggle('on')">Prospect</span>
+              <span class="chip c-violet"   onclick="this.classList.toggle('on')">⭐ VIP</span>
+              <span class="chip c-gray"     onclick="this.classList.toggle('on')">Sospeso</span>
+              <span class="chip c-red"      onclick="this.classList.toggle('on')">⛔ Blacklist</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sblock">
+        <div class="stitle">📝 Note</div>
+        <div class="sbody"><textarea class="finput" rows="3">Agenzia molto importante e molto esigente. Preferisce comunicazioni via PEC. Sconto concordato 12%.</textarea></div>
+      </div>
+      <div class="sblock">
+        <div class="stitle">📞 Contatti</div>
+        <div class="sbody">
+          <div class="fg fg4">
+            <div class="field"><label class="flabel">Cellulare 1</label><input class="finput" type="tel" value="+39 333 123456789"></div>
+            <div class="field"><label class="flabel">Cellulare 2</label><input class="finput" type="tel" value="+39 333 987654321"></div>
+            <div class="field"><label class="flabel">Telefono 1</label><input class="finput" type="tel" value="+39 06 123456789"></div>
+            <div class="field"><label class="flabel">Telefono 2</label><input class="finput" type="tel" value="+39 06 987654321"></div>
+            <div class="field cs2"><label class="flabel">e-Mail 1</label><input class="finput" type="text" value="prossi@gmail.com"></div>
+            <div class="field cs2"><label class="flabel">e-Mail 2</label><input class="finput" type="text" value="r.verdi@gmail.com"></div>
+            <div class="field cs2"><label class="flabel">PEC</label><input class="finput" type="text" value="pec@pec.pincopallino.it"></div>
+            <div class="field cs2"><label class="flabel">Home Page</label><input class="finput" type="text" value="www.alpitour.it"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sblock">
+        <div class="stitle">📍 Indirizzo</div>
+        <div class="sbody">
+          <div class="fg fg5">
+            <div class="field cs2"><label class="flabel">Via / Indirizzo</label><input class="finput" type="text" value="Via della Tiburtina, 23"></div>
+            <div class="field"><label class="flabel">CAP</label><input class="finput" type="text" value="00159"></div>
+            <div class="field"><label class="flabel">Città</label><input class="finput" type="text" value="Roma"></div>
+            <div class="field"><label class="flabel">Provincia</label><input class="finput" type="text" value="RM"></div>
+            <div class="field cs2"><label class="flabel">Stato / Nazione</label><input class="finput" type="text" value="Italia"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sblock">
+        <div class="stitle">✍️ Firmatario Contratto</div>
+        <div class="sbody">
+          <div class="fg fg4">
+            <div class="field cs2"><label class="flabel">Nominativo Firmatario</label><input class="finput" type="text" value="Tizio Caio Sempronio"></div>
+            <div class="field"><label class="flabel">Città di Nascita</label><input class="finput" type="text" value="Livorno"></div>
+            <div class="field"><label class="flabel">Data di Nascita</label><input class="finput" type="date" value="1980-01-13"></div>
+            <div class="field cs2"><label class="flabel">Codice Fiscale</label><input class="finput" type="text" value="AAABBB99C77D959S" style="font-family:'DM Mono',monospace;letter-spacing:1px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pane: Dati Fiscali -->
+    <div class="tpane" id="tp-fisc">
+      <div class="sblock">
+        <div class="stitle">🏢 Dati Fiscali</div>
+        <div class="sbody">
+          <div class="fg fg3">
+            <div class="field"><label class="flabel">Partita IVA</label><input class="finput" type="text" value="IT 123456789123" style="font-family:'DM Mono',monospace"></div>
+            <div class="field"><label class="flabel">Codice Fiscale</label><input class="finput" type="text" value="AAABBB99C77D959S" style="font-family:'DM Mono',monospace"></div>
+            <div class="field"><label class="flabel">Codice SDI</label><input class="finput" type="text" value="URIM9CA" style="font-family:'DM Mono',monospace"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sblock">
+        <div class="stitle">📄 Dati Fatturazione</div>
+        <div class="sbody">
+          <div class="tog-row" style="margin-bottom:16px">
+            <label class="tog"><input type="checkbox" id="togFatt" onchange="togFattura()"><span class="tslider"></span></label>
+            <span class="tog-label">Dati fatturazione diversi da dati generali</span>
+          </div>
+          <div id="fattFields" style="display:none">
+            <div class="fg fg3" style="margin-bottom:14px">
+              <div class="field cs2"><label class="flabel">Nominativo Fatturazione</label><input class="finput" type="text" placeholder="Ragione sociale"></div>
+              <div class="field"><label class="flabel">P.IVA</label><input class="finput" type="text" style="font-family:'DM Mono',monospace"></div>
+              <div class="field cs2"><label class="flabel">Via</label><input class="finput" type="text"></div>
+              <div class="field"><label class="flabel">CAP</label><input class="finput" type="text"></div>
+              <div class="field"><label class="flabel">Città</label><input class="finput" type="text"></div>
+              <div class="field"><label class="flabel">Provincia</label><input class="finput" type="text"></div>
+              <div class="field"><label class="flabel">Stato</label><input class="finput" type="text"></div>
+            </div>
+            <div class="fg fg4">
+              <div class="field"><label class="flabel">Telefono</label><input class="finput" type="tel"></div>
+              <div class="field"><label class="flabel">Cellulare</label><input class="finput" type="tel"></div>
+              <div class="field"><label class="flabel">e-Mail</label><input class="finput" type="text"></div>
+              <div class="field"><label class="flabel">PEC</label><input class="finput" type="text"></div>
+            </div>
+          </div>
+          <div id="fattSame" style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px">
+            <span style="font-size:20px">✅</span> I dati di fatturazione coincidono con i dati generali.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pane: Dati Bancari -->
+    <div class="tpane" id="tp-bank">
+      <div class="sblock">
+        <div class="stitle">🏦 Coordinate Bancarie</div>
+        <div class="sbody">
+          <div class="fg fg2" style="margin-bottom:14px">
+            <div class="field"><label class="flabel">Intestatario Conto</label><input class="finput" type="text" value="Alpitour S.p.A."></div>
+            <div class="field"><label class="flabel">Banca</label><input class="finput" type="text" value="Banca di Credito Industriale"></div>
+          </div>
+          <div class="fg fg2">
+            <div class="field cs2"><label class="flabel">IBAN</label><input class="finput" type="text" value="IT71 H010 1585 4970 0000 1234 5678" style="font-family:'DM Mono',monospace;letter-spacing:1.5px"></div>
+            <div class="field"><label class="flabel">SWIFT / BIC</label><input class="finput" type="text" value="URCM97ITA" style="font-family:'DM Mono',monospace;letter-spacing:1.5px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pane: Collaboratori -->
+    <div class="tpane" id="tp-coll">
+      <div class="sblock">
+        <div class="stitle">🤝 Collaboratori</div>
+        <div class="sbody">
+          <div class="clist" id="collabList">
+            <div class="ccard">
+              <div class="ccard-head">
+                <div class="ccard-hl">
+                  <div class="cord">⠿</div>
+                  <div class="oarrows"><div class="oarrow" onclick="moveC(this,-1)">▲</div><div class="oarrow" onclick="moveC(this,1)">▼</div></div>
+                  <input class="cname" type="text" value="Maria Bianchi">
+                </div>
+                <div class="ccard-hr">
+                  <span class="badge b-blue"><span class="bdot"></span>Referente</span>
+                  <button class="btn btn-danger-o btn-sm btn-icon" onclick="delC(this)">🗑</button>
+                </div>
+              </div>
+              <div class="cbody">
+                <div class="fg fg4" style="margin-bottom:12px">
+                  <div class="field"><label class="flabel">Ruolo</label><input class="finput" type="text" value="Resp. Prenotazioni"></div>
+                  <div class="field"><label class="flabel">Cellulare</label><input class="finput" type="tel" value="+39 347 111222333"></div>
+                  <div class="field"><label class="flabel">Telefono</label><input class="finput" type="tel" value="+39 06 1234567"></div>
+                  <div class="field"><label class="flabel">e-Mail</label><input class="finput" type="text" value="m.bianchi@alpitour.it"></div>
+                </div>
+                <div class="field"><label class="flabel">Note</label><textarea class="finput" rows="2">Referente principale per prenotazioni gruppi.</textarea></div>
+              </div>
+            </div>
+            <div class="ccard">
+              <div class="ccard-head">
+                <div class="ccard-hl">
+                  <div class="cord">⠿</div>
+                  <div class="oarrows"><div class="oarrow" onclick="moveC(this,-1)">▲</div><div class="oarrow" onclick="moveC(this,1)">▼</div></div>
+                  <input class="cname" type="text" value="Luca Ferrari">
+                </div>
+                <div class="ccard-hr">
+                  <span class="badge b-gray"><span class="bdot"></span>Contatto</span>
+                  <button class="btn btn-danger-o btn-sm btn-icon" onclick="delC(this)">🗑</button>
+                </div>
+              </div>
+              <div class="cbody">
+                <div class="fg fg4" style="margin-bottom:12px">
+                  <div class="field"><label class="flabel">Ruolo</label><input class="finput" type="text" value="Amministrazione"></div>
+                  <div class="field"><label class="flabel">Cellulare</label><input class="finput" type="tel" value="+39 338 444555666"></div>
+                  <div class="field"><label class="flabel">Telefono</label><input class="finput" type="tel" placeholder="+39 ..."></div>
+                  <div class="field"><label class="flabel">e-Mail</label><input class="finput" type="text" value="l.ferrari@alpitour.it"></div>
+                </div>
+                <div class="field"><label class="flabel">Note</label><textarea class="finput" rows="2" placeholder="Note..."></textarea></div>
+              </div>
+            </div>
+          </div>
+          <div class="add-row"><button class="btn-add" onclick="addC()">＋ Aggiungi Collaboratore</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pane: Annotazioni -->
+    <div class="tpane" id="tp-note">
+      <div class="sblock">
+        <div class="stitle">📝 Annotazioni</div>
+        <div class="sbody">
+          <div class="ancard">
+            <div class="anmeta"><strong style="font-size:13px">Accordo sconto 2026</strong><span class="andate">04/03/2026 — 14:30</span></div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6">Concordato sconto del 12%. Confermato via email da Maria Bianchi.</div>
+          </div>
+          <div class="ancard">
+            <div class="anmeta"><strong style="font-size:13px">Reclamo pulizie</strong><span class="andate">01/02/2026 — 10:15</span></div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6">Appartamento 3A. Risolto con rimborso parziale.</div>
+          </div>
+          <div class="divider"></div>
+          <div class="field" style="margin-bottom:10px"><label class="flabel">Nuova Annotazione</label><textarea class="finput" rows="3" placeholder="Scrivi una nuova annotazione..."></textarea></div>
+          <button class="btn btn-primary btn-sm">＋ Aggiungi</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dpanel -->
+</div><!-- /pg-clienti -->
+
+
+<!-- PAGE: TIPOLOGIE -->
+<div class="page" id="pg-tipologie">
+  <div class="sp-head">
+    <h2>🏷️ Tab_Clienti_Tipologie</h2>
+    <p>Gestisci le tipologie clienti — assegna un colore e l'ordine di visualizzazione.</p>
+  </div>
+  <div class="stcard">
+    <div class="sthead">
+      <div style="display:flex;align-items:center"><h3 style="font-size:14px;font-weight:600">Tipologie</h3><span class="tcnt" id="tipoCnt">5</span></div>
+      <button class="btn btn-primary btn-sm" onclick="addTipo()">＋ Nuova Tipologia</button>
+    </div>
+    <div class="sgrid sgrid-th">
+      <span class="c">ID</span><span class="c">Ordine</span><span>Tipologia</span><span>Colore / Anteprima</span><span class="c">Azioni</span>
+    </div>
+    <div id="tipoList"></div>
+  </div>
+</div>
+
+<!-- PAGE: STATI -->
+<div class="page" id="pg-stati">
+  <div class="sp-head">
+    <h2>🔵 Tab_Clienti_Stati</h2>
+    <p>Gestisci gli stati clienti — assegna un colore e l'ordine di visualizzazione.</p>
+  </div>
+  <div class="stcard">
+    <div class="sthead">
+      <div style="display:flex;align-items:center"><h3 style="font-size:14px;font-weight:600">Stati</h3><span class="tcnt" id="statoCnt">5</span></div>
+      <button class="btn btn-primary btn-sm" onclick="addStato()">＋ Nuovo Stato</button>
+    </div>
+    <div class="sgrid sgrid-th">
+      <span class="c">ID</span><span class="c">Ordine</span><span>Stato</span><span>Colore / Anteprima</span><span class="c">Azioni</span>
+    </div>
+    <div id="statoList"></div>
+  </div>
+</div>
+
+<script>
+/* ──────────────────────────────────────────
+   Msk_Clienti — funzioni del modulo
+   Tutte le funzioni di questo modulo hanno
+   prefisso o sono scoped qui per non
+   interferire con altri moduli.
+────────────────────────────────────────── */
+
+/* Pulsanti azione per questo modulo */
+function moduleActions(pgId) {
+  if (pgId === 'pg-clienti') {
+    return `
+      <button class="btn btn-outline-w btn-sm">⬇ Esporta</button>
+      <button class="btn btn-teal btn-sm" onclick="showSubPage('pg-tipologie')">🏷️ Tipologie</button>
+      <button class="btn btn-violet btn-sm" onclick="showSubPage('pg-stati')">🔵 Stati</button>
+      <button class="btn btn-primary btn-sm" onclick="newClient()">＋ Nuovo Cliente</button>`;
+  }
+  if (pgId === 'pg-tipologie' || pgId === 'pg-stati') {
+    return `<button class="btn btn-outline-w btn-sm" onclick="showSubPage('pg-clienti')">← Clienti</button>`;
+  }
+  return '';
+}
+
+/* Mostra una sotto-pagina del modulo */
+function showSubPage(pgId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  const pg = document.getElementById(pgId);
+  if (pg) pg.classList.add('on');
+  if (pgId === 'pg-tipologie') renderTipo();
+  if (pgId === 'pg-stati')     renderStato();
+  // Aggiorna pulsanti
+  if (typeof buildActions === 'function') buildActions(pgId);
+}
+
+/* TABELLA CLIENTI */
+function selClient(row) {
+  document.querySelectorAll('#clientTable tr').forEach(r => r.classList.remove('sel'));
+  row.classList.add('sel');
+  const n = row.querySelector('.t-nome').textContent;
+  document.getElementById('dName').textContent = n;
+  document.getElementById('dAvatar').textContent = initials(n);
+}
+function filterRows() {
+  const s = document.getElementById('srch').value.toLowerCase();
+  const t = document.getElementById('fTipo').value.toLowerCase();
+  const st = document.getElementById('fStato').value.toLowerCase();
+  let c = 0;
+  document.querySelectorAll('#clientTable tr').forEach(r => {
+    const tx = r.textContent.toLowerCase();
+    const ok = (!s || tx.includes(s)) && (!t || tx.includes(t)) && (!st || tx.includes(st));
+    r.style.display = ok ? '' : 'none'; if (ok) c++;
+  });
+  document.getElementById('rowCnt').textContent = c;
+}
+function clearF() {
+  document.getElementById('srch').value = '';
+  document.getElementById('fTipo').value = '';
+  document.getElementById('fStato').value = '';
+  filterRows();
+}
+function newClient() {
+  document.getElementById('dName').textContent = 'Nuovo Cliente';
+  document.getElementById('dAvatar').textContent = 'NC';
+  document.querySelectorAll('.finput').forEach(f => { if (f.tagName !== 'SELECT') f.value = ''; });
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  document.querySelector('.dpanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* FATTURAZIONE TOGGLE */
+function togFattura() {
+  const c = document.getElementById('togFatt').checked;
+  document.getElementById('fattFields').style.display = c ? 'block' : 'none';
+  document.getElementById('fattSame').style.display = c ? 'none' : 'flex';
+}
+
+/* COLLABORATORI */
+function addC() {
+  const list = document.getElementById('collabList');
+  const d = document.createElement('div'); d.className = 'ccard';
+  d.innerHTML = `
+    <div class="ccard-head">
+      <div class="ccard-hl">
+        <div class="cord">⠿</div>
+        <div class="oarrows"><div class="oarrow" onclick="moveC(this,-1)">▲</div><div class="oarrow" onclick="moveC(this,1)">▼</div></div>
+        <input class="cname" type="text" placeholder="Nome collaboratore...">
+      </div>
+      <div class="ccard-hr"><button class="btn btn-danger-o btn-sm btn-icon" onclick="delC(this)">🗑</button></div>
+    </div>
+    <div class="cbody">
+      <div class="fg fg4" style="margin-bottom:12px">
+        <div class="field"><label class="flabel">Ruolo</label><input class="finput" type="text" placeholder="es. Account Manager"></div>
+        <div class="field"><label class="flabel">Cellulare</label><input class="finput" type="tel" placeholder="+39 ..."></div>
+        <div class="field"><label class="flabel">Telefono</label><input class="finput" type="tel" placeholder="+39 ..."></div>
+        <div class="field"><label class="flabel">e-Mail</label><input class="finput" type="text" placeholder="email..."></div>
+      </div>
+      <div class="field"><label class="flabel">Note</label><textarea class="finput" rows="2" placeholder="Note..."></textarea></div>
+    </div>`;
+  list.appendChild(d);
+  d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function delC(btn) { btn.closest('.ccard').remove(); }
+function moveC(btn, dir) {
+  const c = btn.closest('.ccard'), l = document.getElementById('collabList');
+  if (dir === -1 && c.previousElementSibling) l.insertBefore(c, c.previousElementSibling);
+  else if (dir === 1 && c.nextElementSibling) l.insertBefore(c.nextElementSibling, c);
+}
+
+/* TIPOLOGIE */
+let tipos = [
+  {id:1,ord:1,label:'Agenzia Viaggi',color:'#2563eb'},
+  {id:2,ord:2,label:'Tour Operator', color:'#7c3aed'},
+  {id:3,ord:3,label:'OTA',           color:'#6366f1'},
+  {id:4,ord:4,label:'Privato',       color:'#64748b'},
+  {id:5,ord:5,label:'Azienda',       color:'#0d9488'},
+];
+let tipoNx = 6;
+function renderTipo() {
+  const L = document.getElementById('tipoList');
+  document.getElementById('tipoCnt').textContent = tipos.length;
+  if (!tipos.length) { L.innerHTML = '<div class="empty-row">Nessuna tipologia.</div>'; return; }
+  L.innerHTML = tipos.map((t,i) => `
+    <div class="sgrid srow">
+      <div class="rid">#${t.id}</div>
+      <div class="rord">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div class="oarrow" onclick="mvTipo(${i},-1)">▲</div>
+          <div class="oarrow" onclick="mvTipo(${i},1)">▼</div>
+        </div>
+        <span class="ordnum">${t.ord}</span>
+      </div>
+      <div><input class="sinput" type="text" value="${t.label}" placeholder="Nome tipologia..."
+        onchange="tipos[${i}].label=this.value;renderTipo()"></div>
+      <div class="rcol">
+        <div class="cprev" style="background:${t.color}" onclick="document.getElementById('tc${t.id}').click()"></div>
+        <input class="chide" type="color" id="tc${t.id}" value="${t.color}" onchange="tipos[${i}].color=this.value;renderTipo()">
+        <span class="bprev" style="background:${t.color}22;color:${t.color};border:1.5px solid ${t.color}66">${t.label||'Anteprima'}</span>
+      </div>
+      <div class="ract"><button class="btn btn-danger-o btn-sm btn-icon" onclick="delTipo(${i})">🗑</button></div>
+    </div>`).join('');
+}
+function addTipo() {
+  tipos.push({id:tipoNx++,ord:tipos.length+1,label:'',color:'#2563eb'});
+  renderTipo();
+  setTimeout(() => { const a=document.querySelectorAll('#tipoList .sinput'); if(a.length) a[a.length-1].focus(); }, 50);
+}
+function delTipo(i) { tipos.splice(i,1); tipos.forEach((t,j)=>t.ord=j+1); renderTipo(); }
+function mvTipo(i,d) {
+  const j=i+d; if(j<0||j>=tipos.length) return;
+  [tipos[i],tipos[j]]=[tipos[j],tipos[i]]; tipos.forEach((t,k)=>t.ord=k+1); renderTipo();
+}
+
+/* STATI */
+let statiD = [
+  {id:1,ord:1,label:'Contrattualizzato',color:'#10b981'},
+  {id:2,ord:2,label:'Prospect',         color:'#f59e0b'},
+  {id:3,ord:3,label:'VIP',              color:'#8b5cf6'},
+  {id:4,ord:4,label:'Sospeso',          color:'#94a3b8'},
+  {id:5,ord:5,label:'Blacklist',        color:'#ef4444'},
+];
+let statoNx = 6;
+function renderStato() {
+  const L = document.getElementById('statoList');
+  document.getElementById('statoCnt').textContent = statiD.length;
+  if (!statiD.length) { L.innerHTML = '<div class="empty-row">Nessuno stato.</div>'; return; }
+  L.innerHTML = statiD.map((s,i) => `
+    <div class="sgrid srow">
+      <div class="rid">#${s.id}</div>
+      <div class="rord">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div class="oarrow" onclick="mvStato(${i},-1)">▲</div>
+          <div class="oarrow" onclick="mvStato(${i},1)">▼</div>
+        </div>
+        <span class="ordnum">${s.ord}</span>
+      </div>
+      <div><input class="sinput" type="text" value="${s.label}" placeholder="Nome stato..."
+        onchange="statiD[${i}].label=this.value;renderStato()"></div>
+      <div class="rcol">
+        <div class="cprev" style="background:${s.color}" onclick="document.getElementById('sc${s.id}').click()"></div>
+        <input class="chide" type="color" id="sc${s.id}" value="${s.color}" onchange="statiD[${i}].color=this.value;renderStato()">
+        <span class="bprev" style="background:${s.color}22;color:${s.color};border:1.5px solid ${s.color}66">${s.label||'Anteprima'}</span>
+      </div>
+      <div class="ract"><button class="btn btn-danger-o btn-sm btn-icon" onclick="delStato(${i})">🗑</button></div>
+    </div>`).join('');
+}
+function addStato() {
+  statiD.push({id:statoNx++,ord:statiD.length+1,label:'',color:'#10b981'});
+  renderStato();
+  setTimeout(() => { const a=document.querySelectorAll('#statoList .sinput'); if(a.length) a[a.length-1].focus(); }, 50);
+}
+function delStato(i) { statiD.splice(i,1); statiD.forEach((s,j)=>s.ord=j+1); renderStato(); }
+function mvStato(i,d) {
+  const j=i+d; if(j<0||j>=statiD.length) return;
+  [statiD[i],statiD[j]]=[statiD[j],statiD[i]]; statiD.forEach((s,k)=>s.ord=k+1); renderStato();
+}
+
+/* Ricostruisce i pulsanti ora che il modulo è caricato */
+if (typeof buildActions === 'function') buildActions('pg-clienti');
+</script>
