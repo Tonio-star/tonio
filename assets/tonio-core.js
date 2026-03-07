@@ -37,11 +37,9 @@ var TONIO_NAV = {
   }
 };
 
-/* Pulsanti toolbar per pagina */
+/* Pulsanti toolbar per pagina — solo "Nuovo" nella nav */
 var TONIO_PAGE_ACTIONS = {
-  clienti: '<button class="nav-action-btn green"  onclick="MSK_Clienti.openModalTipologie()">🏷️ Tipologie</button>'
-         + '<button class="nav-action-btn purple" onclick="MSK_Clienti.openModalStati()">🔵 Stati</button>'
-         + '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>'
+  clienti: '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>'
 };
 
 var TONIO_currentModule = 'anagrafiche';
