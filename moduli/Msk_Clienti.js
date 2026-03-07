@@ -95,6 +95,10 @@ var MSK_Clienti = (function() {
       +       '<div class="panel-header-title">Clienti</div>'
       +       '<div class="panel-header-sub">' + count + ' client' + (count === 1 ? 'e' : 'i') + '</div>'
       +     '</div>'
+      +     '<div class="panel-header-actions">'
+      +       '<button class="btn btn-success btn-sm" onclick="MSK_Clienti.openModalTipologie()">&#127991; Tipologie</button>'
+      +       '<button class="btn btn-edit btn-sm"    onclick="MSK_Clienti.openModalStati()">&#9679; Stati</button>'
+      +     '</div>'
       +   '</div>'
       +   '<div class="search-bar-wrap">'
       +     '<div class="search-wrap">'
@@ -172,9 +176,8 @@ var MSK_Clienti = (function() {
     var stessiDatiOn  = c ? (c.fattStessiDati !== false) : true;
     var stessiDatiCls = stessiDatiOn ? 'on' : '';
 
-    var collabAddBtn = (editMode||isNew)
-      ? '<button class="btn btn-ghost" style="width:100%;margin-top:4px" onclick="MSK_Clienti.addCollab()">&#xFF0B; Aggiungi Collaboratore</button>'
-      : '';
+    /* Pulsante Aggiungi Collaboratore sempre visibile; i campi sono readonly in view mode */
+    var collabAddBtn = '<button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="MSK_Clienti.addCollab()">&#xFF0B; Aggiungi Collaboratore</button>';
     var annotAddBtn = (editMode||isNew)
       ? '<button class="annot-add-row" onclick="MSK_Clienti.addAnnotazione()">&#xFF0B; Aggiungi annotazione</button>'
       : '';
@@ -435,8 +438,10 @@ var MSK_Clienti = (function() {
   function _lockCollabFields() {
     var list = document.getElementById('collab-list');
     if (!list) return;
+    /* Campi bloccati in view mode */
     list.querySelectorAll('input,textarea,select').forEach(function(el){ el.setAttribute('readonly',''); });
-    list.querySelectorAll('.collab-order-btn,.collab-remove-btn').forEach(function(btn){ btn.style.display='none'; });
+    /* Nascondi solo il pulsante rimuovi; le frecce ordine restano visibili */
+    list.querySelectorAll('.collab-remove-btn').forEach(function(btn){ btn.style.display='none'; });
   }
 
   /* ================================================================
