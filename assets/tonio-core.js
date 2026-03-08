@@ -41,7 +41,7 @@ var TONIO_NAV = {
 var TONIO_PAGE_ACTIONS = {
   clienti: '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>',
   fornitori: '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
-  ospiti:   '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
+  ospiti: '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
   immobili: '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>'
 };
 
