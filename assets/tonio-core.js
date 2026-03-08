@@ -40,7 +40,8 @@ var TONIO_NAV = {
 /* Pulsanti toolbar per pagina — solo "Nuovo" nella nav */
 var TONIO_PAGE_ACTIONS = {
   clienti: '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>',
-  fornitori: '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>'
+  fornitori: '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
+  ospiti: '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>'
 };
 
 var TONIO_currentModule = 'anagrafiche';
