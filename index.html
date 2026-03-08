@@ -68,7 +68,7 @@
   <div id="page-fornitori" class="page"></div>
 
   <!-- PAGINE FUTURE -->
-  <div id="page-ospiti"       class="page"><div class="coming-soon"><div class="cs-icon">🧑</div><h2>Ospiti</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-ospiti" class="page"></div>
   <div id="page-immobili"     class="page"><div class="coming-soon"><div class="cs-icon">🏠</div><h2>Immobili</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-prenotazioni" class="page"><div class="coming-soon"><div class="cs-icon">📅</div><h2>Prenotazioni</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-contratti"    class="page"><div class="coming-soon"><div class="cs-icon">📄</div><h2>Contratti</h2><p>Modulo in sviluppo</p></div></div>
@@ -177,6 +177,54 @@
   </div>
 </div>
 
+<!-- ============================================================
+     MODALI OSPITI
+     ============================================================ -->
+
+<!-- MODAL TIPOLOGIE OSPITI -->
+<div class="modal-overlay" id="modal-osp-tipologie">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">🏷️</span>
+      <div class="modal-title">Tipologie Ospite</div>
+      <button class="modal-close" onclick="document.getElementById('modal-osp-tipologie').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="osp-tipo-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Ospiti.addTipologia()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Ospiti.saveTipologie()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-osp-tipologie').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STATI OSPITI -->
+<div class="modal-overlay" id="modal-osp-stati">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">🔵</span>
+      <div class="modal-title">Stati Ospite</div>
+      <button class="modal-close" onclick="document.getElementById('modal-osp-stati').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="osp-stati-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Ospiti.addStato()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Ospiti.saveStati()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-osp-stati').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <!--
   SCRIPTS — ordine fondamentale:
   1. Dati  (⚠️ non toccare durante aggiornamenti struttura)
@@ -187,7 +235,9 @@
 <script src="dati/Dati_Fornitori.js"></script>
 <script src="assets/tonio-core.js"></script>
 <script src="moduli/Msk_Clienti.js"></script>
+<script src="dati/Dati_Ospiti.js"></script>
 <script src="moduli/Msk_Fornitori.js"></script>
+<script src="moduli/Msk_Ospiti.js"></script>
 
 </body>
 </html>
