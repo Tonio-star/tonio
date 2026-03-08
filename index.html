@@ -64,10 +64,12 @@
   <!-- CLIENTI — gestito da Msk_Clienti.js -->
   <div id="page-clienti" class="page active"></div>
 
+  <!-- FORNITORI — gestito da Msk_Fornitori.js -->
+  <div id="page-fornitori" class="page"></div>
+
   <!-- PAGINE FUTURE -->
   <div id="page-ospiti"       class="page"><div class="coming-soon"><div class="cs-icon">🧑</div><h2>Ospiti</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-immobili"     class="page"><div class="coming-soon"><div class="cs-icon">🏠</div><h2>Immobili</h2><p>Modulo in sviluppo</p></div></div>
-  <div id="page-fornitori"    class="page"><div class="coming-soon"><div class="cs-icon">🔧</div><h2>Fornitori</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-prenotazioni" class="page"><div class="coming-soon"><div class="cs-icon">📅</div><h2>Prenotazioni</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-contratti"    class="page"><div class="coming-soon"><div class="cs-icon">📄</div><h2>Contratti</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-incassi"      class="page"><div class="coming-soon"><div class="cs-icon">💰</div><h2>Incassi</h2><p>Modulo in sviluppo</p></div></div>
@@ -79,7 +81,11 @@
 
 </main>
 
-<!-- MODAL TIPOLOGIE -->
+<!-- ============================================================
+     MODALI CLIENTI
+     ============================================================ -->
+
+<!-- MODAL TIPOLOGIE CLIENTI -->
 <div class="modal-overlay" id="modal-tipologie">
   <div class="modal">
     <div class="modal-header">
@@ -101,7 +107,7 @@
   </div>
 </div>
 
-<!-- MODAL STATI -->
+<!-- MODAL STATI CLIENTI -->
 <div class="modal-overlay" id="modal-stati">
   <div class="modal">
     <div class="modal-header">
@@ -123,6 +129,54 @@
   </div>
 </div>
 
+<!-- ============================================================
+     MODALI FORNITORI
+     ============================================================ -->
+
+<!-- MODAL TIPOLOGIE FORNITORI -->
+<div class="modal-overlay" id="modal-forn-tipologie">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">🏷️</span>
+      <div class="modal-title">Tipologie Fornitore</div>
+      <button class="modal-close" onclick="document.getElementById('modal-forn-tipologie').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="forn-tipo-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Fornitori.addTipologia()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Fornitori.saveTipologie()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-forn-tipologie').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STATI FORNITORI -->
+<div class="modal-overlay" id="modal-forn-stati">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">🔵</span>
+      <div class="modal-title">Stati Fornitore</div>
+      <button class="modal-close" onclick="document.getElementById('modal-forn-stati').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="forn-stati-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Fornitori.addStato()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Fornitori.saveStati()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-forn-stati').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <!--
   SCRIPTS — ordine fondamentale:
   1. Dati  (⚠️ non toccare durante aggiornamenti struttura)
@@ -130,8 +184,10 @@
   3. Moduli (uno per modulo)
 -->
 <script src="dati/Dati_Clienti.js"></script>
+<script src="dati/Dati_Fornitori.js"></script>
 <script src="assets/tonio-core.js"></script>
 <script src="moduli/Msk_Clienti.js"></script>
+<script src="moduli/Msk_Fornitori.js"></script>
 
 </body>
 </html>
