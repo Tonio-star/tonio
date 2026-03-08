@@ -225,6 +225,98 @@
   </div>
 </div>
 
+<!-- ============================================================
+     MODALI IMMOBILI
+     ============================================================ -->
+
+<!-- MODAL PRODOTTI -->
+<div class="modal-overlay" id="modal-imm-prodotti">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">&#127981;</span>
+      <div class="modal-title">Prodotti Immobile</div>
+      <button class="modal-close" onclick="document.getElementById('modal-imm-prodotti').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Prodotto</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="imm-prod-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addProdotto()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Immobili.saveProdotti()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-prodotti').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUPER PRODOTTI -->
+<div class="modal-overlay" id="modal-imm-superprodotti">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">&#11088;</span>
+      <div class="modal-title">Super Prodotti Immobile</div>
+      <button class="modal-close" onclick="document.getElementById('modal-imm-superprodotti').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Super Prodotto</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="imm-super-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addSuperProdotto()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Immobili.saveSuperProdotti()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-superprodotti').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TIPI -->
+<div class="modal-overlay" id="modal-imm-tipi">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">&#127968;</span>
+      <div class="modal-title">Tipi Immobile</div>
+      <button class="modal-close" onclick="document.getElementById('modal-imm-tipi').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Tipo</th><th>Colore</th><th></th></tr></thead>
+        <tbody id="imm-tipo-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addTipo()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Immobili.saveTipi()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-tipi').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PIANI -->
+<div class="modal-overlay" id="modal-imm-piani">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:19px">&#127970;</span>
+      <div class="modal-title">Piani Immobile</div>
+      <button class="modal-close" onclick="document.getElementById('modal-imm-piani').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="lookup-table">
+        <thead><tr><th>#</th><th>Ordine</th><th>Piano</th><th></th></tr></thead>
+        <tbody id="imm-piani-tbody"></tbody>
+      </table>
+      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addPiano()">＋ Aggiungi</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="MSK_Immobili.savePiani()">💾 Salva</button>
+      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-piani').classList.remove('open')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <!--
   SCRIPTS — ordine fondamentale:
   1. Dati  (⚠️ non toccare durante aggiornamenti struttura)
@@ -238,6 +330,8 @@
 <script src="dati/Dati_Ospiti.js"></script>
 <script src="moduli/Msk_Fornitori.js"></script>
 <script src="moduli/Msk_Ospiti.js"></script>
+<script src="dati/Dati_Immobili.js"></script>
+<script src="moduli/Msk_Immobili.js"></script>
 
 </body>
 </html>
