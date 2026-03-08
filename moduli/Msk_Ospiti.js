@@ -1,6 +1,6 @@
 /* ================================================================
    TONIO — Msk_Ospiti.js  |  Modulo Anagrafica Ospiti
-   v1.0 — Struttura analoga a Msk_Clienti (senza scheda Collaboratori)
+   v2.0 — Aggiunta scheda Registrazione documento, rimosso Firmatario da Fiscali
    ================================================================ */
 
 var MSK_Ospiti = (function() {
@@ -55,8 +55,8 @@ var MSK_Ospiti = (function() {
         var tipoBadge  = c.tipologia ? TONIO_makeBadge(c.tipologia, _tipoColore(c.tipologia)) : '&mdash;';
         var statoBadge = c.stato     ? TONIO_makeBadge(c.stato, _statoColore(c.stato))         : '&mdash;';
         if (!c.attivo) statoBadge += ' <span class="badge" style="background:rgba(100,116,139,0.15);color:#64748b;border:1px solid rgba(100,116,139,0.3)">DISATTIVO</span>';
-        var tel  = c.cellulare  || c.telefono  || '&mdash;';
-        var tel2 = c.cellulare2 || c.telefono2 || '';
+        var tel      = c.cellulare  || c.telefono  || '&mdash;';
+        var tel2     = c.cellulare2 || c.telefono2 || '';
         var mailHtml  = c.mail  ? '<div class="td-contact">' + TONIO_escapeHtml(c.mail)  + '</div>' : '';
         var mailHtml2 = c.mail2 ? '<div class="td-contact" style="color:var(--text3)">' + TONIO_escapeHtml(c.mail2) + '</div>' : '';
         var noteHtml  = c.note  ? '<div class="td-note">' + TONIO_escapeHtml(c.note) + '</div>' : '&mdash;';
@@ -126,8 +126,8 @@ var MSK_Ospiti = (function() {
   function renderScheda(c, mode) {
     var page = document.getElementById('page-ospiti');
     if (!page) return;
-    editMode  = mode || false;
-    annotCnt  = 0;
+    editMode = mode || false;
+    annotCnt = 0;
 
     var isNew = !c;
     var nom   = c ? TONIO_escapeHtml(c.nominativo) : 'Nuovo Ospite';
@@ -138,12 +138,23 @@ var MSK_Ospiti = (function() {
 
     var tipoOpts = '<option value="">\u2014 Seleziona \u2014</option>';
     tipologie.slice().sort(function(a,b){return a.ordine-b.ordine;}).forEach(function(t){
-      tipoOpts += '<option value="' + TONIO_escapeHtml(t.nome) + '"'+(c&&c.tipologia===t.nome?' selected':'')+'>'+TONIO_escapeHtml(t.nome)+'</option>';
+      tipoOpts += '<option value="'+TONIO_escapeHtml(t.nome)+'"'+(c&&c.tipologia===t.nome?' selected':'')+'>'+TONIO_escapeHtml(t.nome)+'</option>';
     });
     var statoOpts = '<option value="">\u2014 Seleziona \u2014</option>';
     stati.slice().sort(function(a,b){return a.ordine-b.ordine;}).forEach(function(s){
-      statoOpts += '<option value="' + TONIO_escapeHtml(s.nome) + '"'+(c&&c.stato===s.nome?' selected':'')+'>'+TONIO_escapeHtml(s.nome)+'</option>';
+      statoOpts += '<option value="'+TONIO_escapeHtml(s.nome)+'"'+(c&&c.stato===s.nome?' selected':'')+'>'+TONIO_escapeHtml(s.nome)+'</option>';
     });
+
+    /* Opzioni tipo documento */
+    var docTipi = ['Carta d\'Identità','Passaporto','Patente di Guida','Permesso di Soggiorno','Altro'];
+    var docTipoOpts = '<option value="">\u2014 Seleziona \u2014</option>';
+    docTipi.forEach(function(t){
+      docTipoOpts += '<option value="'+TONIO_escapeHtml(t)+'"'+(c&&c.doc_tipo===t?' selected':'')+'>'+TONIO_escapeHtml(t)+'</option>';
+    });
+    var sessoOpts = ''
+      + '<option value="">\u2014</option>'
+      + '<option value="M"'+(c&&c.doc_sesso==='M'?' selected':'')+'>M</option>'
+      + '<option value="F"'+(c&&c.doc_sesso==='F'?' selected':'')+'>F</option>';
 
     var btnEdit     = !isNew && !editMode
       ? '<button class="btn btn-edit btn-sm" onclick="MSK_Ospiti._setEditMode(true)">&#9998; Modifica</button>' : '';
@@ -173,6 +184,7 @@ var MSK_Ospiti = (function() {
     page.innerHTML =
         '<div class="panel">'
 
+      /* ===== HEADER ===== */
       + '<div class="panel-header" style="background:linear-gradient(135deg,#1a0d3c 0%,#3a1a6e 50%,#1a0d3c 100%);border-bottom:1px solid rgba(167,139,250,0.2);">'
       +   '<button class="btn btn-ghost btn-sm" onclick="MSK_Ospiti.tornaLista()" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff;flex-shrink:0">\u2190 Lista</button>'
       +   '<div class="panel-header-icon" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2)">&#129489;</div>'
@@ -187,8 +199,10 @@ var MSK_Ospiti = (function() {
 
       + disattivoBar
 
+      /* ===== TAB BAR ===== */
       + '<div class="tabs-bar" id="sob">'
       +   '<button class="tab-btn active" onclick="TONIO_setTab(\'sobb\',\'principale\',this)">&#128203; Principale</button>'
+      +   '<button class="tab-btn" onclick="TONIO_setTab(\'sobb\',\'registrazione\',this)">&#128196; Registrazione</button>'
       +   '<button class="tab-btn" onclick="TONIO_setTab(\'sobb\',\'fiscali\',this)">&#127968; Dati Fiscali</button>'
       +   '<button class="tab-btn" onclick="TONIO_setTab(\'sobb\',\'bancari\',this)">&#128179; Dati Bancari</button>'
       +   '<button class="tab-btn" onclick="TONIO_setTab(\'sobb\',\'annotazioni\',this)">&#128221; Annotazioni</button>'
@@ -198,78 +212,90 @@ var MSK_Ospiti = (function() {
 
       /* ===== TAB PRINCIPALE ===== */
       + '<div class="tab-panel active" id="sobb-tab-principale">'
-
       + '<div style="padding:20px 20px 0">'
       +   '<div class="form-group">'
       +     '<label class="form-label">Ragione Sociale / Nominativo *</label>'
       +     '<input class="form-input" id="fo-nominativo" value="'+v('nominativo')+'" placeholder="Es. Ferrari Luca"'+ro+' oninput="MSK_Ospiti.aggiornaHeader()">'
       +   '</div>'
       + '</div>'
-
       + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
       +   '<div class="form-group"><label class="form-label">Tipologia</label>'
       +     '<select class="form-select" id="fo-tipo"'+dis+' onchange="MSK_Ospiti.aggiornaHeader()">'+tipoOpts+'</select></div>'
       +   '<div class="form-group"><label class="form-label">Stato</label>'
       +     '<select class="form-select" id="fo-stato"'+dis+' onchange="MSK_Ospiti.aggiornaHeader()">'+statoOpts+'</select></div>'
       + '</div>'
-
       + '<div style="padding:12px 20px 0">'
       +   '<div class="form-group"><label class="form-label">Note</label>'
       +     '<textarea class="form-textarea" id="fo-note" placeholder="Note libere\u2026"'+ro+'>'+v('note')+'</textarea></div>'
       + '</div>'
-
       + '<div style="padding:16px 20px 4px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-top:1px solid var(--border);margin-top:16px">&#128222; Contatti</div>'
-
       + '<div class="form-grid form-grid-2" style="padding:8px 20px 0">'
-      +   '<div class="form-group"><label class="form-label">Cellulare 1</label>'
-      +     '<input class="form-input" id="fo-cellulare"  value="'+v('cellulare')+'"  placeholder="+39 \u2026"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">Cellulare 2</label>'
-      +     '<input class="form-input" id="fo-cellulare2" value="'+v('cellulare2')+'" placeholder="+39 \u2026"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Cellulare 1</label><input class="form-input" id="fo-cellulare"  value="'+v('cellulare')+'"  placeholder="+39 \u2026"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Cellulare 2</label><input class="form-input" id="fo-cellulare2" value="'+v('cellulare2')+'" placeholder="+39 \u2026"'+ro+'></div>'
       + '</div>'
-
       + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
-      +   '<div class="form-group"><label class="form-label">Telefono 1</label>'
-      +     '<input class="form-input" id="fo-telefono"  value="'+v('telefono')+'"  placeholder="+39 \u2026"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">Telefono 2</label>'
-      +     '<input class="form-input" id="fo-telefono2" value="'+v('telefono2')+'" placeholder="+39 \u2026"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Telefono 1</label><input class="form-input" id="fo-telefono"  value="'+v('telefono')+'"  placeholder="+39 \u2026"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Telefono 2</label><input class="form-input" id="fo-telefono2" value="'+v('telefono2')+'" placeholder="+39 \u2026"'+ro+'></div>'
       + '</div>'
-
       + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
-      +   '<div class="form-group"><label class="form-label">Mail 1</label>'
-      +     '<input class="form-input" id="fo-mail"  type="email" value="'+v('mail')+'"  placeholder="esempio@mail.it"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">Mail 2</label>'
-      +     '<input class="form-input" id="fo-mail2" type="email" value="'+v('mail2')+'" placeholder="esempio@mail.it"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Mail 1</label><input class="form-input" id="fo-mail"  type="email" value="'+v('mail')+'"  placeholder="esempio@mail.it"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Mail 2</label><input class="form-input" id="fo-mail2" type="email" value="'+v('mail2')+'" placeholder="esempio@mail.it"'+ro+'></div>'
       + '</div>'
-
       + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
-      +   '<div class="form-group"><label class="form-label">PEC</label>'
-      +     '<input class="form-input" id="fo-pec" type="email" value="'+v('pec')+'" placeholder="pec@esempio.it"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">Home Page</label>'
-      +     '<input class="form-input" id="fo-web" value="'+v('web')+'" placeholder="https://\u2026"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">PEC</label><input class="form-input" id="fo-pec" type="email" value="'+v('pec')+'" placeholder="pec@esempio.it"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Home Page</label><input class="form-input" id="fo-web" value="'+v('web')+'" placeholder="https://\u2026"'+ro+'></div>'
       + '</div>'
-
       + '<div style="padding:16px 20px 4px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-top:1px solid var(--border);margin-top:16px">&#128205; Indirizzo</div>'
-
       + '<div style="padding:8px 20px 0">'
-      +   '<div class="form-group"><label class="form-label">Via</label>'
-      +     '<input class="form-input" id="fo-via" value="'+v('via')+'" placeholder="Via Roma 1"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Via</label><input class="form-input" id="fo-via" value="'+v('via')+'" placeholder="Via Roma 1"'+ro+'></div>'
       + '</div>'
-
       + '<div class="form-grid form-grid-3" style="padding:12px 20px 0">'
-      +   '<div class="form-group"><label class="form-label">Citt\u00e0</label>'
-      +     '<input class="form-input" id="fo-citta" value="'+v('citta')+'" placeholder="Roma"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">CAP</label>'
-      +     '<input class="form-input" id="fo-cap" value="'+v('cap')+'" placeholder="00100"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">Provincia</label>'
-      +     '<input class="form-input" id="fo-prov" value="'+v('prov')+'" placeholder="RM" maxlength="3"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Citt\u00e0</label><input class="form-input" id="fo-citta" value="'+v('citta')+'" placeholder="Roma"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">CAP</label><input class="form-input" id="fo-cap" value="'+v('cap')+'" placeholder="00100"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Provincia</label><input class="form-input" id="fo-prov" value="'+v('prov')+'" placeholder="RM" maxlength="3"'+ro+'></div>'
       + '</div>'
-
       + '<div style="padding:12px 20px 20px">'
-      +   '<div class="form-group"><label class="form-label">Stato / Paese</label>'
-      +     '<input class="form-input" id="fo-paese" value="'+(c&&c.paese?TONIO_escapeHtml(c.paese):'Italia')+'"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Stato / Paese</label><input class="form-input" id="fo-paese" value="'+(c&&c.paese?TONIO_escapeHtml(c.paese):'Italia')+'"'+ro+'></div>'
       + '</div>'
-
       + '</div>' /* /tab-principale */
+
+      /* ===== TAB REGISTRAZIONE ===== */
+      + '<div class="tab-panel" id="sobb-tab-registrazione">'
+      + '<div style="padding:16px 20px 4px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-top:8px">&#128196; Documento di Identit\u00e0</div>'
+      + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
+      +   '<div class="form-group"><label class="form-label">Tipo Documento</label>'
+      +     '<select class="form-select" id="fo-doc-tipo"'+dis+'>'+docTipoOpts+'</select></div>'
+      +   '<div class="form-group"><label class="form-label">N\u00b0 Documento</label>'
+      +     '<input class="form-input" id="fo-doc-numero" value="'+v('doc_numero')+'" placeholder="Es. CA12345678"'+ro+'></div>'
+      + '</div>'
+      + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
+      +   '<div class="form-group"><label class="form-label">Ente di Rilascio</label>'
+      +     '<input class="form-input" id="fo-doc-ente" value="'+v('doc_ente')+'" placeholder="Es. Comune di Roma"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Localit\u00e0 Rilascio</label>'
+      +     '<input class="form-input" id="fo-doc-localita" value="'+v('doc_localita')+'" placeholder="Es. Roma"'+ro+'></div>'
+      + '</div>'
+      + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
+      +   '<div class="form-group"><label class="form-label">Data Emissione</label>'
+      +     '<input class="form-input" type="date" id="fo-doc-emissione" value="'+v('doc_emissione')+'"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Data Scadenza</label>'
+      +     '<input class="form-input" type="date" id="fo-doc-scadenza" value="'+v('doc_scadenza')+'"'+ro+'></div>'
+      + '</div>'
+      + '<div style="padding:16px 20px 4px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-top:1px solid var(--border);margin-top:16px">&#127919; Dati Anagrafici</div>'
+      + '<div class="form-grid form-grid-2" style="padding:12px 20px 0">'
+      +   '<div class="form-group"><label class="form-label">Luogo di Nascita</label>'
+      +     '<input class="form-input" id="fo-doc-luogo-nascita" value="'+v('doc_luogo_nascita')+'" placeholder="Es. Roma"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Provincia Nascita</label>'
+      +     '<input class="form-input" id="fo-doc-prov-nascita" value="'+v('doc_prov_nascita')+'" placeholder="RM" maxlength="3"'+ro+'></div>'
+      + '</div>'
+      + '<div class="form-grid form-grid-3" style="padding:12px 20px 20px">'
+      +   '<div class="form-group"><label class="form-label">Data di Nascita</label>'
+      +     '<input class="form-input" type="date" id="fo-doc-data-nascita" value="'+v('doc_data_nascita')+'"'+ro+'></div>'
+      +   '<div class="form-group"><label class="form-label">Sesso</label>'
+      +     '<select class="form-select" id="fo-doc-sesso"'+dis+'>'+sessoOpts+'</select></div>'
+      +   '<div class="form-group"><label class="form-label">Stato / Nazionalit\u00e0</label>'
+      +     '<input class="form-input" id="fo-doc-stato" value="'+(c&&c.doc_stato?TONIO_escapeHtml(c.doc_stato):'Italia')+'" placeholder="Italia"'+ro+'></div>'
+      + '</div>'
+      + '</div>' /* /tab-registrazione */
 
       /* ===== TAB DATI FISCALI ===== */
       + '<div class="tab-panel" id="sobb-tab-fiscali">'
@@ -307,12 +333,8 @@ var MSK_Ospiti = (function() {
       + '<div style="overflow-x:auto">'
       + '<table class="annot-table">'
       + '<thead><tr>'
-      +   '<th>Destinatario</th>'
-      +   '<th>Data</th>'
-      +   '<th>N\u00b0 Prenotazione</th>'
-      +   '<th>Ospite</th>'
-      +   '<th>Descrizione</th>'
-      +   '<th style="width:80px"></th>'
+      +   '<th>Destinatario</th><th>Data</th><th>N\u00b0 Prenotazione</th>'
+      +   '<th>Ospite</th><th>Descrizione</th><th style="width:80px"></th>'
       + '</tr></thead>'
       + '<tbody id="osp-annot-tbody"></tbody>'
       + '</table>'
@@ -330,7 +352,7 @@ var MSK_Ospiti = (function() {
   }
 
   /* ================================================================
-     CAMPI FISCALI
+     CAMPI FISCALI (senza sezione Firmatario)
      ================================================================ */
   function _buildFiscaliFields(c, ro, dis, stessiDati) {
     var v = function(f){ return c ? TONIO_escapeHtml(c[f]||'') : ''; };
@@ -375,18 +397,7 @@ var MSK_Ospiti = (function() {
       +     '<input class="form-input" id="fo-fatt-prov" value="'+vFatt('fatt_prov','prov')+'" placeholder="RM" maxlength="3"'+roFatt+'></div>'
       + '</div>'
       + '<div class="form-group"><label class="form-label">Stato / Paese</label>'
-      +   '<input class="form-input" id="fo-fatt-paese" value="'+(stessiDati&&c?TONIO_escapeHtml(c.paese||'Italia'):(c?TONIO_escapeHtml(c.fatt_paese||''):''))+'" placeholder="Italia"'+roFatt+'></div>'
-      + '<div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">&#9997; Firmatario Contratto</div>'
-      + '<div class="form-group"><label class="form-label">Firmatario Contratto</label>'
-      +   '<input class="form-input" id="fo-firmatario" value="'+v('firmatario')+'" placeholder="Nome e Cognome"'+ro+'></div>'
-      + '<div class="form-grid form-grid-3">'
-      +   '<div class="form-group"><label class="form-label">Citt\u00e0 di Nascita</label>'
-      +     '<input class="form-input" id="fo-firmatario-citta" value="'+v('firmatario_citta')+'" placeholder="Roma"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">Data di Nascita</label>'
-      +     '<input class="form-input" id="fo-firmatario-data" type="date" value="'+v('firmatario_data')+'"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">Codice Fiscale Firmatario</label>'
-      +     '<input class="form-input" id="fo-firmatario-cf" value="'+v('firmatario_cf')+'" placeholder="RSSMRA80A01H501Z"'+ro+'></div>'
-      + '</div>';
+      +   '<input class="form-input" id="fo-fatt-paese" value="'+(stessiDati&&c?TONIO_escapeHtml(c.paese||'Italia'):(c?TONIO_escapeHtml(c.fatt_paese||''):''))+'" placeholder="Italia"'+roFatt+'></div>';
   }
 
   function _toggleStessiDati() {
@@ -428,8 +439,8 @@ var MSK_Ospiti = (function() {
   }
 
   function tornaLista() {
-    currentId  = null;
-    editMode   = false;
+    currentId = null;
+    editMode  = false;
     renderLista();
     TONIO_showPage('ospiti');
   }
@@ -475,46 +486,56 @@ var MSK_Ospiti = (function() {
     var pae1  = _val('fo-paese');
 
     var data = {
-      nominativo:       nom,
-      tipologia:        _val('fo-tipo'),
-      stato:            _val('fo-stato'),
-      note:             _val('fo-note'),
-      cellulare:        cell1,
-      cellulare2:       _val('fo-cellulare2'),
-      telefono:         tel1,
-      telefono2:        _val('fo-telefono2'),
-      mail:             mail1,
-      mail2:            _val('fo-mail2'),
-      pec:              pec1,
-      web:              _val('fo-web'),
-      via:              via1,
-      citta:            cit1,
-      cap:              cap1,
-      prov:             prv1,
-      paese:            pae1,
-      fattStessiDati:   stessiDati,
-      fatt_nominativo:  stessiDati ? nom   : _val('fo-fatt-nominativo'),
-      cf:               _val('fo-cf'),
-      piva:             _val('fo-piva'),
-      sdi:              _val('fo-sdi'),
-      fatt_cell:        stessiDati ? cell1  : _val('fo-fatt-cell'),
-      fatt_tel:         stessiDati ? tel1   : _val('fo-fatt-tel'),
-      fatt_mail:        stessiDati ? mail1  : _val('fo-fatt-mail'),
-      fatt_pec:         stessiDati ? pec1   : _val('fo-fatt-pec'),
-      fatt_via:         stessiDati ? via1   : _val('fo-fatt-via'),
-      fatt_citta:       stessiDati ? cit1   : _val('fo-fatt-citta'),
-      fatt_cap:         stessiDati ? cap1   : _val('fo-fatt-cap'),
-      fatt_prov:        stessiDati ? prv1   : _val('fo-fatt-prov'),
-      fatt_paese:       stessiDati ? pae1   : _val('fo-fatt-paese'),
-      firmatario:       _val('fo-firmatario'),
-      firmatario_citta: _val('fo-firmatario-citta'),
-      firmatario_data:  _val('fo-firmatario-data'),
-      firmatario_cf:    _val('fo-firmatario-cf'),
-      intestatario:     _val('fo-intestatario'),
-      banca:            _val('fo-banca'),
-      iban:             _val('fo-iban'),
-      bic:              _val('fo-bic'),
-      annotazioni:      _collectAnnotazioni()
+      nominativo:  nom,
+      tipologia:   _val('fo-tipo'),
+      stato:       _val('fo-stato'),
+      note:        _val('fo-note'),
+      cellulare:   cell1,
+      cellulare2:  _val('fo-cellulare2'),
+      telefono:    tel1,
+      telefono2:   _val('fo-telefono2'),
+      mail:        mail1,
+      mail2:       _val('fo-mail2'),
+      pec:         pec1,
+      web:         _val('fo-web'),
+      via:         via1,
+      citta:       cit1,
+      cap:         cap1,
+      prov:        prv1,
+      paese:       pae1,
+      /* Registrazione */
+      doc_tipo:          _val('fo-doc-tipo'),
+      doc_numero:        _val('fo-doc-numero'),
+      doc_ente:          _val('fo-doc-ente'),
+      doc_localita:      _val('fo-doc-localita'),
+      doc_emissione:     _val('fo-doc-emissione'),
+      doc_scadenza:      _val('fo-doc-scadenza'),
+      doc_luogo_nascita: _val('fo-doc-luogo-nascita'),
+      doc_prov_nascita:  _val('fo-doc-prov-nascita'),
+      doc_data_nascita:  _val('fo-doc-data-nascita'),
+      doc_sesso:         _val('fo-doc-sesso'),
+      doc_stato:         _val('fo-doc-stato'),
+      /* Fiscali */
+      fattStessiDati:  stessiDati,
+      fatt_nominativo: stessiDati ? nom   : _val('fo-fatt-nominativo'),
+      cf:              _val('fo-cf'),
+      piva:            _val('fo-piva'),
+      sdi:             _val('fo-sdi'),
+      fatt_cell:       stessiDati ? cell1 : _val('fo-fatt-cell'),
+      fatt_tel:        stessiDati ? tel1  : _val('fo-fatt-tel'),
+      fatt_mail:       stessiDati ? mail1 : _val('fo-fatt-mail'),
+      fatt_pec:        stessiDati ? pec1  : _val('fo-fatt-pec'),
+      fatt_via:        stessiDati ? via1  : _val('fo-fatt-via'),
+      fatt_citta:      stessiDati ? cit1  : _val('fo-fatt-citta'),
+      fatt_cap:        stessiDati ? cap1  : _val('fo-fatt-cap'),
+      fatt_prov:       stessiDati ? prv1  : _val('fo-fatt-prov'),
+      fatt_paese:      stessiDati ? pae1  : _val('fo-fatt-paese'),
+      /* Bancari */
+      intestatario: _val('fo-intestatario'),
+      banca:        _val('fo-banca'),
+      iban:         _val('fo-iban'),
+      bic:          _val('fo-bic'),
+      annotazioni:  _collectAnnotazioni()
     };
 
     if (currentId) {
@@ -534,7 +555,6 @@ var MSK_Ospiti = (function() {
     var saved = ospiti.find(function(x){return x.id===currentId;});
     renderScheda(saved, false);
 
-    /* Flash viola header */
     var ph = document.querySelector('#page-ospiti .panel-header');
     if (ph) {
       ph.style.transition = 'background 0.4s';
