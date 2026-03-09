@@ -1,6 +1,6 @@
 /* ================================================================
    TONIO — Msk_Clienti.js  |  Modulo Anagrafica Clienti
-   v2.0 — Campi completi, edit mode, barra ricerca, annotazioni strutturate
+   v2.1 — Aggiunto salvataggio localStorage (dati persistenti)
    ================================================================ */
 
 var MSK_Clienti = (function() {
@@ -16,12 +16,24 @@ var MSK_Clienti = (function() {
 
   /* ---- INIT ---- */
   function init() {
-    tipologie = (window.TONIO_TIPOLOGIE || []).map(function(x){ return Object.assign({},x); });
-    stati     = (window.TONIO_STATI     || []).map(function(x){ return Object.assign({},x); });
-    clienti   = (window.TONIO_CLIENTI   || []).map(function(x){ return Object.assign({},x,{
+    /* Carica da localStorage (se presenti) o dai dati di default */
+    var savedTipologie = TONIO_Storage.load('clienti_tipologie');
+    var savedStati     = TONIO_Storage.load('clienti_stati');
+    var savedClienti   = TONIO_Storage.load('clienti');
+
+    tipologie = (savedTipologie || window.TONIO_TIPOLOGIE || []).map(function(x){ return Object.assign({},x); });
+    stati     = (savedStati     || window.TONIO_STATI     || []).map(function(x){ return Object.assign({},x); });
+    clienti   = (savedClienti   || window.TONIO_CLIENTI   || []).map(function(x){ return Object.assign({},x,{
       attivo: x.attivo !== undefined ? x.attivo : true
     }); });
     renderLista();
+  }
+
+  /* ---- SALVATAGGIO PERSISTENTE ---- */
+  function _persist() {
+    TONIO_Storage.save('clienti_tipologie', tipologie);
+    TONIO_Storage.save('clienti_stati', stati);
+    TONIO_Storage.save('clienti', clienti);
   }
 
   /* ================================================================
@@ -471,6 +483,7 @@ var MSK_Clienti = (function() {
   function eliminaCliente(id) {
     if (!confirm('Eliminare definitivamente questo cliente?\nL\'operazione non pu\u00f2 essere annullata.')) return;
     clienti = clienti.filter(function(x){ return x.id !== id; });
+    _persist();
     if (currentId === id) tornaLista(); else renderLista();
   }
 
@@ -484,6 +497,7 @@ var MSK_Clienti = (function() {
     var idx = clienti.findIndex(function(x){return x.id===currentId;});
     if (idx < 0) return;
     clienti[idx].attivo = !(clienti[idx].attivo !== false);
+    _persist();
     renderScheda(clienti[idx], editMode);
   }
 
@@ -567,6 +581,7 @@ var MSK_Clienti = (function() {
     }
 
     var saved = clienti.find(function(x){return x.id===currentId;});
+    _persist();
     renderScheda(saved, false);
 
     /* Flash verde header */
@@ -741,7 +756,7 @@ var MSK_Clienti = (function() {
   function _moveTipo(idx,dir){var s=tipologie.slice().sort(function(a,b){return a.ordine-b.ordine;});var ni=idx+dir;if(ni<0||ni>=s.length)return;var t=s[idx].ordine;s[idx].ordine=s[ni].ordine;s[ni].ordine=t;_renderTipologieModal();}
   function _delTipo(id){if(!confirm('Eliminare?'))return;tipologie=tipologie.filter(function(x){return x.id!==id;});_renderTipologieModal();}
   function addTipologia(){var n=tipologie.length>0?Math.max.apply(null,tipologie.map(function(x){return x.id;}))+1:1;tipologie.push({id:n,ordine:tipologie.length+1,nome:'Nuova Tipologia',colore:'#4f8ef7'});_renderTipologieModal();}
-  function saveTipologie(){tipologie=tipologie.map(function(t){return Object.assign({},t,{nome:(document.getElementById('tipo-nome-'+t.id)||{}).value||t.nome,colore:(document.getElementById('tipo-col-'+t.id)||{}).value||t.colore});});document.getElementById('modal-tipologie').classList.remove('open');}
+  function saveTipologie(){tipologie=tipologie.map(function(t){return Object.assign({},t,{nome:(document.getElementById('tipo-nome-'+t.id)||{}).value||t.nome,colore:(document.getElementById('tipo-col-'+t.id)||{}).value||t.colore});});_persist();document.getElementById('modal-tipologie').classList.remove('open');}
 
   /* ================================================================
      MODAL STATI
@@ -766,7 +781,7 @@ var MSK_Clienti = (function() {
   function _moveStato(idx,dir){var s=stati.slice().sort(function(a,b){return a.ordine-b.ordine;});var ni=idx+dir;if(ni<0||ni>=s.length)return;var t=s[idx].ordine;s[idx].ordine=s[ni].ordine;s[ni].ordine=t;_renderStatiModal();}
   function _delStato(id){if(!confirm('Eliminare?'))return;stati=stati.filter(function(x){return x.id!==id;});_renderStatiModal();}
   function addStato(){var n=stati.length>0?Math.max.apply(null,stati.map(function(x){return x.id;}))+1:1;stati.push({id:n,ordine:stati.length+1,nome:'Nuovo Stato',colore:'#34d399'});_renderStatiModal();}
-  function saveStati(){stati=stati.map(function(s){return Object.assign({},s,{nome:(document.getElementById('stato-nome-'+s.id)||{}).value||s.nome,colore:(document.getElementById('stato-col-'+s.id)||{}).value||s.colore});});document.getElementById('modal-stati').classList.remove('open');}
+  function saveStati(){stati=stati.map(function(s){return Object.assign({},s,{nome:(document.getElementById('stato-nome-'+s.id)||{}).value||s.nome,colore:(document.getElementById('stato-col-'+s.id)||{}).value||s.colore});});_persist();document.getElementById('modal-stati').classList.remove('open');}
 
   /* ================================================================
      AGGIORNA HEADER LIVE
@@ -805,4 +820,4 @@ var MSK_Clienti = (function() {
   };
 })();
 
-document.addEventListener('DOMContentLoaded', function(){ MSK_Clienti.init(); });
+/* Init viene chiamato da tonio-core.js nel DOMContentLoaded centralizzato */
