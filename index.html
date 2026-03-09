@@ -4,16 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TONIO — Gestionale Immobiliare</title>
-<link rel="stylesheet" href="assets/tonio-core.css">
+<link rel="stylesheet" href="assets/tonio_core.css">
 </head>
 <body>
-
 <!-- MOBILE TOPBAR -->
 <div id="mob-topbar">
   <div class="mob-logo">T<span>O</span>NIO</div>
   <button id="mob-menu-btn" onclick="TONIO_toggleSidebar()">☰</button>
 </div>
-
 <!-- MOBILE SIDEBAR -->
 <div id="sidebar-overlay" onclick="TONIO_closeSidebar()"></div>
 <nav id="sidebar">
@@ -43,288 +41,48 @@
     <button class="sb-btn" onclick="TONIO_showPage('impostazioni');TONIO_closeSidebar()">⚙️ Impostazioni</button>
   </div>
 </nav>
-
 <!-- DESKTOP NAV -->
 <div id="desk-nav">
   <div class="nav-r1">
     <div class="nav-logo">T<span>O</span>NIO <small>GESTIONALE</small></div>
     <div class="nav-sep"></div>
     <button class="nav-main-btn active" id="nav-main-anagrafiche" onclick="TONIO_setModule('anagrafiche')">👤 Anagrafiche</button>
-    <button class="nav-main-btn"        id="nav-main-operativo"    onclick="TONIO_setModule('operativo')">📅 Operativo</button>
-    <button class="nav-main-btn"        id="nav-main-contabilita"  onclick="TONIO_setModule('contabilita')">💰 Contabilità</button>
-    <button class="nav-main-btn"        id="nav-main-gestione"     onclick="TONIO_setModule('gestione')">⚙️ Gestione</button>
+    <button class="nav-main-btn" id="nav-main-operativo" onclick="TONIO_setModule('operativo')">📅 Operativo</button>
+    <button class="nav-main-btn" id="nav-main-contabilita" onclick="TONIO_setModule('contabilita')">💰 Contabilità</button>
+    <button class="nav-main-btn" id="nav-main-gestione" onclick="TONIO_setModule('gestione')">⚙️ Gestione</button>
     <div class="nav-spacer"></div>
   </div>
-  <div class="nav-r2" id="nav-r2"><!-- costruito da JS --></div>
+  <div class="nav-r2" id="nav-r2"></div>
 </div>
-
 <!-- MAIN CONTENT -->
 <main id="main">
-
-  <!-- CLIENTI — gestito da Msk_Clienti.js -->
   <div id="page-clienti" class="page active"></div>
-
-  <!-- FORNITORI — gestito da Msk_Fornitori.js -->
   <div id="page-fornitori" class="page"></div>
-
-  <!-- PAGINE FUTURE -->
   <div id="page-ospiti" class="page"></div>
   <div id="page-immobili" class="page"></div>
   <div id="page-prenotazioni" class="page"><div class="coming-soon"><div class="cs-icon">📅</div><h2>Prenotazioni</h2><p>Modulo in sviluppo</p></div></div>
-  <div id="page-contratti"    class="page"><div class="coming-soon"><div class="cs-icon">📄</div><h2>Contratti</h2><p>Modulo in sviluppo</p></div></div>
-  <div id="page-incassi"      class="page"><div class="coming-soon"><div class="cs-icon">💰</div><h2>Incassi</h2><p>Modulo in sviluppo</p></div></div>
-  <div id="page-spese"        class="page"><div class="coming-soon"><div class="cs-icon">📊</div><h2>Spese</h2><p>Modulo in sviluppo</p></div></div>
-  <div id="page-budget"       class="page"><div class="coming-soon"><div class="cs-icon">📈</div><h2>Budget</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-contratti" class="page"><div class="coming-soon"><div class="cs-icon">📄</div><h2>Contratti</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-incassi" class="page"><div class="coming-soon"><div class="cs-icon">💰</div><h2>Incassi</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-spese" class="page"><div class="coming-soon"><div class="cs-icon">📊</div><h2>Spese</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-budget" class="page"><div class="coming-soon"><div class="cs-icon">📈</div><h2>Budget</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-manutenzioni" class="page"><div class="coming-soon"><div class="cs-icon">🔨</div><h2>Manutenzioni</h2><p>Modulo in sviluppo</p></div></div>
-  <div id="page-documenti"    class="page"><div class="coming-soon"><div class="cs-icon">📁</div><h2>Documenti</h2><p>Modulo in sviluppo</p></div></div>
+  <div id="page-documenti" class="page"><div class="coming-soon"><div class="cs-icon">📁</div><h2>Documenti</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-impostazioni" class="page"><div class="coming-soon"><div class="cs-icon">⚙️</div><h2>Impostazioni</h2><p>Modulo in sviluppo</p></div></div>
-
 </main>
-
-<!-- ============================================================
-     MODALI CLIENTI
-     ============================================================ -->
-
-<!-- MODAL TIPOLOGIE CLIENTI -->
-<div class="modal-overlay" id="modal-tipologie">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">🏷️</span>
-      <div class="modal-title">Tipologie Cliente</div>
-      <button class="modal-close" onclick="document.getElementById('modal-tipologie').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="tipo-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Clienti.addTipologia()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Clienti.saveTipologie()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-tipologie').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL STATI CLIENTI -->
-<div class="modal-overlay" id="modal-stati">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">🔵</span>
-      <div class="modal-title">Stati Cliente</div>
-      <button class="modal-close" onclick="document.getElementById('modal-stati').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="stati-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Clienti.addStato()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Clienti.saveStati()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-stati').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     MODALI FORNITORI
-     ============================================================ -->
-
-<!-- MODAL TIPOLOGIE FORNITORI -->
-<div class="modal-overlay" id="modal-forn-tipologie">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">🏷️</span>
-      <div class="modal-title">Tipologie Fornitore</div>
-      <button class="modal-close" onclick="document.getElementById('modal-forn-tipologie').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="forn-tipo-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Fornitori.addTipologia()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Fornitori.saveTipologie()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-forn-tipologie').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL STATI FORNITORI -->
-<div class="modal-overlay" id="modal-forn-stati">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">🔵</span>
-      <div class="modal-title">Stati Fornitore</div>
-      <button class="modal-close" onclick="document.getElementById('modal-forn-stati').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="forn-stati-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Fornitori.addStato()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Fornitori.saveStati()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-forn-stati').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     MODALI OSPITI
-     ============================================================ -->
-
-<!-- MODAL TIPOLOGIE OSPITI -->
-<div class="modal-overlay" id="modal-osp-tipologie">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">🏷️</span>
-      <div class="modal-title">Tipologie Ospite</div>
-      <button class="modal-close" onclick="document.getElementById('modal-osp-tipologie').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="osp-tipo-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Ospiti.addTipologia()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Ospiti.saveTipologie()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-osp-tipologie').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL STATI OSPITI -->
-<div class="modal-overlay" id="modal-osp-stati">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">🔵</span>
-      <div class="modal-title">Stati Ospite</div>
-      <button class="modal-close" onclick="document.getElementById('modal-osp-stati').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="osp-stati-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Ospiti.addStato()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Ospiti.saveStati()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-osp-stati').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     MODALI IMMOBILI
-     ============================================================ -->
-
-<!-- MODAL PRODOTTI -->
-<div class="modal-overlay" id="modal-imm-prodotti">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">&#127981;</span>
-      <div class="modal-title">Prodotti Immobile</div>
-      <button class="modal-close" onclick="document.getElementById('modal-imm-prodotti').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Prodotto</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="imm-prod-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addProdotto()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Immobili.saveProdotti()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-prodotti').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL SUPER PRODOTTI -->
-<div class="modal-overlay" id="modal-imm-superprodotti">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">&#11088;</span>
-      <div class="modal-title">Super Prodotti Immobile</div>
-      <button class="modal-close" onclick="document.getElementById('modal-imm-superprodotti').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Super Prodotto</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="imm-super-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addSuperProdotto()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Immobili.saveSuperProdotti()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-superprodotti').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL TIPI -->
-<div class="modal-overlay" id="modal-imm-tipi">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">&#127968;</span>
-      <div class="modal-title">Tipi Immobile</div>
-      <button class="modal-close" onclick="document.getElementById('modal-imm-tipi').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Tipo</th><th>Colore</th><th></th></tr></thead>
-        <tbody id="imm-tipo-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addTipo()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Immobili.saveTipi()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-tipi').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL PIANI -->
-<div class="modal-overlay" id="modal-imm-piani">
-  <div class="modal">
-    <div class="modal-header">
-      <span style="font-size:19px">&#127970;</span>
-      <div class="modal-title">Piani Immobile</div>
-      <button class="modal-close" onclick="document.getElementById('modal-imm-piani').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <table class="lookup-table">
-        <thead><tr><th>#</th><th>Ordine</th><th>Piano</th><th></th></tr></thead>
-        <tbody id="imm-piani-tbody"></tbody>
-      </table>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addPiano()">＋ Aggiungi</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="MSK_Immobili.savePiani()">💾 Salva</button>
-      <button class="btn btn-ghost"   onclick="document.getElementById('modal-imm-piani').classList.remove('open')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!--
-  SCRIPTS — ordine fondamentale:
-  1. Dati  (⚠️ non toccare durante aggiornamenti struttura)
-  2. Core  (navigazione, utility e TONIO_Storage)
-  3. Moduli (uno per modulo)
-  Il DOMContentLoaded è centralizzato in tonio-core.js
-  I moduli NON hanno più DOMContentLoaded autonomi
--->
+<!-- MODALI CLIENTI -->
+<div class="modal-overlay" id="modal-tipologie"><div class="modal"><div class="modal-header"><span style="font-size:19px">🏷️</span><div class="modal-title">Tipologie Cliente</div><button class="modal-close" onclick="document.getElementById('modal-tipologie').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead><tbody id="tipo-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Clienti.addTipologia()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Clienti.saveTipologie()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-tipologie').classList.remove('open')">Chiudi</button></div></div></div>
+<div class="modal-overlay" id="modal-stati"><div class="modal"><div class="modal-header"><span style="font-size:19px">🔵</span><div class="modal-title">Stati Cliente</div><button class="modal-close" onclick="document.getElementById('modal-stati').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead><tbody id="stati-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Clienti.addStato()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Clienti.saveStati()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-stati').classList.remove('open')">Chiudi</button></div></div></div>
+<!-- MODALI FORNITORI -->
+<div class="modal-overlay" id="modal-forn-tipologie"><div class="modal"><div class="modal-header"><span style="font-size:19px">🏷️</span><div class="modal-title">Tipologie Fornitore</div><button class="modal-close" onclick="document.getElementById('modal-forn-tipologie').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead><tbody id="forn-tipo-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Fornitori.addTipologia()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Fornitori.saveTipologie()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-forn-tipologie').classList.remove('open')">Chiudi</button></div></div></div>
+<div class="modal-overlay" id="modal-forn-stati"><div class="modal"><div class="modal-header"><span style="font-size:19px">🔵</span><div class="modal-title">Stati Fornitore</div><button class="modal-close" onclick="document.getElementById('modal-forn-stati').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead><tbody id="forn-stati-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Fornitori.addStato()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Fornitori.saveStati()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-forn-stati').classList.remove('open')">Chiudi</button></div></div></div>
+<!-- MODALI OSPITI -->
+<div class="modal-overlay" id="modal-osp-tipologie"><div class="modal"><div class="modal-header"><span style="font-size:19px">🏷️</span><div class="modal-title">Tipologie Ospite</div><button class="modal-close" onclick="document.getElementById('modal-osp-tipologie').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Tipologia</th><th>Colore</th><th></th></tr></thead><tbody id="osp-tipo-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Ospiti.addTipologia()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Ospiti.saveTipologie()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-osp-tipologie').classList.remove('open')">Chiudi</button></div></div></div>
+<div class="modal-overlay" id="modal-osp-stati"><div class="modal"><div class="modal-header"><span style="font-size:19px">🔵</span><div class="modal-title">Stati Ospite</div><button class="modal-close" onclick="document.getElementById('modal-osp-stati').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Stato</th><th>Colore</th><th></th></tr></thead><tbody id="osp-stati-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Ospiti.addStato()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Ospiti.saveStati()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-osp-stati').classList.remove('open')">Chiudi</button></div></div></div>
+<!-- MODALI IMMOBILI -->
+<div class="modal-overlay" id="modal-imm-prodotti"><div class="modal"><div class="modal-header"><span style="font-size:19px">&#127981;</span><div class="modal-title">Prodotti Immobile</div><button class="modal-close" onclick="document.getElementById('modal-imm-prodotti').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Prodotto</th><th>Colore</th><th></th></tr></thead><tbody id="imm-prod-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addProdotto()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Immobili.saveProdotti()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-imm-prodotti').classList.remove('open')">Chiudi</button></div></div></div>
+<div class="modal-overlay" id="modal-imm-superprodotti"><div class="modal"><div class="modal-header"><span style="font-size:19px">&#11088;</span><div class="modal-title">Super Prodotti Immobile</div><button class="modal-close" onclick="document.getElementById('modal-imm-superprodotti').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Super Prodotto</th><th>Colore</th><th></th></tr></thead><tbody id="imm-super-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addSuperProdotto()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Immobili.saveSuperProdotti()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-imm-superprodotti').classList.remove('open')">Chiudi</button></div></div></div>
+<div class="modal-overlay" id="modal-imm-tipi"><div class="modal"><div class="modal-header"><span style="font-size:19px">&#127968;</span><div class="modal-title">Tipi Immobile</div><button class="modal-close" onclick="document.getElementById('modal-imm-tipi').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Tipo</th><th>Colore</th><th></th></tr></thead><tbody id="imm-tipo-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addTipo()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Immobili.saveTipi()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-imm-tipi').classList.remove('open')">Chiudi</button></div></div></div>
+<div class="modal-overlay" id="modal-imm-piani"><div class="modal"><div class="modal-header"><span style="font-size:19px">&#127970;</span><div class="modal-title">Piani Immobile</div><button class="modal-close" onclick="document.getElementById('modal-imm-piani').classList.remove('open')">×</button></div><div class="modal-body"><table class="lookup-table"><thead><tr><th>#</th><th>Ordine</th><th>Piano</th><th></th></tr></thead><tbody id="imm-piani-tbody"></tbody></table><button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="MSK_Immobili.addPiano()">＋ Aggiungi</button></div><div class="modal-footer"><button class="btn btn-primary" onclick="MSK_Immobili.savePiani()">💾 Salva</button><button class="btn btn-ghost" onclick="document.getElementById('modal-imm-piani').classList.remove('open')">Chiudi</button></div></div></div>
 <script src="dati/Dati_Clienti.js"></script>
 <script src="dati/Dati_Fornitori.js"></script>
 <script src="dati/Dati_Ospiti.js"></script>
@@ -334,6 +92,5 @@
 <script src="moduli/Msk_Fornitori.js"></script>
 <script src="moduli/Msk_Ospiti.js"></script>
 <script src="moduli/Msk_Immobili.js"></script>
-
 </body>
 </html>
