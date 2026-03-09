@@ -15,12 +15,24 @@ var MSK_Ospiti = (function() {
 
   /* ---- INIT ---- */
   function init() {
-    tipologie = (window.TONIO_OSPITI_TIPOLOGIE || []).map(function(x){ return Object.assign({},x); });
-    stati     = (window.TONIO_OSPITI_STATI     || []).map(function(x){ return Object.assign({},x); });
-    ospiti    = (window.TONIO_OSPITI           || []).map(function(x){ return Object.assign({},x,{
+    /* Carica da localStorage (se presenti) o dai dati di default */
+    var savedTipologie = TONIO_Storage.load('ospiti_tipologie');
+    var savedStati     = TONIO_Storage.load('ospiti_stati');
+    var savedOspiti    = TONIO_Storage.load('ospiti');
+
+    tipologie = (savedTipologie || window.TONIO_OSPITI_TIPOLOGIE || []).map(function(x){ return Object.assign({},x); });
+    stati     = (savedStati     || window.TONIO_OSPITI_STATI     || []).map(function(x){ return Object.assign({},x); });
+    ospiti    = (savedOspiti    || window.TONIO_OSPITI           || []).map(function(x){ return Object.assign({},x,{
       attivo: x.attivo !== undefined ? x.attivo : true
     }); });
     renderLista();
+  }
+
+  /* ---- SALVATAGGIO PERSISTENTE ---- */
+  function _persist() {
+    TONIO_Storage.save('ospiti_tipologie', tipologie);
+    TONIO_Storage.save('ospiti_stati', stati);
+    TONIO_Storage.save('ospiti', ospiti);
   }
 
   /* ================================================================
@@ -448,6 +460,7 @@ var MSK_Ospiti = (function() {
   function eliminaOspite(id) {
     if (!confirm('Eliminare definitivamente questo ospite?\nL\'operazione non pu\u00f2 essere annullata.')) return;
     ospiti = ospiti.filter(function(x){ return x.id !== id; });
+    _persist();
     if (currentId === id) tornaLista(); else renderLista();
   }
 
@@ -461,6 +474,7 @@ var MSK_Ospiti = (function() {
     var idx = ospiti.findIndex(function(x){return x.id===currentId;});
     if (idx < 0) return;
     ospiti[idx].attivo = !(ospiti[idx].attivo !== false);
+    _persist();
     renderScheda(ospiti[idx], editMode);
   }
 
@@ -553,6 +567,7 @@ var MSK_Ospiti = (function() {
     }
 
     var saved = ospiti.find(function(x){return x.id===currentId;});
+    _persist();
     renderScheda(saved, false);
 
     var ph = document.querySelector('#page-ospiti .panel-header');
@@ -649,7 +664,7 @@ var MSK_Ospiti = (function() {
   function _moveTipo(idx,dir){var s=tipologie.slice().sort(function(a,b){return a.ordine-b.ordine;});var ni=idx+dir;if(ni<0||ni>=s.length)return;var t=s[idx].ordine;s[idx].ordine=s[ni].ordine;s[ni].ordine=t;_renderTipologieModal();}
   function _delTipo(id){if(!confirm('Eliminare?'))return;tipologie=tipologie.filter(function(x){return x.id!==id;});_renderTipologieModal();}
   function addTipologia(){var n=tipologie.length>0?Math.max.apply(null,tipologie.map(function(x){return x.id;}))+1:1;tipologie.push({id:n,ordine:tipologie.length+1,nome:'Nuova Tipologia',colore:'#a78bfa'});_renderTipologieModal();}
-  function saveTipologie(){tipologie=tipologie.map(function(t){return Object.assign({},t,{nome:(document.getElementById('osp-tipo-nome-'+t.id)||{}).value||t.nome,colore:(document.getElementById('osp-tipo-col-'+t.id)||{}).value||t.colore});});document.getElementById('modal-osp-tipologie').classList.remove('open');}
+  function saveTipologie(){tipologie=tipologie.map(function(t){return Object.assign({},t,{nome:(document.getElementById('osp-tipo-nome-'+t.id)||{}).value||t.nome,colore:(document.getElementById('osp-tipo-col-'+t.id)||{}).value||t.colore});});_persist();document.getElementById('modal-osp-tipologie').classList.remove('open');}
 
   /* ================================================================
      MODAL STATI
@@ -675,7 +690,7 @@ var MSK_Ospiti = (function() {
   function _moveStato(idx,dir){var s=stati.slice().sort(function(a,b){return a.ordine-b.ordine;});var ni=idx+dir;if(ni<0||ni>=s.length)return;var t=s[idx].ordine;s[idx].ordine=s[ni].ordine;s[ni].ordine=t;_renderStatiModal();}
   function _delStato(id){if(!confirm('Eliminare?'))return;stati=stati.filter(function(x){return x.id!==id;});_renderStatiModal();}
   function addStato(){var n=stati.length>0?Math.max.apply(null,stati.map(function(x){return x.id;}))+1:1;stati.push({id:n,ordine:stati.length+1,nome:'Nuovo Stato',colore:'#34d399'});_renderStatiModal();}
-  function saveStati(){stati=stati.map(function(s){return Object.assign({},s,{nome:(document.getElementById('osp-stato-nome-'+s.id)||{}).value||s.nome,colore:(document.getElementById('osp-stato-col-'+s.id)||{}).value||s.colore});});document.getElementById('modal-osp-stati').classList.remove('open');}
+  function saveStati(){stati=stati.map(function(s){return Object.assign({},s,{nome:(document.getElementById('osp-stato-nome-'+s.id)||{}).value||s.nome,colore:(document.getElementById('osp-stato-col-'+s.id)||{}).value||s.colore});});_persist();document.getElementById('modal-osp-stati').classList.remove('open');}
 
   /* ================================================================
      AGGIORNA HEADER LIVE
@@ -713,4 +728,4 @@ var MSK_Ospiti = (function() {
   };
 })();
 
-document.addEventListener('DOMContentLoaded', function(){ MSK_Ospiti.init(); });
+/* Init viene chiamato da tonio-core.js nel DOMContentLoaded centralizzato */
