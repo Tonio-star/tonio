@@ -320,17 +320,19 @@
 <!--
   SCRIPTS — ordine fondamentale:
   1. Dati  (⚠️ non toccare durante aggiornamenti struttura)
-  2. Core  (navigazione e utility)
+  2. Core  (navigazione, utility e TONIO_Storage)
   3. Moduli (uno per modulo)
+  Il DOMContentLoaded è centralizzato in tonio-core.js
+  I moduli NON hanno più DOMContentLoaded autonomi
 -->
 <script src="dati/Dati_Clienti.js"></script>
 <script src="dati/Dati_Fornitori.js"></script>
+<script src="dati/Dati_Ospiti.js"></script>
+<script src="dati/Dati_Immobili.js"></script>
 <script src="assets/tonio-core.js"></script>
 <script src="moduli/Msk_Clienti.js"></script>
-<script src="dati/Dati_Ospiti.js"></script>
 <script src="moduli/Msk_Fornitori.js"></script>
 <script src="moduli/Msk_Ospiti.js"></script>
-<script src="dati/Dati_Immobili.js"></script>
 <script src="moduli/Msk_Immobili.js"></script>
 
 </body>
