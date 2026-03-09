@@ -1,5 +1,6 @@
 /* ================================================================
    TONIO — tonio-core.js  |  Navigazione e utility comuni
+   v2.0 — Init centralizzato, tutti i moduli avviati qui
    ================================================================ */
 
 var TONIO_NAV = {
@@ -37,18 +38,24 @@ var TONIO_NAV = {
   }
 };
 
-/* Pulsanti toolbar per pagina — solo "Nuovo" nella nav */
+/* Pulsanti toolbar per pagina */
 var TONIO_PAGE_ACTIONS = {
-  clienti: '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>',
-  fornitori: '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
-  ospiti: '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
-  immobili: '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>'
+  clienti:    '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>',
+  fornitori:  '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
+  ospiti:     '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
+  immobili:   '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>'
 };
 
 var TONIO_currentModule = 'anagrafiche';
 var TONIO_currentPage   = 'clienti';
 
 document.addEventListener('DOMContentLoaded', function() {
+  /* ---- Avvio centralizzato di tutti i moduli ---- */
+  if (typeof MSK_Clienti   !== 'undefined') MSK_Clienti.init();
+  if (typeof MSK_Fornitori !== 'undefined') MSK_Fornitori.init();
+  if (typeof MSK_Ospiti    !== 'undefined') MSK_Ospiti.init();
+  if (typeof MSK_Immobili  !== 'undefined') MSK_Immobili.init();
+
   TONIO_setModule('anagrafiche', false);
   TONIO_showPage('clienti');
 });
@@ -107,7 +114,7 @@ function TONIO_closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('open');
 }
 
-/* Tab generici — containerId è l'id del wrapper dei tab */
+/* Tab generici */
 function TONIO_setTab(containerId, tabId, btn) {
   var container = document.getElementById(containerId);
   if (!container) return;
@@ -130,3 +137,25 @@ function TONIO_escapeHtml(str) {
 function TONIO_makeBadge(nome, colore) {
   return '<span class="badge" style="background:' + colore + '22;color:' + colore + ';border:1px solid ' + colore + '44">' + nome + '</span>';
 }
+
+/* ================================================================
+   UTILITY localStorage — usata da tutti i moduli
+   ================================================================ */
+var TONIO_Storage = {
+  save: function(key, data) {
+    try {
+      localStorage.setItem('tonio_' + key, JSON.stringify(data));
+    } catch(e) {
+      console.warn('TONIO Storage: impossibile salvare', key, e);
+    }
+  },
+  load: function(key) {
+    try {
+      var raw = localStorage.getItem('tonio_' + key);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) {
+      console.warn('TONIO Storage: impossibile caricare', key, e);
+      return null;
+    }
+  }
+};
