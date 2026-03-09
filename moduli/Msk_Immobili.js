@@ -24,14 +24,30 @@ var MSK_Immobili = (function() {
 
   /* ---- INIT ---- */
   function init() {
-    prodotti      = (window.TONIO_IMMOBILI_PRODOTTI      || []).map(function(x){ return Object.assign({},x); });
-    superprodotti = (window.TONIO_IMMOBILI_SUPERPRODOTTI || []).map(function(x){ return Object.assign({},x); });
-    tipi          = (window.TONIO_IMMOBILI_TIPI          || []).map(function(x){ return Object.assign({},x); });
-    piani         = (window.TONIO_IMMOBILI_PIANI         || []).map(function(x){ return Object.assign({},x); });
-    immobili      = (window.TONIO_IMMOBILI               || []).map(function(x){ return Object.assign({},x,{
+    /* Carica da localStorage (se presenti) o dai dati di default */
+    var savedProdotti      = TONIO_Storage.load('immobili_prodotti');
+    var savedSuperProdotti = TONIO_Storage.load('immobili_superprodotti');
+    var savedTipi          = TONIO_Storage.load('immobili_tipi');
+    var savedPiani         = TONIO_Storage.load('immobili_piani');
+    var savedImmobili      = TONIO_Storage.load('immobili');
+
+    prodotti      = (savedProdotti      || window.TONIO_IMMOBILI_PRODOTTI      || []).map(function(x){ return Object.assign({},x); });
+    superprodotti = (savedSuperProdotti || window.TONIO_IMMOBILI_SUPERPRODOTTI || []).map(function(x){ return Object.assign({},x); });
+    tipi          = (savedTipi          || window.TONIO_IMMOBILI_TIPI          || []).map(function(x){ return Object.assign({},x); });
+    piani         = (savedPiani         || window.TONIO_IMMOBILI_PIANI         || []).map(function(x){ return Object.assign({},x); });
+    immobili      = (savedImmobili      || window.TONIO_IMMOBILI               || []).map(function(x){ return Object.assign({},x,{
       attivo: x.attivo !== undefined ? x.attivo : true
     }); });
     renderLista();
+  }
+
+  /* ---- SALVATAGGIO PERSISTENTE ---- */
+  function _persist() {
+    TONIO_Storage.save('immobili_prodotti', prodotti);
+    TONIO_Storage.save('immobili_superprodotti', superprodotti);
+    TONIO_Storage.save('immobili_tipi', tipi);
+    TONIO_Storage.save('immobili_piani', piani);
+    TONIO_Storage.save('immobili', immobili);
   }
 
   /* ================================================================
@@ -317,6 +333,7 @@ var MSK_Immobili = (function() {
   function eliminaImmobile(id) {
     if (!confirm('Eliminare definitivamente questo immobile?\nL\'operazione non pu\u00f2 essere annullata.')) return;
     immobili = immobili.filter(function(x){ return x.id !== id; });
+    _persist();
     if (currentId === id) tornaLista(); else renderLista();
   }
 
@@ -330,6 +347,7 @@ var MSK_Immobili = (function() {
     var idx = immobili.findIndex(function(x){ return x.id === currentId; });
     if (idx < 0) return;
     immobili[idx].attivo = !(immobili[idx].attivo !== false);
+    _persist();
     renderAnagrafica(immobili[idx], editMode);
   }
 
@@ -375,6 +393,7 @@ var MSK_Immobili = (function() {
     }
 
     var saved = immobili.find(function(x){ return x.id === currentId; });
+    _persist();
     renderAnagrafica(saved, false);
 
     /* Flash header */
@@ -406,6 +425,7 @@ var MSK_Immobili = (function() {
         colore:(document.getElementById('imm-prod-col-'+t.id)||{}).value||t.colore
       });
     });
+    _persist();
     document.getElementById('modal-imm-prodotti').classList.remove('open');
   }
 
@@ -427,6 +447,7 @@ var MSK_Immobili = (function() {
         colore:(document.getElementById('imm-super-col-'+t.id)||{}).value||t.colore
       });
     });
+    _persist();
     document.getElementById('modal-imm-superprodotti').classList.remove('open');
   }
 
@@ -448,6 +469,7 @@ var MSK_Immobili = (function() {
         colore:(document.getElementById('imm-tipo-col-'+t.id)||{}).value||t.colore
       });
     });
+    _persist();
     document.getElementById('modal-imm-tipi').classList.remove('open');
   }
 
@@ -480,6 +502,7 @@ var MSK_Immobili = (function() {
     piani=piani.map(function(p){
       return Object.assign({},p,{nome:(document.getElementById('imm-piano-nome-'+p.id)||{}).value||p.nome});
     });
+    _persist();
     document.getElementById('modal-imm-piani').classList.remove('open');
   }
 
@@ -567,4 +590,4 @@ var MSK_Immobili = (function() {
   };
 })();
 
-document.addEventListener('DOMContentLoaded', function(){ MSK_Immobili.init(); });
+/* Init viene chiamato da tonio-core.js nel DOMContentLoaded centralizzato */
