@@ -1,6 +1,6 @@
 /* ================================================================
-   TONIO — Msk_Immobili.js  |  Modulo Immobili
-   v1.0 — Lista con filtri, maschere lookup: Prodotti, SuperProdotti,
+   TONIO - Msk_Immobili.js  |  Modulo Immobili
+   v1.0 - Lista con filtri, maschere lookup: Prodotti, SuperProdotti,
            Tipo, Piani, Anagrafica Immobile
    ================================================================ */
 
@@ -50,9 +50,6 @@ var MSK_Immobili = (function() {
     TONIO_Storage.save('immobili', immobili);
   }
 
-  /* ================================================================
-     LISTA
-     ================================================================ */
   function renderLista() {
     _vista = 'lista';
     var page = document.getElementById('page-immobili');
@@ -119,7 +116,6 @@ var MSK_Immobili = (function() {
     page.innerHTML =
         '<div class="panel">'
 
-      /* ===== HEADER PANEL ===== */
       + '<div class="panel-header">'
       +   '<div class="panel-header-icon">&#127968;</div>'
       +   '<div>'
@@ -135,7 +131,6 @@ var MSK_Immobili = (function() {
       +   '</div>'
       + '</div>'
 
-      /* ===== FILTRI ===== */
       + '<div style="padding:12px 20px;background:var(--bg2,#f8fafc);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:10px;align-items:center">'
       +   '<span style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);letter-spacing:1px">&#128269; Filtri</span>'
       +   '<select class="form-select" style="min-width:140px;max-width:180px" onchange="MSK_Immobili._setFiltro(\'prodotto\',this.value)">'
@@ -148,12 +143,9 @@ var MSK_Immobili = (function() {
       +     optsFrom(tipi, 'nome', _filtro.tipo)
       +   '</select>'
       +   '<input class="search-input" style="min-width:180px;max-width:260px" placeholder="&#128269; Cerca immobile, comune, via\u2026" value="'+TONIO_escapeHtml(_filtro.immobile)+'" oninput="MSK_Immobili._setFiltro(\'immobile\',this.value)">'
-      +   (_filtro.prodotto||_filtro.superprodotto||_filtro.tipo||_filtro.immobile
-      +     ? '<button class="btn btn-ghost btn-sm" onclick="MSK_Immobili._resetFiltri()">\u00d7 Reset filtri</button>'
-      +     : '')
+      +   (_filtro.prodotto||_filtro.superprodotto||_filtro.tipo||_filtro.immobile ? '<button class="btn btn-ghost btn-sm" onclick="MSK_Immobili._resetFiltri()">\u00d7 Reset filtri</button>' : '')
       + '</div>'
 
-      /* ===== TABELLA ===== */
       + '<div class="tbl-wrap">'
       +   '<table>'
       +     '<thead><tr>'
@@ -165,7 +157,7 @@ var MSK_Immobili = (function() {
       +       '<th>Prodotto</th>'
       +       '<th>Super Prodotto</th>'
       +       '<th>Via</th>'
-      +       '<th style="width:50px">N°</th>'
+      +       '<th style="width:50px">N&deg;</th>'
       +       '<th style="width:70px">CAP</th>'
       +       '<th>Comune</th>'
       +       '<th style="width:50px">Prov.</th>'
@@ -187,9 +179,6 @@ var MSK_Immobili = (function() {
     renderLista();
   }
 
-  /* ================================================================
-     ANAGRAFICA IMMOBILE
-     ================================================================ */
   function renderAnagrafica(im, mode) {
     _vista = 'anagrafica';
     var page = document.getElementById('page-immobili');
@@ -250,7 +239,6 @@ var MSK_Immobili = (function() {
 
       + disattivoBar
 
-      /* ===== FORM CAMPI ===== */
       + '<div style="padding:20px 20px 0">'
       +   '<div class="form-group">'
       +     '<label class="form-label">Nome Immobile *</label>'
@@ -284,7 +272,7 @@ var MSK_Immobili = (function() {
       + '<div class="form-grid form-grid-2" style="padding:8px 20px 0">'
       +   '<div class="form-group"><label class="form-label">Via</label>'
       +     '<input class="form-input" id="fim-via" value="'+v('via')+'" placeholder="Via Roma"'+ro+'></div>'
-      +   '<div class="form-group"><label class="form-label">N°</label>'
+      +   '<div class="form-group"><label class="form-label">N&deg;</label>'
       +     '<input class="form-input" id="fim-numero" value="'+v('numero')+'" placeholder="1"'+ro+'></div>'
       + '</div>'
 
@@ -306,9 +294,6 @@ var MSK_Immobili = (function() {
     if (el) el.textContent = v;
   }
 
-  /* ================================================================
-     AZIONI LISTA / ANAGRAFICA
-     ================================================================ */
   function nuovoImmobile() {
     currentId = null;
     renderAnagrafica(null, true);
@@ -356,9 +341,6 @@ var MSK_Immobili = (function() {
     renderAnagrafica(im, on);
   }
 
-  /* ================================================================
-     SALVA ANAGRAFICA
-     ================================================================ */
   function salva() {
     var nom = _val('fim-immobile');
     if (!nom) { alert('Il campo Nome Immobile \u00e8 obbligatorio'); return; }
@@ -407,9 +389,6 @@ var MSK_Immobili = (function() {
     }
   }
 
-  /* ================================================================
-     MODAL PRODOTTI
-     ================================================================ */
   function openModalProdotti() {
     _renderLookupModal('modal-imm-prodotti', 'imm-prod', prodotti,
       'MSK_Immobili._moveProd', 'MSK_Immobili._delProd', true);
@@ -429,9 +408,6 @@ var MSK_Immobili = (function() {
     document.getElementById('modal-imm-prodotti').classList.remove('open');
   }
 
-  /* ================================================================
-     MODAL SUPER PRODOTTI
-     ================================================================ */
   function openModalSuperProdotti() {
     _renderLookupModal('modal-imm-superprodotti', 'imm-super', superprodotti,
       'MSK_Immobili._moveSuper', 'MSK_Immobili._delSuper', true);
@@ -451,9 +427,6 @@ var MSK_Immobili = (function() {
     document.getElementById('modal-imm-superprodotti').classList.remove('open');
   }
 
-  /* ================================================================
-     MODAL TIPI
-     ================================================================ */
   function openModalTipi() {
     _renderLookupModal('modal-imm-tipi', 'imm-tipo', tipi,
       'MSK_Immobili._moveTipo', 'MSK_Immobili._delTipo', true);
@@ -473,9 +446,6 @@ var MSK_Immobili = (function() {
     document.getElementById('modal-imm-tipi').classList.remove('open');
   }
 
-  /* ================================================================
-     MODAL PIANI  (senza colore)
-     ================================================================ */
   function openModalPiani() {
     _renderPianiModal();
     document.getElementById('modal-imm-piani').classList.add('open');
@@ -506,9 +476,6 @@ var MSK_Immobili = (function() {
     document.getElementById('modal-imm-piani').classList.remove('open');
   }
 
-  /* ================================================================
-     HELPER: render modale lookup con colore
-     ================================================================ */
   function _renderLookupModal(modalId, prefix, arr, moveFn, delFn, hasColor) {
     var tbody = document.getElementById(prefix+'-tbody');
     if (!tbody) return;
@@ -540,9 +507,6 @@ var MSK_Immobili = (function() {
     }
   }
 
-  /* ================================================================
-     UTILITY
-     ================================================================ */
   function _moveLookup(arr, idx, dir) {
     var s = arr.slice().sort(function(a,b){return a.ordine-b.ordine;});
     var ni = idx + dir;
@@ -567,7 +531,6 @@ var MSK_Immobili = (function() {
   function _superColore(n) { var t=superprodotti.find(function(x){return x.nome===n;}); return t?t.colore:'#64748b'; }
   function _tipoColore(n)  { var t=tipi.find(function(x){return x.nome===n;});          return t?t.colore:'#64748b'; }
 
-  /* ===== API PUBBLICA ===== */
   return {
     init: init,
     nuovoImmobile: nuovoImmobile, apriImmobile: apriImmobile,
