@@ -1,6 +1,6 @@
 /* ================================================================
    TONIO — Msk_Fornitori.js  |  Modulo Anagrafica Fornitori
-   v1.0 — Struttura identica a Msk_Clienti
+   v1.1 — Aggiunto salvataggio localStorage (dati persistenti)
    ================================================================ */
 
 var MSK_Fornitori = (function() {
@@ -16,12 +16,24 @@ var MSK_Fornitori = (function() {
 
   /* ---- INIT ---- */
   function init() {
-    tipologie = (window.TONIO_FORNITORI_TIPOLOGIE || []).map(function(x){ return Object.assign({},x); });
-    stati     = (window.TONIO_FORNITORI_STATI     || []).map(function(x){ return Object.assign({},x); });
-    fornitori = (window.TONIO_FORNITORI           || []).map(function(x){ return Object.assign({},x,{
+    /* Carica da localStorage (se presenti) o dai dati di default */
+    var savedTipologie = TONIO_Storage.load('fornitori_tipologie');
+    var savedStati     = TONIO_Storage.load('fornitori_stati');
+    var savedFornitori = TONIO_Storage.load('fornitori');
+
+    tipologie = (savedTipologie || window.TONIO_FORNITORI_TIPOLOGIE || []).map(function(x){ return Object.assign({},x); });
+    stati     = (savedStati     || window.TONIO_FORNITORI_STATI     || []).map(function(x){ return Object.assign({},x); });
+    fornitori = (savedFornitori || window.TONIO_FORNITORI           || []).map(function(x){ return Object.assign({},x,{
       attivo: x.attivo !== undefined ? x.attivo : true
     }); });
     renderLista();
+  }
+
+  /* ---- SALVATAGGIO PERSISTENTE ---- */
+  function _persist() {
+    TONIO_Storage.save('fornitori_tipologie', tipologie);
+    TONIO_Storage.save('fornitori_stati', stati);
+    TONIO_Storage.save('fornitori', fornitori);
   }
 
   /* ================================================================
@@ -468,6 +480,7 @@ var MSK_Fornitori = (function() {
   function eliminaFornitore(id) {
     if (!confirm('Eliminare definitivamente questo fornitore?\nL\'operazione non pu\u00f2 essere annullata.')) return;
     fornitori = fornitori.filter(function(x){ return x.id !== id; });
+    _persist();
     if (currentId === id) tornaLista(); else renderLista();
   }
 
@@ -481,6 +494,7 @@ var MSK_Fornitori = (function() {
     var idx = fornitori.findIndex(function(x){return x.id===currentId;});
     if (idx < 0) return;
     fornitori[idx].attivo = !(fornitori[idx].attivo !== false);
+    _persist();
     renderScheda(fornitori[idx], editMode);
   }
 
@@ -564,6 +578,7 @@ var MSK_Fornitori = (function() {
     }
 
     var saved = fornitori.find(function(x){return x.id===currentId;});
+    _persist();
     renderScheda(saved, false);
 
     /* Flash verde header */
@@ -739,7 +754,7 @@ var MSK_Fornitori = (function() {
   function _moveTipo(idx,dir){var s=tipologie.slice().sort(function(a,b){return a.ordine-b.ordine;});var ni=idx+dir;if(ni<0||ni>=s.length)return;var t=s[idx].ordine;s[idx].ordine=s[ni].ordine;s[ni].ordine=t;_renderTipologieModal();}
   function _delTipo(id){if(!confirm('Eliminare?'))return;tipologie=tipologie.filter(function(x){return x.id!==id;});_renderTipologieModal();}
   function addTipologia(){var n=tipologie.length>0?Math.max.apply(null,tipologie.map(function(x){return x.id;}))+1:1;tipologie.push({id:n,ordine:tipologie.length+1,nome:'Nuova Tipologia',colore:'#4f8ef7'});_renderTipologieModal();}
-  function saveTipologie(){tipologie=tipologie.map(function(t){return Object.assign({},t,{nome:(document.getElementById('forn-tipo-nome-'+t.id)||{}).value||t.nome,colore:(document.getElementById('forn-tipo-col-'+t.id)||{}).value||t.colore});});document.getElementById('modal-forn-tipologie').classList.remove('open');}
+  function saveTipologie(){tipologie=tipologie.map(function(t){return Object.assign({},t,{nome:(document.getElementById('forn-tipo-nome-'+t.id)||{}).value||t.nome,colore:(document.getElementById('forn-tipo-col-'+t.id)||{}).value||t.colore});});_persist();document.getElementById('modal-forn-tipologie').classList.remove('open');}
 
   /* ================================================================
      MODAL STATI
@@ -765,7 +780,7 @@ var MSK_Fornitori = (function() {
   function _moveStato(idx,dir){var s=stati.slice().sort(function(a,b){return a.ordine-b.ordine;});var ni=idx+dir;if(ni<0||ni>=s.length)return;var t=s[idx].ordine;s[idx].ordine=s[ni].ordine;s[ni].ordine=t;_renderStatiModal();}
   function _delStato(id){if(!confirm('Eliminare?'))return;stati=stati.filter(function(x){return x.id!==id;});_renderStatiModal();}
   function addStato(){var n=stati.length>0?Math.max.apply(null,stati.map(function(x){return x.id;}))+1:1;stati.push({id:n,ordine:stati.length+1,nome:'Nuovo Stato',colore:'#34d399'});_renderStatiModal();}
-  function saveStati(){stati=stati.map(function(s){return Object.assign({},s,{nome:(document.getElementById('forn-stato-nome-'+s.id)||{}).value||s.nome,colore:(document.getElementById('forn-stato-col-'+s.id)||{}).value||s.colore});});document.getElementById('modal-forn-stati').classList.remove('open');}
+  function saveStati(){stati=stati.map(function(s){return Object.assign({},s,{nome:(document.getElementById('forn-stato-nome-'+s.id)||{}).value||s.nome,colore:(document.getElementById('forn-stato-col-'+s.id)||{}).value||s.colore});});_persist();document.getElementById('modal-forn-stati').classList.remove('open');}
 
   /* ================================================================
      AGGIORNA HEADER LIVE
@@ -804,4 +819,4 @@ var MSK_Fornitori = (function() {
   };
 })();
 
-document.addEventListener('DOMContentLoaded', function(){ MSK_Fornitori.init(); });
+/* Init viene chiamato da tonio-core.js nel DOMContentLoaded centralizzato */
