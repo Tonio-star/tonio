@@ -9,7 +9,6 @@ var TONIO_NAV = {
     subs: [
       { label: '👥 Clienti',   page: 'clienti' },
       { label: '🧑 Ospiti',    page: 'ospiti' },
-      { label: '🏠 Immobili',  page: 'immobili' },
       { label: '🔧 Fornitori', page: 'fornitori' },
     ]
   },
@@ -23,9 +22,16 @@ var TONIO_NAV = {
   contabilita: {
     label: '💰 Contabilità',
     subs: [
-      { label: '💰 Incassi', page: 'incassi' },
-      { label: '📊 Spese',   page: 'spese' },
-      { label: '📈 Budget',  page: 'budget' },
+      { label: '💰 Incassi',               page: 'incassi' },
+      { label: '📊 Spese',                 page: 'spese' },
+      { label: '📈 Budget',                page: 'budget' },
+      { label: '💳 Modalità di Pagamento', page: 'modalita_pagamento' },
+    ]
+  },
+  immobili_tariffe: {
+    label: '🏠 Immobili & Tariffe',
+    subs: [
+      { label: '🏠 Immobili', page: 'immobili' },
     ]
   },
   gestione: {
@@ -40,10 +46,11 @@ var TONIO_NAV = {
 
 /* Pulsanti toolbar per pagina */
 var TONIO_PAGE_ACTIONS = {
-  clienti:    '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>',
-  fornitori:  '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
-  ospiti:     '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
-  immobili:   '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>'
+  clienti:             '<button class="nav-action-btn primary" onclick="MSK_Clienti.nuovoCliente()">＋ Nuovo Cliente</button>',
+  fornitori:           '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
+  ospiti:              '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
+  immobili:            '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>',
+  modalita_pagamento:  '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaModalita()">＋ Nuova Modalità</button>'
 };
 
 var TONIO_currentModule = 'anagrafiche';
@@ -55,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof MSK_Fornitori !== 'undefined') MSK_Fornitori.init();
   if (typeof MSK_Ospiti    !== 'undefined') MSK_Ospiti.init();
   if (typeof MSK_Immobili  !== 'undefined') MSK_Immobili.init();
+  if (typeof MSK_Contabilita !== 'undefined') MSK_Contabilita.init();
 
   TONIO_setModule('anagrafiche', false);
   TONIO_showPage('clienti');
