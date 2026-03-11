@@ -2,7 +2,8 @@
    TONIO — Msk_Tariffe.js
    Modulo Tariffe — Tipo Tariffa, Trattamento, Unità di Misura,
                     Tariffario (unica maschera inline)
-   v2.0 — Tariffario inline, lookup da modulo Immobili
+   v2.1 — Super Prodotto, Prodotto, Tipo Immobile: lookup ID-based
+          (foreign key verso modulo Immobili)
    ================================================================ */
 
 var MSK_Tariffe = (function () {
@@ -34,96 +35,114 @@ var MSK_Tariffe = (function () {
     _unitaMisura = savedUnita  ? savedUnita  : JSON.parse(JSON.stringify(TONIO_TARIFFE_UNITA_MISURA));
     _tariffario  = savedTariff ? savedTariff : JSON.parse(JSON.stringify(TONIO_TARIFFARIO));
 
-    /* Render solo la pagina principale Tariffario — le altre tre sono ora solo modali */
     _renderTariffPage();
   }
 
   /* ================================================================
-     ─────────────────────────────────────────────────────────────
-     MASCHERA PRINCIPALE — TARIFFARIO (unica pagina inline)
-     I campi header + righe dettaglio sono visibili direttamente
-     nella pagina, senza aprire una sotto-maschera.
-     I pulsanti Tipo Tariffa / Trattamento / Unità di Misura
-     sono posizionati nel margine destro dell'header.
-     ─────────────────────────────────────────────────────────────
+     HELPER — costruisce <option> list per array generici (nome come value)
+  ================================================================ */
+  function _opts(arr, selected) {
+    var h = '<option value="">— Seleziona —</option>';
+    arr.forEach(function (item) {
+      var v = item.nome;
+      h += '<option value="' + TONIO_escapeHtml(v) + '"' + (v === selected ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
+    });
+    return h;
+  }
+
+  /* ================================================================
+     HELPER — costruisce <option> list con ID come value (lookup relazionale)
+     arr    = array di oggetti {id, nome, ...}
+     selId  = id attualmente selezionato (numero o stringa)
+  ================================================================ */
+  function _optsById(arr, selId) {
+    var h = '<option value="">— Seleziona —</option>';
+    arr.forEach(function (item) {
+      var selected = (String(item.id) === String(selId) && selId !== '' && selId !== null && selId !== undefined) ? ' selected' : '';
+      h += '<option value="' + item.id + '"' + selected + '>' + TONIO_escapeHtml(item.nome) + '</option>';
+    });
+    return h;
+  }
+
+  /* ================================================================
+     MASCHERA PRINCIPALE — TARIFFARIO
   ================================================================ */
   function _renderTariffPage() {
     var c = document.getElementById('page-tariffe');
     if (!c) return;
 
-    /* ── helper: <option> list ── */
-    function opts(arr, selected) {
-      var h = '<option value="">— Seleziona —</option>';
-      arr.forEach(function (item) {
-        var v = item.nome;
-        h += '<option value="' + TONIO_escapeHtml(v) + '"' + (v === selected ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
-      });
-      return h;
-    }
-
     /* Lookup da modulo Immobili */
     var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
     var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
 
-    /* Costruisci le righe esistenti del tariffario */
+    /* Righe tariffario per tariffa selezionata */
     var righeHtml = _buildTariffRigheHtml();
 
     c.innerHTML =
       '<div class="list-page">' +
 
-        /* ── HEADER: "CREA TARIFFE" a sinistra, pulsanti lookup verso il margine destro ── */
+        /* ── HEADER ── */
         '<div class="list-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">' +
           '<div style="display:flex;align-items:center;gap:12px">' +
             '<h1 class="list-title" style="margin:0;white-space:nowrap">CREA TARIFFE</h1>' +
             '<span class="list-count" id="tar-count"></span>' +
           '</div>' +
-          /* Pulsanti lookup sul margine destro, orizzontali, nell'ordine richiesto */
           '<div style="display:flex;flex-direction:row;gap:8px;align-items:center;margin-left:auto">' +
-            '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalTipo()">' +
-              '🏷️ Tipo Tariffa' +
-            '</button>' +
-            '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalTratt()">' +
-              '🍽️ Trattamento' +
-            '</button>' +
-            '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalUnita()">' +
-              '📐 Unità di Misura' +
-            '</button>' +
+            '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalTipo()">🏷️ Tipo Tariffa</button>' +
+            '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalTratt()">🍽️ Trattamento</button>' +
+            '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalUnita()">📐 Unità di Misura</button>' +
           '</div>' +
         '</div>' +
 
-        /* ── SEZIONE HEADER TARIFFA (campi unici, orizzontali) ── */
+        /* ── SEZIONE HEADER TARIFFA ── */
         '<div style="background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:16px 20px;margin-bottom:20px">' +
           '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">📌 Dati Tariffa (unici per ogni tariffario)</div>' +
           '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">' +
+
+            /* ID */
             '<div class="form-group" style="flex:0 0 60px">' +
               '<label class="form-label" style="font-size:11px">ID</label>' +
               '<input class="form-input" type="text" id="tf-id" value="" readonly style="background:#f8fafc;color:#94a3b8;cursor:default;height:36px;font-size:13px;width:100%">' +
             '</div>' +
+
+            /* Tipo Tariffa — valore testo (nome) */
             '<div class="form-group" style="flex:1 1 150px">' +
               '<label class="form-label" style="font-size:11px">Tipo Tariffa <span class="req">*</span></label>' +
-              '<select class="form-input" id="tf-tipo" style="height:36px;font-size:13px">' + opts(_tipoTariffa, '') + '</select>' +
+              '<select class="form-input" id="tf-tipo" style="height:36px;font-size:13px">' + _opts(_tipoTariffa, '') + '</select>' +
             '</div>' +
+
+            /* Trattamento — valore testo (nome) */
             '<div class="form-group" style="flex:1 1 150px">' +
               '<label class="form-label" style="font-size:11px">Trattamento</label>' +
-              '<select class="form-input" id="tf-tratt" style="height:36px;font-size:13px">' + opts(_trattamento, '') + '</select>' +
+              '<select class="form-input" id="tf-tratt" style="height:36px;font-size:13px">' + _opts(_trattamento, '') + '</select>' +
             '</div>' +
+
+            /* ★ Super Prodotto — valore = ID (lookup relazionale → TONIO_IMMOBILI_SUPERPRODOTTI) */
             '<div class="form-group" style="flex:1 1 130px">' +
               '<label class="form-label" style="font-size:11px">Super Prodotto</label>' +
-              '<select class="form-input" id="tf-superprod" style="height:36px;font-size:13px">' + opts(superProds, '') + '</select>' +
+              '<select class="form-input" id="tf-superprod" style="height:36px;font-size:13px">' + _optsById(superProds, '') + '</select>' +
             '</div>' +
+
+            /* ★ Prodotto — valore = ID (lookup relazionale → TONIO_IMMOBILI_PRODOTTI) */
             '<div class="form-group" style="flex:1 1 130px">' +
               '<label class="form-label" style="font-size:11px">Prodotto</label>' +
-              '<select class="form-input" id="tf-prod" style="height:36px;font-size:13px">' + opts(prods, '') + '</select>' +
+              '<select class="form-input" id="tf-prod" style="height:36px;font-size:13px">' + _optsById(prods, '') + '</select>' +
             '</div>' +
+
+            /* Unità di Misura — valore testo (nome) */
             '<div class="form-group" style="flex:1 1 130px">' +
               '<label class="form-label" style="font-size:11px">Unità di Misura</label>' +
-              '<select class="form-input" id="tf-unita" style="height:36px;font-size:13px">' + opts(_unitaMisura, '') + '</select>' +
+              '<select class="form-input" id="tf-unita" style="height:36px;font-size:13px">' + _opts(_unitaMisura, '') + '</select>' +
             '</div>' +
+
+            /* % IVA */
             '<div class="form-group" style="flex:0 0 90px">' +
               '<label class="form-label" style="font-size:11px">% IVA</label>' +
               '<input class="form-input" type="number" id="tf-iva" value="" min="0" max="100" step="1" placeholder="0" style="height:36px;font-size:13px;width:100%">' +
             '</div>' +
+
           '</div>' +
+
           /* Bottoni azione header */
           '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">' +
             '<button class="btn btn-primary" style="font-size:13px" onclick="MSK_Tariffe.nuovaTariffa()">' +
@@ -138,18 +157,14 @@ var MSK_Tariffe = (function () {
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/></svg>' +
               'Elimina Tariffa' +
             '</button>' +
-            '<button class="btn btn-ghost" style="font-size:13px;display:none" id="tf-btn-annulla" onclick="MSK_Tariffe.annullaTariff()">' +
-              'Annulla' +
-            '</button>' +
+            '<button class="btn btn-ghost" style="font-size:13px;display:none" id="tf-btn-annulla" onclick="MSK_Tariffe.annullaTariff()">Annulla</button>' +
           '</div>' +
         '</div>' +
 
         /* ── SEZIONE RIGHE TARIFFARIO ── */
         '<div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">' +
           '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase">📋 Righe Tariffario</div>' +
-          '<button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" id="tf-btn-add-riga" onclick="MSK_Tariffe.addRiga()" disabled>' +
-            '＋ Aggiungi Riga' +
-          '</button>' +
+          '<button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" id="tf-btn-add-riga" onclick="MSK_Tariffe.addRiga()" disabled>＋ Aggiungi Riga</button>' +
         '</div>' +
         '<div style="overflow-x:auto">' +
           '<table class="data-table" style="min-width:1100px;font-size:12px">' +
@@ -181,7 +196,6 @@ var MSK_Tariffe = (function () {
           '</table>' +
         '</div>' +
 
-        /* pulsante salva righe (visibile solo quando c'è una tariffa selezionata) */
         '<div style="margin-top:14px">' +
           '<button class="btn btn-primary" style="font-size:13px;display:none" id="tf-btn-salva-righe" onclick="MSK_Tariffe.salvaRighe()">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>' +
@@ -189,7 +203,7 @@ var MSK_Tariffe = (function () {
           '</button>' +
         '</div>' +
 
-        /* ── LISTA TARIFFE ESISTENTI ── */
+        /* ── LISTA TARIFFE SALVATE ── */
         '<div style="margin-top:32px">' +
           '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">📂 Tariffe Salvate</div>' +
           '<div style="margin-bottom:10px">' +
@@ -212,7 +226,7 @@ var MSK_Tariffe = (function () {
           '</div>' +
         '</div>' +
 
-      '</div>'; /* fine list-page */
+      '</div>';
 
     _renderListaTariffe(_tariffario);
     _aggiornaCount();
@@ -231,23 +245,23 @@ var MSK_Tariffe = (function () {
     return html;
   }
 
-  /* ── Costruisce una singola riga TR ── */
+  /* ── Costruisce una singola riga TR ──
+     ★ Tipo Immobile: value = ID (lookup → TONIO_IMMOBILI_TIPI)
+  ── */
   function _buildRigaHtml(riga, idx) {
     var tipiImmobile = (typeof TONIO_IMMOBILI_TIPI !== 'undefined') ? TONIO_IMMOBILI_TIPI : [];
-    var optsImmobile = '<option value="">— Seleziona —</option>';
-    tipiImmobile.forEach(function (item) {
-      var v = item.nome;
-      optsImmobile += '<option value="' + TONIO_escapeHtml(v) + '"' + (riga && v === riga.tipo_immobile ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
-    });
+    /* Il valore salvato è l'ID del tipo immobile */
+    var selTipoImmId = riga ? (riga.tipo_immobile_id !== undefined ? riga.tipo_immobile_id : '') : '';
+    var optsImmobile = _optsById(tipiImmobile, selTipoImmId);
 
     return (
       '<tr class="tariff-riga" data-idx="' + idx + '">' +
+        /* ★ Tipo Immobile — select con value = ID */
         '<td style="min-width:140px">' +
           '<select class="form-input form-input-sm" id="tr-tipo-imm-' + idx + '">' + optsImmobile + '</select>' +
         '</td>' +
         '<td><input class="form-input form-input-sm" type="date" id="tr-dal-' + idx + '" value="' + (riga ? riga.dal || '' : '') + '"></td>' +
         '<td><input class="form-input form-input-sm" type="date" id="tr-al-'  + idx + '" value="' + (riga ? riga.al  || '' : '') + '"></td>' +
-        /* Importo allargato per 999.999,99 */
         '<td style="min-width:130px"><input class="form-input form-input-sm" type="number" id="tr-importo-' + idx + '" value="' + (riga ? riga.importo || '' : '') + '" step="0.01" min="0" max="999999.99" placeholder="0,00" style="text-align:right;width:125px"></td>' +
         '<td style="text-align:center;background:#fff0f0"><input type="checkbox" id="tr-obl-'    + idx + '"' + (riga && riga.obbligatorio  ? ' checked' : '') + '></td>' +
         '<td style="text-align:center;background:#dbeafe"><input type="checkbox" id="tr-cp-cli-' + idx + '"' + (riga && riga.chi_paga_cli  ? ' checked' : '') + '></td>' +
@@ -266,25 +280,40 @@ var MSK_Tariffe = (function () {
     );
   }
 
+  /* ── Helper: risolve l'ID di un Super Prodotto o Prodotto in nome leggibile ── */
+  function _nomeById(arr, id) {
+    if (!id && id !== 0) return '—';
+    var found = arr.find(function (item) { return String(item.id) === String(id); });
+    return found ? found.nome : ('ID:' + id);
+  }
+
   /* ── Render lista tariffe salvate ── */
   function _renderListaTariffe(list) {
     var tbody = document.getElementById('tar-lista-tbody');
     if (!tbody) return;
+
+    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
+    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
+
     if (!list.length) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#94a3b8">Nessuna tariffa salvata</td></tr>';
       return;
     }
     var html = '';
     list.forEach(function (r) {
-      var nRighe = (r.righe || []).length;
-      var isActive = r.id === _editTariffId;
+      var nRighe    = (r.righe || []).length;
+      var isActive  = r.id === _editTariffId;
+      /* Risolve i nomi da ID per visualizzazione */
+      var nomeSuperProd = r.super_prodotto_id ? _nomeById(superProds, r.super_prodotto_id) : (r.super_prodotto || '—');
+      var nomeProd      = r.prodotto_id       ? _nomeById(prods,      r.prodotto_id)       : (r.prodotto      || '—');
+
       html +=
         '<tr class="data-row' + (isActive ? ' active-row' : '') + '" onclick="MSK_Tariffe.caricaTariffa(' + r.id + ')" style="' + (isActive ? 'background:#eff6ff;font-weight:600' : '') + '">' +
           '<td><strong>' + TONIO_escapeHtml(r.tipo_tariffa || '—') + '</strong></td>' +
-          '<td>' + TONIO_escapeHtml(r.trattamento   || '—') + '</td>' +
-          '<td>' + TONIO_escapeHtml(r.super_prodotto || '—') + '</td>' +
-          '<td>' + TONIO_escapeHtml(r.prodotto       || '—') + '</td>' +
-          '<td>' + TONIO_escapeHtml(r.unita_misura   || '—') + '</td>' +
+          '<td>' + TONIO_escapeHtml(r.trattamento || '—') + '</td>' +
+          '<td>' + TONIO_escapeHtml(nomeSuperProd) + '</td>' +
+          '<td>' + TONIO_escapeHtml(nomeProd) + '</td>' +
+          '<td>' + TONIO_escapeHtml(r.unita_misura || '—') + '</td>' +
           '<td style="text-align:center">' + (r.iva_perc !== undefined ? r.iva_perc + '%' : '—') + '</td>' +
           '<td style="text-align:center">' +
             '<span class="badge" style="background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe">' + nRighe + '</span>' +
@@ -306,11 +335,11 @@ var MSK_Tariffe = (function () {
 
   /* ── Mostra/nasconde i pulsanti di modifica ── */
   function _setBtnVisibility(editing) {
-    var btnSalvaH   = document.getElementById('tf-btn-salva-header');
-    var btnElimina  = document.getElementById('tf-btn-elimina-header');
-    var btnAnnulla  = document.getElementById('tf-btn-annulla');
-    var btnSalvaR   = document.getElementById('tf-btn-salva-righe');
-    var btnAddRiga  = document.getElementById('tf-btn-add-riga');
+    var btnSalvaH  = document.getElementById('tf-btn-salva-header');
+    var btnElimina = document.getElementById('tf-btn-elimina-header');
+    var btnAnnulla = document.getElementById('tf-btn-annulla');
+    var btnSalvaR  = document.getElementById('tf-btn-salva-righe');
+    var btnAddRiga = document.getElementById('tf-btn-add-riga');
     if (btnSalvaH)  btnSalvaH.style.display  = editing ? '' : 'none';
     if (btnElimina) btnElimina.style.display  = editing ? '' : 'none';
     if (btnAnnulla) btnAnnulla.style.display  = editing ? '' : 'none';
@@ -325,18 +354,17 @@ var MSK_Tariffe = (function () {
     _editTariffId = id;
     _righeCount   = 0;
 
-    /* Ricostruisce la pagina con la tariffa selezionata */
     _renderTariffPage();
 
-    /* Popola i campi header */
-    var _s = function (elId, val) { var el = document.getElementById(elId); if (el) el.value = val !== undefined && val !== null ? val : ''; };
+    var _s = function (elId, val) { var el = document.getElementById(elId); if (el) el.value = (val !== undefined && val !== null) ? val : ''; };
     _s('tf-id',        rec.id);
     _s('tf-tipo',      rec.tipo_tariffa  || '');
     _s('tf-tratt',     rec.trattamento   || '');
-    _s('tf-superprod', rec.super_prodotto || '');
-    _s('tf-prod',      rec.prodotto      || '');
-    _s('tf-unita',     rec.unita_misura  || '');
-    _s('tf-iva',       rec.iva_perc      !== undefined ? rec.iva_perc : '');
+    /* ★ Usa l'ID salvato per ripristinare la selezione nelle tendine lookup */
+    _s('tf-superprod', rec.super_prodotto_id !== undefined ? rec.super_prodotto_id : '');
+    _s('tf-prod',      rec.prodotto_id       !== undefined ? rec.prodotto_id       : '');
+    _s('tf-unita',     rec.unita_misura      || '');
+    _s('tf-iva',       rec.iva_perc !== undefined ? rec.iva_perc : '');
 
     _setBtnVisibility(true);
   }
@@ -347,16 +375,13 @@ var MSK_Tariffe = (function () {
     _righeCount   = 0;
     _renderTariffPage();
 
-    /* Pulisce i campi header */
     ['tf-id','tf-tipo','tf-tratt','tf-superprod','tf-prod','tf-unita','tf-iva'].forEach(function (id) {
       var el = document.getElementById(id); if (el) el.value = '';
     });
 
-    /* Mostra i pulsanti di inserimento */
     var btnSalvaH = document.getElementById('tf-btn-salva-header');
-    if (btnSalvaH) { btnSalvaH.style.display = ''; btnSalvaH.textContent = ''; }
-    /* Ricostruisci il pulsante salva con icona */
     if (btnSalvaH) {
+      btnSalvaH.style.display = '';
       btnSalvaH.innerHTML =
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Intestazione';
     }
@@ -364,7 +389,6 @@ var MSK_Tariffe = (function () {
     if (btnAnnulla) btnAnnulla.style.display = '';
     var btnAddRiga = document.getElementById('tf-btn-add-riga');
     if (btnAddRiga) btnAddRiga.disabled = false;
-    /* Nasconde elimina — non esiste ancora */
     var btnElimina = document.getElementById('tf-btn-elimina-header');
     if (btnElimina) btnElimina.style.display = 'none';
     var btnSalvaR = document.getElementById('tf-btn-salva-righe');
@@ -375,33 +399,48 @@ var MSK_Tariffe = (function () {
   function _leggiHeader() {
     var gv = function (id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
     return {
-      tipo_tariffa:  gv('tf-tipo'),
-      trattamento:   gv('tf-tratt'),
-      super_prodotto: gv('tf-superprod'),
-      prodotto:      gv('tf-prod'),
-      unita_misura:  gv('tf-unita'),
-      iva_perc:      parseFloat(gv('tf-iva')) || 0
+      tipo_tariffa:      gv('tf-tipo'),
+      trattamento:       gv('tf-tratt'),
+      /* ★ Salva l'ID (come numero) per Super Prodotto e Prodotto */
+      super_prodotto_id: gv('tf-superprod') !== '' ? parseInt(gv('tf-superprod'), 10) : null,
+      prodotto_id:       gv('tf-prod')      !== '' ? parseInt(gv('tf-prod'),      10) : null,
+      unita_misura:      gv('tf-unita'),
+      iva_perc:          parseFloat(gv('tf-iva')) || 0
     };
   }
 
-  /* ── Salva solo i campi header (crea o aggiorna la tariffa) ── */
+  /* ── Salva i campi header ── */
   function salvaTariffHeader() {
     var h = _leggiHeader();
     if (!h.tipo_tariffa) { alert('⚠️ Selezionare il Tipo Tariffa.'); return; }
 
     if (_editTariffId === null) {
-      /* Nuovo record */
       var newId = _tariffario.length > 0 ? Math.max.apply(null, _tariffario.map(function (r) { return r.id; })) + 1 : 1;
-      _tariffario.push({ id: newId, tipo_tariffa: h.tipo_tariffa, trattamento: h.trattamento, super_prodotto: h.super_prodotto, prodotto: h.prodotto, unita_misura: h.unita_misura, iva_perc: h.iva_perc, righe: [] });
+      _tariffario.push({
+        id:               newId,
+        tipo_tariffa:     h.tipo_tariffa,
+        trattamento:      h.trattamento,
+        super_prodotto_id: h.super_prodotto_id,
+        prodotto_id:      h.prodotto_id,
+        unita_misura:     h.unita_misura,
+        iva_perc:         h.iva_perc,
+        righe:            []
+      });
       _editTariffId = newId;
     } else {
       var rec = _tariffario.find(function (r) { return r.id === _editTariffId; });
-      if (rec) { rec.tipo_tariffa = h.tipo_tariffa; rec.trattamento = h.trattamento; rec.super_prodotto = h.super_prodotto; rec.prodotto = h.prodotto; rec.unita_misura = h.unita_misura; rec.iva_perc = h.iva_perc; }
+      if (rec) {
+        rec.tipo_tariffa      = h.tipo_tariffa;
+        rec.trattamento       = h.trattamento;
+        rec.super_prodotto_id = h.super_prodotto_id;
+        rec.prodotto_id       = h.prodotto_id;
+        rec.unita_misura      = h.unita_misura;
+        rec.iva_perc          = h.iva_perc;
+      }
     }
 
     TONIO_Storage.save('tariffe_tariffario', _tariffario);
     _setBtnVisibility(true);
-    /* Aggiorna ID nel campo */
     var elId = document.getElementById('tf-id');
     if (elId) elId.value = _editTariffId;
     _renderListaTariffe(_tariffario);
@@ -423,7 +462,9 @@ var MSK_Tariffe = (function () {
     if (row) row.parentNode.removeChild(row);
   }
 
-  /* ── Legge le righe dal DOM ── */
+  /* ── Legge le righe dal DOM ──
+     ★ Tipo Immobile: salva l'ID (foreign key → TONIO_IMMOBILI_TIPI)
+  ── */
   function _leggiRighe() {
     var rows = document.querySelectorAll('.tariff-riga');
     var righe = [];
@@ -431,19 +472,21 @@ var MSK_Tariffe = (function () {
       var idx = parseInt(row.getAttribute('data-idx'), 10);
       var gv = function (id) { var el = document.getElementById(id + '-' + idx); return el ? el.value : ''; };
       var gc = function (id) { var el = document.getElementById(id + '-' + idx); return el ? el.checked : false; };
+      var tipoImmVal = gv('tr-tipo-imm');
       righe.push({
-        tipo_immobile:  gv('tr-tipo-imm'),
-        dal:            gv('tr-dal'),
-        al:             gv('tr-al'),
-        importo:        parseFloat(gv('tr-importo')) || 0,
-        obbligatorio:   gc('tr-obl'),
-        chi_paga_cli:   gc('tr-cp-cli'),
-        chi_paga_osp:   gc('tr-cp-osp'),
-        fat_fat:        gc('tr-fat'),
-        fat_nf:         gc('tr-nf'),
-        fatturare_cli:  gc('tr-fcli'),
-        fatturare_osp:  gc('tr-fosp'),
-        ordinamento:    parseInt(gv('tr-ord'), 10) || 1
+        /* ★ Salva l'ID del tipo immobile */
+        tipo_immobile_id: tipoImmVal !== '' ? parseInt(tipoImmVal, 10) : null,
+        dal:              gv('tr-dal'),
+        al:               gv('tr-al'),
+        importo:          parseFloat(gv('tr-importo')) || 0,
+        obbligatorio:     gc('tr-obl'),
+        chi_paga_cli:     gc('tr-cp-cli'),
+        chi_paga_osp:     gc('tr-cp-osp'),
+        fat_fat:          gc('tr-fat'),
+        fat_nf:           gc('tr-nf'),
+        fatturare_cli:    gc('tr-fcli'),
+        fatturare_osp:    gc('tr-fosp'),
+        ordinamento:      parseInt(gv('tr-ord'), 10) || 1
       });
     });
     return righe;
@@ -461,7 +504,7 @@ var MSK_Tariffe = (function () {
     _showToast('Righe salvate ✓');
   }
 
-  /* ── Elimina la tariffa corrente in editing ── */
+  /* ── Elimina la tariffa corrente ── */
   function eliminaTariff() {
     if (_editTariffId === null) return;
     eliminaTariffId(_editTariffId);
@@ -487,11 +530,16 @@ var MSK_Tariffe = (function () {
 
   /* ── Live search ── */
   function filterTariff() {
+    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
+    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
     var q = (document.getElementById('tar-search') ? document.getElementById('tar-search').value : '').toLowerCase();
     _renderListaTariffe(_tariffario.filter(function (r) {
+      var nomeSP = r.super_prodotto_id ? _nomeById(superProds, r.super_prodotto_id) : (r.super_prodotto || '');
+      var nomeP  = r.prodotto_id       ? _nomeById(prods,      r.prodotto_id)       : (r.prodotto      || '');
       return (r.tipo_tariffa  || '').toLowerCase().indexOf(q) !== -1 ||
              (r.trattamento   || '').toLowerCase().indexOf(q) !== -1 ||
-             (r.prodotto      || '').toLowerCase().indexOf(q) !== -1;
+             nomeP.toLowerCase().indexOf(q) !== -1 ||
+             nomeSP.toLowerCase().indexOf(q) !== -1;
     }));
   }
 
@@ -511,9 +559,44 @@ var MSK_Tariffe = (function () {
   }
 
   /* ================================================================
-     ─────────────────────────────────────────────────────────────
-     MODALE TIPO TARIFFA (aperta da pulsante nel Tariffario)
-     ─────────────────────────────────────────────────────────────
+     AGGIORNA SELECT NELL'HEADER dopo modifica lookup
+     ★ Super Prodotto e Prodotto usano _optsById
+  ================================================================ */
+  function _refreshHeaderSelects() {
+    function setOptsTxt(elId, arr, curVal) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      var h = '<option value="">— Seleziona —</option>';
+      arr.forEach(function (item) {
+        var v = item.nome;
+        h += '<option value="' + TONIO_escapeHtml(v) + '"' + (v === curVal ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
+      });
+      el.innerHTML = h;
+    }
+    function setOptsId(elId, arr, curId) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      el.innerHTML = _optsById(arr, curId);
+    }
+
+    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
+    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
+
+    var curTipo  = document.getElementById('tf-tipo')      ? document.getElementById('tf-tipo').value      : '';
+    var curTratt = document.getElementById('tf-tratt')     ? document.getElementById('tf-tratt').value     : '';
+    var curSP    = document.getElementById('tf-superprod') ? document.getElementById('tf-superprod').value : '';
+    var curP     = document.getElementById('tf-prod')      ? document.getElementById('tf-prod').value      : '';
+    var curUnita = document.getElementById('tf-unita')     ? document.getElementById('tf-unita').value     : '';
+
+    setOptsTxt('tf-tipo',      _tipoTariffa, curTipo);
+    setOptsTxt('tf-tratt',     _trattamento, curTratt);
+    setOptsId ('tf-superprod', superProds,   curSP);
+    setOptsId ('tf-prod',      prods,        curP);
+    setOptsTxt('tf-unita',     _unitaMisura, curUnita);
+  }
+
+  /* ================================================================
+     MODALE TIPO TARIFFA
   ================================================================ */
   var _editTipo = null;
 
@@ -567,12 +650,9 @@ var MSK_Tariffe = (function () {
     _editTipo = id;
     var rec = _tipoTariffa.find(function (r) { return r.id === id; });
     if (!rec) return;
-    var title = document.getElementById('tipo-form-title');
-    var elOrd = document.getElementById('tipo-ordine');
-    var elNom = document.getElementById('tipo-nome');
-    if (title) title.textContent = '✏️ MODIFICA TIPO TARIFFA';
-    if (elOrd) elOrd.value = rec.ordine;
-    if (elNom) elNom.value = rec.nome;
+    var title = document.getElementById('tipo-form-title'); if (title) title.textContent = '✏️ MODIFICA TIPO TARIFFA';
+    var elOrd = document.getElementById('tipo-ordine');    if (elOrd) elOrd.value = rec.ordine;
+    var elNom = document.getElementById('tipo-nome');      if (elNom) elNom.value = rec.nome;
   }
 
   function salvaTipo() {
@@ -590,14 +670,13 @@ var MSK_Tariffe = (function () {
     TONIO_Storage.save('tariffe_tipo', _tipoTariffa);
     _editTipo = null;
     _renderModalTipo();
-    /* Riaggiorna select nel form header */
     _refreshHeaderSelects();
   }
 
   function annullaTipo() {
     _editTipo = null;
     var title = document.getElementById('tipo-form-title'); if (title) title.textContent = '＋ NUOVO TIPO TARIFFA';
-    var elNom = document.getElementById('tipo-nome'); if (elNom) elNom.value = '';
+    var elNom = document.getElementById('tipo-nome');  if (elNom) elNom.value = '';
     var elOrd = document.getElementById('tipo-ordine'); if (elOrd) elOrd.value = _tipoTariffa.length + 1;
   }
 
@@ -652,7 +731,6 @@ var MSK_Tariffe = (function () {
         '<div class="modal-body">' +
           '<table class="data-table"><thead><tr><th style="width:55px">ID</th><th style="width:80px">Ordine</th><th>Trattamento</th><th>Definizione</th><th style="width:50px"></th></tr></thead>' +
           '<tbody>' + html + '</tbody></table>' +
-          /* Form inline orizzontale */
           '<div style="margin-top:14px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0">' +
             '<div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px" id="tratt-form-title">＋ NUOVO TRATTAMENTO</div>' +
             '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:nowrap">' +
@@ -804,7 +882,7 @@ var MSK_Tariffe = (function () {
   function annullaUnita() {
     _editUnita = null;
     var title = document.getElementById('unita-form-title'); if (title) title.textContent = '＋ NUOVA UNITÀ DI MISURA';
-    var elNom = document.getElementById('unita-nome'); if (elNom) elNom.value = '';
+    var elNom = document.getElementById('unita-nome');  if (elNom) elNom.value = '';
     var elOrd = document.getElementById('unita-ordine'); if (elOrd) elOrd.value = _unitaMisura.length + 1;
   }
 
@@ -825,29 +903,6 @@ var MSK_Tariffe = (function () {
   }
 
   /* ================================================================
-     AGGIORNA SELECT NELL'HEADER dopo modifica lookup
-  ================================================================ */
-  function _refreshHeaderSelects() {
-    function setOpts(elId, arr, curVal) {
-      var el = document.getElementById(elId);
-      if (!el) return;
-      var h = '<option value="">— Seleziona —</option>';
-      arr.forEach(function (item) {
-        var v = item.nome;
-        h += '<option value="' + TONIO_escapeHtml(v) + '"' + (v === curVal ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
-      });
-      el.innerHTML = h;
-    }
-    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
-    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
-    setOpts('tf-tipo',      _tipoTariffa, document.getElementById('tf-tipo')      ? document.getElementById('tf-tipo').value      : '');
-    setOpts('tf-tratt',     _trattamento, document.getElementById('tf-tratt')     ? document.getElementById('tf-tratt').value     : '');
-    setOpts('tf-superprod', superProds,   document.getElementById('tf-superprod') ? document.getElementById('tf-superprod').value : '');
-    setOpts('tf-prod',      prods,        document.getElementById('tf-prod')      ? document.getElementById('tf-prod').value      : '');
-    setOpts('tf-unita',     _unitaMisura, document.getElementById('tf-unita')     ? document.getElementById('tf-unita').value     : '');
-  }
-
-  /* ================================================================
      UTILITY
   ================================================================ */
   function _getOrCreateOverlay(id) {
@@ -865,37 +920,35 @@ var MSK_Tariffe = (function () {
      API PUBBLICA
   ================================================================ */
   return {
-    init:             init,
-    /* Tariffario inline */
-    nuovaTariffa:     nuovaTariffa,
-    caricaTariffa:    caricaTariffa,
+    init:              init,
+    nuovaTariffa:      nuovaTariffa,
+    caricaTariffa:     caricaTariffa,
     salvaTariffHeader: salvaTariffHeader,
-    salvaRighe:       salvaRighe,
-    addRiga:          addRiga,
-    removeRiga:       removeRiga,
-    eliminaTariff:    eliminaTariff,
-    eliminaTariffId:  eliminaTariffId,
-    annullaTariff:    annullaTariff,
-    filterTariff:     filterTariff,
-    /* Modali lookup */
-    openModalTipo:    openModalTipo,
-    _clickTipo:       _clickTipo,
-    salvaTipo:        salvaTipo,
-    annullaTipo:      annullaTipo,
-    eliminaTipo:      eliminaTipo,
-    closeModalTipo:   closeModalTipo,
-    openModalTratt:   openModalTratt,
-    _clickTratt:      _clickTratt,
-    salvaTratt:       salvaTratt,
-    annullaTratt:     annullaTratt,
-    eliminaTratt:     eliminaTratt,
-    closeModalTratt:  closeModalTratt,
-    openModalUnita:   openModalUnita,
-    _clickUnita:      _clickUnita,
-    salvaUnita:       salvaUnita,
-    annullaUnita:     annullaUnita,
-    eliminaUnita:     eliminaUnita,
-    closeModalUnita:  closeModalUnita
+    salvaRighe:        salvaRighe,
+    addRiga:           addRiga,
+    removeRiga:        removeRiga,
+    eliminaTariff:     eliminaTariff,
+    eliminaTariffId:   eliminaTariffId,
+    annullaTariff:     annullaTariff,
+    filterTariff:      filterTariff,
+    openModalTipo:     openModalTipo,
+    _clickTipo:        _clickTipo,
+    salvaTipo:         salvaTipo,
+    annullaTipo:       annullaTipo,
+    eliminaTipo:       eliminaTipo,
+    closeModalTipo:    closeModalTipo,
+    openModalTratt:    openModalTratt,
+    _clickTratt:       _clickTratt,
+    salvaTratt:        salvaTratt,
+    annullaTratt:      annullaTratt,
+    eliminaTratt:      eliminaTratt,
+    closeModalTratt:   closeModalTratt,
+    openModalUnita:    openModalUnita,
+    _clickUnita:       _clickUnita,
+    salvaUnita:        salvaUnita,
+    annullaUnita:      annullaUnita,
+    eliminaUnita:      eliminaUnita,
+    closeModalUnita:   closeModalUnita
   };
 
 })();
