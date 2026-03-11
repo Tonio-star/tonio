@@ -42,7 +42,7 @@ var TONIO_TARIFFARIO = [
     /* Righe dettaglio */
     righe: [
       {
-        tipo_appartamento: 'Appartamento',
+        tipo_immobile: 'Appartamento',
         dal:               '2026-01-01',
         al:                '2026-06-30',
         importo:           80.00,
