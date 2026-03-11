@@ -31,7 +31,11 @@ var TONIO_NAV = {
   immobili_tariffe: {
     label: '🏠 Immobili & Tariffe',
     subs: [
-      { label: '🏠 Immobili', page: 'immobili' },
+      { label: '🏠 Immobili',          page: 'immobili' },
+      { label: '💶 Tariffe',           page: 'tariffe' },
+      { label: '🏷️ Tipo Tariffa',     page: 'tariffe_tipo' },
+      { label: '🍽️ Trattamento',      page: 'tariffe_trattamento' },
+      { label: '📐 Unità di Misura',   page: 'tariffe_unita' },
     ]
   },
   gestione: {
@@ -50,7 +54,11 @@ var TONIO_PAGE_ACTIONS = {
   fornitori:           '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
   ospiti:              '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
   immobili:            '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>',
-  modalita_pagamento:  '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaModalita()">＋ Nuova Modalità</button>'
+  modalita_pagamento:  '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaModalita()">＋ Nuova Modalità</button>',
+  tariffe:             '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovaTariffa()">＋ Nuova Tariffa</button>',
+  tariffe_tipo:        '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovoTipoTariffa()">＋ Nuovo Tipo Tariffa</button>',
+  tariffe_trattamento: '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovoTrattamento()">＋ Nuovo Trattamento</button>',
+  tariffe_unita:       '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovaUnitaMisura()">＋ Nuova Unità di Misura</button>'
 };
 
 var TONIO_currentModule = 'anagrafiche';
@@ -63,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof MSK_Ospiti    !== 'undefined') MSK_Ospiti.init();
   if (typeof MSK_Immobili  !== 'undefined') MSK_Immobili.init();
   if (typeof MSK_Contabilita !== 'undefined') MSK_Contabilita.init();
+  if (typeof MSK_Tariffe    !== 'undefined') MSK_Tariffe.init();
 
   TONIO_setModule('anagrafiche', false);
   TONIO_showPage('clienti');
