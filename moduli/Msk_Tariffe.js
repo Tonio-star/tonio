@@ -71,14 +71,14 @@ var MSK_Tariffe = (function () {
     c.innerHTML =
       '<div class="list-page">' +
 
-        /* ── HEADER: "CREA TARIFFE" + pulsanti lookup sulla stessa riga ── */
-        '<div class="list-header" style="align-items:center;flex-wrap:wrap;gap:12px">' +
-          '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;flex:1">' +
+        /* ── HEADER: "CREA TARIFFE" a sinistra, pulsanti lookup verso il margine destro ── */
+        '<div class="list-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">' +
+          '<div style="display:flex;align-items:center;gap:12px">' +
             '<h1 class="list-title" style="margin:0;white-space:nowrap">CREA TARIFFE</h1>' +
             '<span class="list-count" id="tar-count"></span>' +
           '</div>' +
-          /* Pulsanti lookup — sulla stessa riga della scritta CREA TARIFFE, in ordine */
-          '<div style="display:flex;flex-direction:row;gap:8px;align-items:center;flex-shrink:0">' +
+          /* Pulsanti lookup sul margine destro, orizzontali, nell'ordine richiesto */
+          '<div style="display:flex;flex-direction:row;gap:8px;align-items:center;margin-left:auto">' +
             '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalTipo()">' +
               '🏷️ Tipo Tariffa' +
             '</button>' +
@@ -132,7 +132,7 @@ var MSK_Tariffe = (function () {
             '</button>' +
             '<button class="btn btn-warning" style="font-size:13px" id="tf-btn-salva-header" onclick="MSK_Tariffe.salvaTariffHeader()" style="display:none">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>' +
-              'Salva Tariffa' +
+              'Salva Intestazione' +
             '</button>' +
             '<button class="btn btn-danger" style="font-size:13px;display:none" id="tf-btn-elimina-header" onclick="MSK_Tariffe.eliminaTariff()">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/></svg>' +
@@ -148,7 +148,7 @@ var MSK_Tariffe = (function () {
         '<div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">' +
           '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase">📋 Righe Tariffario</div>' +
           '<button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" id="tf-btn-add-riga" onclick="MSK_Tariffe.addRiga()" disabled>' +
-            '＋ Aggiungi Tariffa' +
+            '＋ Aggiungi Riga' +
           '</button>' +
         '</div>' +
         '<div style="overflow-x:auto">' +
@@ -170,9 +170,9 @@ var MSK_Tariffe = (function () {
                 '<th style="text-align:center;background:#dbeafe">Cli</th>' +
                 '<th style="text-align:center;background:#dcfce7">Osp</th>' +
                 '<th style="text-align:center;background:#fef9c3">Fat</th>' +
-                '<th style="text-align:center;background:#f1f5f9">NF</th>' +
-                '<th style="text-align:center;background:#eff6ff">Cli</th>' +
-                '<th style="text-align:center;background:#f0fdf4">Osp</th>' +
+                '<th style="text-align:center;background:#94a3b8;color:#fff">NF</th>' +
+                '<th style="text-align:center;background:#dbeafe">Cli</th>' +
+                '<th style="text-align:center;background:#dcfce7">Osp</th>' +
                 '<th style="text-align:center;width:60px">Ord.</th>' +
                 '<th style="width:40px"></th>' +
               '</tr>' +
@@ -185,7 +185,7 @@ var MSK_Tariffe = (function () {
         '<div style="margin-top:14px">' +
           '<button class="btn btn-primary" style="font-size:13px;display:none" id="tf-btn-salva-righe" onclick="MSK_Tariffe.salvaRighe()">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>' +
-            'Salva Tariffe' +
+            'Salva Righe' +
           '</button>' +
         '</div>' +
 
@@ -253,9 +253,9 @@ var MSK_Tariffe = (function () {
         '<td style="text-align:center;background:#dbeafe"><input type="checkbox" id="tr-cp-cli-' + idx + '"' + (riga && riga.chi_paga_cli  ? ' checked' : '') + '></td>' +
         '<td style="text-align:center;background:#dcfce7"><input type="checkbox" id="tr-cp-osp-' + idx + '"' + (riga && riga.chi_paga_osp  ? ' checked' : '') + '></td>' +
         '<td style="text-align:center;background:#fef9c3"><input type="checkbox" id="tr-fat-'    + idx + '"' + (riga && riga.fat_fat       ? ' checked' : '') + '></td>' +
-        '<td style="text-align:center;background:#f1f5f9"><input type="checkbox" id="tr-nf-'     + idx + '"' + (riga && riga.fat_nf        ? ' checked' : '') + '></td>' +
-        '<td style="text-align:center;background:#eff6ff"><input type="checkbox" id="tr-fcli-'   + idx + '"' + (riga && riga.fatturare_cli ? ' checked' : '') + '></td>' +
-        '<td style="text-align:center;background:#f0fdf4"><input type="checkbox" id="tr-fosp-'   + idx + '"' + (riga && riga.fatturare_osp ? ' checked' : '') + '></td>' +
+        '<td style="text-align:center;background:#94a3b8"><input type="checkbox" id="tr-nf-'     + idx + '"' + (riga && riga.fat_nf        ? ' checked' : '') + '></td>' +
+        '<td style="text-align:center;background:#dbeafe"><input type="checkbox" id="tr-fcli-'   + idx + '"' + (riga && riga.fatturare_cli ? ' checked' : '') + '></td>' +
+        '<td style="text-align:center;background:#dcfce7"><input type="checkbox" id="tr-fosp-'   + idx + '"' + (riga && riga.fatturare_osp ? ' checked' : '') + '></td>' +
         '<td><input class="form-input form-input-sm" type="number" id="tr-ord-' + idx + '" value="' + (riga ? riga.ordinamento || (idx + 1) : (idx + 1)) + '" min="1" style="width:55px"></td>' +
         '<td style="text-align:center">' +
           '<button class="btn-icon btn-danger" title="Rimuovi riga" onclick="MSK_Tariffe.removeRiga(' + idx + ')" style="padding:4px 6px">' +
