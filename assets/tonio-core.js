@@ -31,11 +31,8 @@ var TONIO_NAV = {
   immobili_tariffe: {
     label: '🏠 Immobili & Tariffe',
     subs: [
-      { label: '🏠 Immobili',          page: 'immobili' },
-      { label: '💶 Tariffe',           page: 'tariffe' },
-      { label: '🏷️ Tipo Tariffa',     page: 'tariffe_tipo' },
-      { label: '🍽️ Trattamento',      page: 'tariffe_trattamento' },
-      { label: '📐 Unità di Misura',   page: 'tariffe_unita' },
+      { label: '🏠 Immobili', page: 'immobili' },
+      { label: '💶 Tariffe',  page: 'tariffe' },
     ]
   },
   gestione: {
@@ -55,10 +52,7 @@ var TONIO_PAGE_ACTIONS = {
   ospiti:              '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
   immobili:            '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>',
   modalita_pagamento:  '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaModalita()">＋ Nuova Modalità</button>',
-  tariffe:             '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovaTariffa()">＋ Nuova Tariffa</button>',
-  tariffe_tipo:        '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovoTipoTariffa()">＋ Nuovo Tipo Tariffa</button>',
-  tariffe_trattamento: '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovoTrattamento()">＋ Nuovo Trattamento</button>',
-  tariffe_unita:       '<button class="nav-action-btn primary" onclick="MSK_Tariffe.nuovaUnitaMisura()">＋ Nuova Unità di Misura</button>'
+  tariffe:             ''
 };
 
 var TONIO_currentModule = 'anagrafiche';
