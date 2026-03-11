@@ -39,6 +39,10 @@
   <div class="sb-section">
     <div class="sb-section-title">Immobili &amp; Tariffe</div>
     <button class="sb-btn" onclick="TONIO_showPage('immobili');TONIO_closeSidebar()">🏠 Immobili</button>
+    <button class="sb-btn" onclick="TONIO_showPage('tariffe');TONIO_closeSidebar()">💶 Tariffe</button>
+    <button class="sb-btn" onclick="TONIO_showPage('tariffe_tipo');TONIO_closeSidebar()">🏷️ Tipo Tariffa</button>
+    <button class="sb-btn" onclick="TONIO_showPage('tariffe_trattamento');TONIO_closeSidebar()">🍽️ Trattamento</button>
+    <button class="sb-btn" onclick="TONIO_showPage('tariffe_unita');TONIO_closeSidebar()">📐 Unità di Misura</button>
   </div>
   <div class="sb-section">
     <div class="sb-section-title">Gestione</div>
@@ -81,6 +85,11 @@
   <div id="page-spese"        class="page"><div class="coming-soon"><div class="cs-icon">📊</div><h2>Spese</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-budget"       class="page"><div class="coming-soon"><div class="cs-icon">📈</div><h2>Budget</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-modalita_pagamento" class="page"></div>
+  <!-- TARIFFE — gestito da Msk_Tariffe.js -->
+  <div id="page-tariffe"              class="page"></div>
+  <div id="page-tariffe_tipo"         class="page"></div>
+  <div id="page-tariffe_trattamento"  class="page"></div>
+  <div id="page-tariffe_unita"        class="page"></div>
   <div id="page-manutenzioni" class="page"><div class="coming-soon"><div class="cs-icon">🔨</div><h2>Manutenzioni</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-documenti"    class="page"><div class="coming-soon"><div class="cs-icon">📁</div><h2>Documenti</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-impostazioni" class="page"><div class="coming-soon"><div class="cs-icon">⚙️</div><h2>Impostazioni</h2><p>Modulo in sviluppo</p></div></div>
@@ -336,12 +345,14 @@
 <script src="dati/Dati_Ospiti.js"></script>
 <script src="dati/Dati_Immobili.js"></script>
 <script src="dati/Dati_Contabilita.js"></script>
+<script src="dati/Dati_Tariffe.js"></script>
 <script src="assets/tonio-core.js"></script>
 <script src="moduli/Msk_Clienti.js"></script>
 <script src="moduli/Msk_Fornitori.js"></script>
 <script src="moduli/Msk_Ospiti.js"></script>
 <script src="moduli/Msk_Immobili.js"></script>
 <script src="moduli/Msk_Contabilita.js"></script>
+<script src="moduli/Msk_Tariffe.js"></script>
 
 </body>
 </html>
