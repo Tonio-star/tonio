@@ -4,10 +4,11 @@
    NON modificare quando si aggiorna la struttura.
    Aggiungi / modifica dati qui in totale sicurezza.
 
-   NOTA — Campi ID relazionali (foreign key):
-   • super_prodotto_id  → ID da TONIO_IMMOBILI_SUPERPRODOTTI
-   • prodotto_id        → ID da TONIO_IMMOBILI_PRODOTTI
-   • tipo_immobile_id   → ID da TONIO_IMMOBILI_TIPI  (nelle righe)
+   v2.0 — super_prodotto_id, prodotto_id, tipo_immobile_id
+           sono ora ID numerici (foreign key → modulo Immobili).
+           I campi super_prodotto / prodotto / tipo_immobile (stringa)
+           sono mantenuti solo per retrocompatibilità con dati salvati
+           in localStorage da versioni precedenti.
    ================================================================ */
 
 var TONIO_TARIFFE_TIPO = [
@@ -18,11 +19,11 @@ var TONIO_TARIFFE_TIPO = [
 ];
 
 var TONIO_TARIFFE_TRATTAMENTO = [
-  { id: 1, ordine: 1, nome: 'Solo Pernottamento',  definizione: 'Solo notte senza colazione' },
-  { id: 2, ordine: 2, nome: 'Bed & Breakfast',      definizione: 'Pernottamento con colazione inclusa' },
-  { id: 3, ordine: 3, nome: 'Mezza Pensione',        definizione: 'Pernottamento con colazione e cena' },
-  { id: 4, ordine: 4, nome: 'Pensione Completa',     definizione: 'Pernottamento con colazione, pranzo e cena' },
-  { id: 5, ordine: 5, nome: 'All Inclusive',         definizione: 'Tutto incluso, bevande comprese' },
+  { id: 1, ordine: 1, nome: 'Solo Pernottamento', definizione: 'Solo notte senza colazione' },
+  { id: 2, ordine: 2, nome: 'Bed & Breakfast',    definizione: 'Pernottamento con colazione inclusa' },
+  { id: 3, ordine: 3, nome: 'Mezza Pensione',      definizione: 'Pernottamento con colazione e cena' },
+  { id: 4, ordine: 4, nome: 'Pensione Completa',   definizione: 'Pernottamento con colazione, pranzo e cena' },
+  { id: 5, ordine: 5, nome: 'All Inclusive',        definizione: 'Tutto incluso, bevande comprese' },
 ];
 
 var TONIO_TARIFFE_UNITA_MISURA = [
@@ -33,27 +34,45 @@ var TONIO_TARIFFE_UNITA_MISURA = [
   { id: 5, ordine: 5, nome: 'Forfait' },
 ];
 
-/* ----------------------------------------------------------------
-   Tariffario
-   Header (campi unici):
-     super_prodotto_id  = ID di TONIO_IMMOBILI_SUPERPRODOTTI  (es. 1 = Standard)
-     prodotto_id        = ID di TONIO_IMMOBILI_PRODOTTI       (es. 1 = Affitto Breve)
+/*
+  Tariffario — schema aggiornato v2.0
+  ─────────────────────────────────────────────────────────────────
+  Campi header (unici per tariffa):
+    tipo_tariffa     string  — nome del tipo tariffa (archivio interno)
+    trattamento      string  — nome del trattamento (archivio interno)
+    super_prodotto_id number — ID → TONIO_IMMOBILI_SUPERPRODOTTI
+    prodotto_id       number — ID → TONIO_IMMOBILI_PRODOTTI
+    unita_misura     string  — nome dell'unità di misura (archivio interno)
+    iva_perc         number
 
-   Righe dettaglio:
-     tipo_immobile_id   = ID di TONIO_IMMOBILI_TIPI           (es. 1 = Appartamento)
-   ---------------------------------------------------------------- */
+  Campi riga (multi-record per tariffa):
+    tipo_immobile_id  number — ID → TONIO_IMMOBILI_TIPI
+    dal / al         string  — date ISO
+    importo          number
+    obbligatorio     bool
+    chi_paga_cli     bool
+    chi_paga_osp     bool
+    fat_fat          bool
+    fat_nf           bool
+    fatturare_cli    bool
+    fatturare_osp    bool
+    ordinamento      number
+  ─────────────────────────────────────────────────────────────────
+*/
 var TONIO_TARIFFARIO = [
   {
     id: 1,
+    /* Campi header */
     tipo_tariffa:      'Tariffa Base',
     trattamento:       'Bed & Breakfast',
-    super_prodotto_id: 1,   /* Standard  — da TONIO_IMMOBILI_SUPERPRODOTTI */
-    prodotto_id:       1,   /* Affitto Breve — da TONIO_IMMOBILI_PRODOTTI  */
+    super_prodotto_id: 1,   /* ID 1 = 'Standard' in TONIO_IMMOBILI_SUPERPRODOTTI */
+    prodotto_id:       1,   /* ID 1 = 'Affitto Breve' in TONIO_IMMOBILI_PRODOTTI */
     unita_misura:      'Per Notte',
     iva_perc:          10,
+    /* Righe dettaglio */
     righe: [
       {
-        tipo_immobile_id: 1,   /* Appartamento — da TONIO_IMMOBILI_TIPI */
+        tipo_immobile_id: 1,    /* ID 1 = 'Appartamento' in TONIO_IMMOBILI_TIPI */
         dal:              '2026-01-01',
         al:               '2026-06-30',
         importo:          80.00,
