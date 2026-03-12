@@ -2,7 +2,7 @@
    TONIO — Msk_Tariffe.js
    Modulo Tariffe — Tipo Tariffa, Trattamento, Unità di Misura,
                     Tariffario (unica maschera inline)
-   v4.0 — Lookup live localStorage + FK by ID + ordinamento + sticky + label + Maschera Sconti
+   v4.1 — Maschera Sconti: layout allineato a Tariffe + Descrizione textarea multiriga
    ================================================================ */
 
 var MSK_Tariffe = (function () {
@@ -980,49 +980,58 @@ var MSK_Tariffe = (function () {
 
     ov.innerHTML =
       '<div class="modal" style="max-width:1380px;width:96vw">' +
-        '<div class="modal-header">' +
+
+        /* ══ HEADER MODALE ══ */
+        '<div class="modal-header" style="position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e2e8f0">' +
           '<span style="font-size:19px">🏷️</span>' +
           '<div class="modal-title">Sconti</div>' +
           '<button class="modal-close" onclick="MSK_Tariffe.closeModalSconti()">×</button>' +
         '</div>' +
-        '<div class="modal-body" style="padding:0">' +
 
-          /* ── DATI SCONTO ── */
-          '<div style="background:#f0f4ff;border-bottom:1px solid #c7d7f5;padding:14px 20px">' +
-            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">📌 Dati Sconto</div>' +
-            '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
-              '<div class="form-group" style="flex:0 0 55px">' +
+        '<div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px">' +
+
+          /* ══ SEZIONE DATI SCONTO — stile uguale a "Dati Tariffa" ══ */
+          '<div style="background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:16px 20px">' +
+            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">📌 Dati Sconto</div>' +
+
+            /* Riga 1: ID + Nome Sconto (orizzontali, stesse altezze di Tariffe) */
+            '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-bottom:12px">' +
+              '<div class="form-group" style="flex:0 0 60px">' +
                 '<label class="form-label" style="font-size:11px">ID</label>' +
-                '<input class="form-input" type="text" id="sc-id" value="' + (curSc.id !== undefined ? curSc.id : '') + '" readonly style="background:#f8fafc;color:#94a3b8;cursor:default;height:34px;font-size:13px;width:100%">' +
+                '<input class="form-input" type="text" id="sc-id" value="' + (curSc.id !== undefined ? curSc.id : '') + '" readonly style="background:#f8fafc;color:#94a3b8;cursor:default;height:36px;font-size:13px;width:100%">' +
               '</div>' +
-              '<div class="form-group" style="flex:1 1 210px">' +
+              '<div class="form-group" style="flex:1 1 220px">' +
                 '<label class="form-label" style="font-size:11px">Nome Sconto <span class="req">*</span></label>' +
-                '<input class="form-input" type="text" id="sc-nome" value="' + TONIO_escapeHtml(curSc.nome_sconto || '') + '" placeholder="Es. Prenota Presto" style="height:34px;font-size:13px;width:100%">' +
-              '</div>' +
-              '<div class="form-group" style="flex:4 1 420px">' +
-                '<label class="form-label" style="font-size:11px">Descrizione Sconto</label>' +
-                '<input class="form-input" type="text" id="sc-desc" value="' + TONIO_escapeHtml(curSc.descrizione_sconto || '') + '" placeholder="Condizioni, periodo, acconto..." style="height:34px;font-size:13px;width:100%">' +
+                '<input class="form-input" type="text" id="sc-nome" value="' + TONIO_escapeHtml(curSc.nome_sconto || '') + '" placeholder="Es. Prenota Presto" style="height:36px;font-size:13px;width:100%">' +
               '</div>' +
             '</div>' +
-            '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
-              '<button class="btn btn-primary" style="font-size:12px" onclick="MSK_Tariffe._nuovoSconto()">' +
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuovo Sconto</button>' +
-              '<button class="btn btn-warning" style="font-size:12px" onclick="MSK_Tariffe._salvaSconto()">' +
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Sconto</button>' +
-              '<button class="btn btn-ghost"   style="font-size:12px" onclick="MSK_Tariffe._annullaSconto()">Annulla</button>' +
+
+            /* Riga 2: Descrizione Sconto — textarea multiriga ampia */
+            '<div class="form-group" style="margin-bottom:14px">' +
+              '<label class="form-label" style="font-size:11px">Descrizione Sconto</label>' +
+              '<textarea class="form-input" id="sc-desc" rows="4" placeholder="Descrivi le condizioni: periodo prenotabile, date scontate, acconto richiesto, condizioni di rimborso..." style="font-size:13px;width:100%;min-height:100px;resize:vertical;padding:8px 10px;line-height:1.5">' + TONIO_escapeHtml(curSc.descrizione_sconto || '') + '</textarea>' +
+            '</div>' +
+
+            /* Pulsanti azione — stile uguale a Tariffe */
+            '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+              '<button class="btn btn-primary" style="font-size:13px" onclick="MSK_Tariffe._nuovoSconto()">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuovo Sconto</button>' +
+              '<button class="btn btn-warning" style="font-size:13px" onclick="MSK_Tariffe._salvaSconto()">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Sconto</button>' +
+              '<button class="btn btn-ghost" style="font-size:13px" onclick="MSK_Tariffe._annullaSconto()">Annulla</button>' +
             '</div>' +
           '</div>' +
 
-          /* ── LISTA SCONTI SALVATI ── */
-          '<div style="padding:12px 20px 6px">' +
-            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">📂 Sconti Salvati</div>' +
-            '<div style="overflow-x:auto">' +
-              '<table class="data-table" style="min-width:580px;font-size:12px">' +
+          /* ══ SEZIONE SCONTI SALVATI — stile uguale a "Tariffari Salvati" ══ */
+          '<div>' +
+            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">📂 Sconti Salvati</div>' +
+            '<div class="table-wrap" style="overflow-x:auto">' +
+              '<table class="data-table" style="min-width:580px">' +
                 '<thead><tr>' +
                   '<th style="width:50px">ID</th>' +
                   '<th>Nome Sconto</th>' +
                   '<th>Descrizione</th>' +
-                  '<th style="width:58px;text-align:center">Righe</th>' +
+                  '<th style="width:60px;text-align:center">Righe</th>' +
                   '<th style="width:40px"></th>' +
                 '</tr></thead>' +
                 '<tbody>' + listHtml + '</tbody>' +
@@ -1030,47 +1039,47 @@ var MSK_Tariffe = (function () {
             '</div>' +
           '</div>' +
 
-          /* ── CONDIZIONI SCONTO ── */
-          '<div style="padding:8px 20px 16px">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
-              '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.5px;text-transform:uppercase">📋 Condizioni Sconto</div>' +
-              '<button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="MSK_Tariffe._addRigaSconto()"' + (!hasEdit ? ' disabled' : '') + '>＋ Aggiungi Condizione</button>' +
+          /* ══ SEZIONE CONDIZIONI SCONTO — stile uguale a "Righe Tariffario" ══ */
+          '<div>' +
+            '<div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">' +
+              '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase">📋 Condizioni Sconto</div>' +
+              '<button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="MSK_Tariffe._addRigaSconto()"' + (!hasEdit ? ' disabled' : '') + '>＋ Aggiungi Condizione</button>' +
             '</div>' +
             '<div style="overflow-x:auto">' +
-              '<table class="data-table" style="min-width:1050px;font-size:11px">' +
+              '<table class="data-table" style="min-width:1050px;font-size:12px">' +
                 '<thead>' +
                   '<tr>' +
-                    '<th colspan="2" style="text-align:center;background:#dbeafe;color:#1d4ed8;border-bottom:2px solid #93c5fd;font-size:10px;padding:4px">Sconto Prenotabile</th>' +
-                    '<th colspan="2" style="text-align:center;background:#dcfce7;color:#166534;border-bottom:2px solid #86efac;font-size:10px;padding:4px">Date Scontate</th>' +
-                    '<th colspan="3" style="text-align:center;background:#fef9c3;color:#854d0e;border-bottom:2px solid #fde047;font-size:10px;padding:4px">Anticipo / Notti</th>' +
-                    '<th colspan="4" style="text-align:center;background:#fff0f0;color:#b91c1c;border-bottom:2px solid #fca5a5;font-size:10px;padding:4px">Importo Sconto</th>' +
-                    '<th style="width:34px"></th>' +
+                    '<th colspan="2" style="text-align:center;background:#dbeafe;color:#1d4ed8;border-bottom:2px solid #93c5fd;font-size:10px">Sconto Prenotabile</th>' +
+                    '<th colspan="2" style="text-align:center;background:#dcfce7;color:#166534;border-bottom:2px solid #86efac;font-size:10px">Date Scontate</th>' +
+                    '<th colspan="3" style="text-align:center;background:#fef9c3;color:#854d0e;border-bottom:2px solid #fde047;font-size:10px">Anticipo / Notti</th>' +
+                    '<th colspan="4" style="text-align:center;background:#fff0f0;color:#b91c1c;border-bottom:2px solid #fca5a5;font-size:10px">Importo Sconto</th>' +
+                    '<th colspan="2" style="width:40px"></th>' +
                   '</tr>' +
                   '<tr style="background:#f1f5f9">' +
-                    '<th style="background:#dbeafe;text-align:center;font-size:10px;padding:4px 6px">Dal</th>' +
-                    '<th style="background:#dbeafe;text-align:center;font-size:10px;padding:4px 6px">Al</th>' +
-                    '<th style="background:#dcfce7;text-align:center;font-size:10px;padding:4px 6px">Dal</th>' +
-                    '<th style="background:#dcfce7;text-align:center;font-size:10px;padding:4px 6px">Al</th>' +
-                    '<th style="background:#fef9c3;text-align:center;font-size:10px;padding:4px 6px">Min.<br>Notti<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
-                    '<th style="background:#fef9c3;text-align:center;font-size:10px;padding:4px 6px">Min.<br>Anticipo<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
-                    '<th style="background:#fef9c3;text-align:center;font-size:10px;padding:4px 6px">Max<br>Anticipo<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
-                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Totale<br>Loc. %</th>' +
-                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Totale<br>Loc. €</th>' +
-                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Notte<br>%</th>' +
-                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Notte<br>€</th>' +
-                    '<th style="width:34px"></th>' +
+                    '<th style="background:#dbeafe;text-align:center;font-size:10px">Dal</th>' +
+                    '<th style="background:#dbeafe;text-align:center;font-size:10px">Al</th>' +
+                    '<th style="background:#dcfce7;text-align:center;font-size:10px">Dal</th>' +
+                    '<th style="background:#dcfce7;text-align:center;font-size:10px">Al</th>' +
+                    '<th style="background:#fef9c3;text-align:center;font-size:10px">Min.<br>Notti<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
+                    '<th style="background:#fef9c3;text-align:center;font-size:10px">Min.<br>Anticipo<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
+                    '<th style="background:#fef9c3;text-align:center;font-size:10px">Max<br>Anticipo<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px">Sc. Totale<br>Loc. %</th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px">Sc. Totale<br>Loc. €</th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px">Sc. Notte<br>%</th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px">Sc. Notte<br>€</th>' +
+                    '<th style="width:40px"></th>' +
                   '</tr>' +
                 '</thead>' +
                 '<tbody id="sc-righe-tbody">' + righeHtml + '</tbody>' +
               '</table>' +
             '</div>' +
-            '<div style="margin-top:10px">' +
-              '<button class="btn btn-primary" style="font-size:12px' + (!hasEdit ? ';display:none' : '') + '" id="sc-btn-salva-righe" onclick="MSK_Tariffe._salvaRigheSconto()">' +
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Condizioni</button>' +
+            '<div style="margin-top:14px">' +
+              '<button class="btn btn-primary" style="font-size:13px' + (!hasEdit ? ';display:none' : '') + '" id="sc-btn-salva-righe" onclick="MSK_Tariffe._salvaRigheSconto()">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Condizioni</button>' +
             '</div>' +
           '</div>' +
 
-        '</div>' +
+        '</div>' + /* fine modal-body */
         '<div class="modal-footer">' +
           '<button class="btn btn-ghost" onclick="MSK_Tariffe.closeModalSconti()">Chiudi</button>' +
         '</div>' +
