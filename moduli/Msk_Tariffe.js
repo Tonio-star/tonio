@@ -2,7 +2,7 @@
    TONIO — Msk_Tariffe.js
    Modulo Tariffe — Tipo Tariffa, Trattamento, Unità di Misura,
                     Tariffario (unica maschera inline)
-   v2.1 — Fix lookup: legge da localStorage (dati live) invece della variabile globale statica
+   v2.0 — Tariffario inline, lookup da modulo Immobili
    ================================================================ */
 
 var MSK_Tariffe = (function () {
@@ -19,31 +19,6 @@ var MSK_Tariffe = (function () {
   var _editTariffId = null;
   /* contatore indici righe dettaglio */
   var _righeCount   = 0;
-
-  /* ================================================================
-     HELPER — Legge i lookup dal modulo Immobili.
-     PRIORITÀ: localStorage (dati aggiornati dall'utente)
-               → variabile globale Dati_Immobili.js (default)
-               → [] (fallback sicuro)
-     Questo garantisce che le modifiche fatte nella maschera
-     Immobili (SuperProdotti, Prodotti, Tipi) siano subito
-     visibili nella tendina della maschera Tariffe.
-  ================================================================ */
-  function _getSuperProdotti() {
-    var fromLS = TONIO_Storage.load('immobili_superprodotti');
-    if (fromLS && fromLS.length) return fromLS;
-    return (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
-  }
-  function _getProdotti() {
-    var fromLS = TONIO_Storage.load('immobili_prodotti');
-    if (fromLS && fromLS.length) return fromLS;
-    return (typeof TONIO_IMMOBILI_PRODOTTI !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI : [];
-  }
-  function _getTipiImmobile() {
-    var fromLS = TONIO_Storage.load('immobili_tipi');
-    if (fromLS && fromLS.length) return fromLS;
-    return (typeof TONIO_IMMOBILI_TIPI !== 'undefined') ? TONIO_IMMOBILI_TIPI : [];
-  }
 
   /* ================================================================
      INIT
@@ -86,15 +61,18 @@ var MSK_Tariffe = (function () {
       return h;
     }
 
-    /* Lookup live dal modulo Immobili — legge localStorage poi fallback globale */
-    var superProds = _getSuperProdotti();
-    var prods      = _getProdotti();
+    /* Lookup da modulo Immobili */
+    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
+    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
 
     /* Costruisci le righe esistenti del tariffario */
     var righeHtml = _buildTariffRigheHtml();
 
     c.innerHTML =
       '<div class="list-page">' +
+
+        /* ── BLOCCO STICKY: header + form dati + barra "Righe / Aggiungi Tariffa" ── */
+        '<div style="position:sticky;top:0;z-index:100;background:#fff;padding-bottom:8px;margin-bottom:0;border-bottom:2px solid #e2e8f0;margin-left:-24px;margin-right:-24px;padding-left:24px;padding-right:24px">' +
 
         /* ── HEADER: "CREA TARIFFE" a sinistra, pulsanti lookup verso il margine destro ── */
         '<div class="list-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">' +
@@ -153,15 +131,15 @@ var MSK_Tariffe = (function () {
           '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">' +
             '<button class="btn btn-primary" style="font-size:13px" onclick="MSK_Tariffe.nuovaTariffa()">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
-              'Nuova Tariffa' +
+              'Nuovo Tariffario' +
             '</button>' +
             '<button class="btn btn-warning" style="font-size:13px" id="tf-btn-salva-header" onclick="MSK_Tariffe.salvaTariffHeader()" style="display:none">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>' +
-              'Salva Intestazione' +
+              'Salva Tariffario' +
             '</button>' +
             '<button class="btn btn-danger" style="font-size:13px;display:none" id="tf-btn-elimina-header" onclick="MSK_Tariffe.eliminaTariff()">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/></svg>' +
-              'Elimina Tariffa' +
+              'Elimina Tariffario' +
             '</button>' +
             '<button class="btn btn-ghost" style="font-size:13px;display:none" id="tf-btn-annulla" onclick="MSK_Tariffe.annullaTariff()">' +
               'Annulla' +
@@ -173,9 +151,12 @@ var MSK_Tariffe = (function () {
         '<div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">' +
           '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase">📋 Righe Tariffario</div>' +
           '<button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" id="tf-btn-add-riga" onclick="MSK_Tariffe.addRiga()" disabled>' +
-            '＋ Aggiungi Riga' +
+            '＋ Aggiungi Tariffa' +
           '</button>' +
         '</div>' +
+        '</div>' +
+
+        /* ── FINE BLOCCO STICKY — da qui scorre ── */
         '<div style="overflow-x:auto">' +
           '<table class="data-table" style="min-width:1100px;font-size:12px">' +
             '<thead>' +
@@ -210,13 +191,13 @@ var MSK_Tariffe = (function () {
         '<div style="margin-top:14px">' +
           '<button class="btn btn-primary" style="font-size:13px;display:none" id="tf-btn-salva-righe" onclick="MSK_Tariffe.salvaRighe()">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>' +
-            'Salva Righe' +
+            'Salva Tariffe' +
           '</button>' +
         '</div>' +
 
         /* ── LISTA TARIFFE ESISTENTI ── */
         '<div style="margin-top:32px">' +
-          '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">📂 Tariffe Salvate</div>' +
+          '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">📂 Tariffari Salvati</div>' +
           '<div style="margin-bottom:10px">' +
             '<input class="search-input" id="tar-search" type="text" placeholder="🔍 Cerca tariffa..." oninput="MSK_Tariffe.filterTariff()" style="max-width:320px">' +
           '</div>' +
@@ -258,8 +239,7 @@ var MSK_Tariffe = (function () {
 
   /* ── Costruisce una singola riga TR ── */
   function _buildRigaHtml(riga, idx) {
-    /* Legge Tipi Immobile da localStorage (aggiornati) poi fallback globale */
-    var tipiImmobile = _getTipiImmobile();
+    var tipiImmobile = (typeof TONIO_IMMOBILI_TIPI !== 'undefined') ? TONIO_IMMOBILI_TIPI : [];
     var optsImmobile = '<option value="">— Seleziona —</option>';
     tipiImmobile.forEach(function (item) {
       var v = item.nome;
@@ -384,7 +364,7 @@ var MSK_Tariffe = (function () {
     /* Ricostruisci il pulsante salva con icona */
     if (btnSalvaH) {
       btnSalvaH.innerHTML =
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Intestazione';
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Tariffario';
     }
     var btnAnnulla = document.getElementById('tf-btn-annulla');
     if (btnAnnulla) btnAnnulla.style.display = '';
@@ -864,8 +844,8 @@ var MSK_Tariffe = (function () {
       });
       el.innerHTML = h;
     }
-    var superProds = _getSuperProdotti();
-    var prods      = _getProdotti();
+    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
+    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
     setOpts('tf-tipo',      _tipoTariffa, document.getElementById('tf-tipo')      ? document.getElementById('tf-tipo').value      : '');
     setOpts('tf-tratt',     _trattamento, document.getElementById('tf-tratt')     ? document.getElementById('tf-tratt').value     : '');
     setOpts('tf-superprod', superProds,   document.getElementById('tf-superprod') ? document.getElementById('tf-superprod').value : '');
