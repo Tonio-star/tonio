@@ -52,6 +52,7 @@ var TONIO_PAGE_ACTIONS = {
   ospiti:              '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
   immobili:            '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>',
   modalita_pagamento:  '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaModalita()">＋ Nuova Modalità</button>',
+  prenotazioni:        '<button class="nav-action-btn primary" onclick="MSK_Prenotazioni.nuovaPrenotazione()">＋ Nuova Prenotazione</button>',
   tariffe:             ''
 };
 
@@ -66,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof MSK_Immobili  !== 'undefined') MSK_Immobili.init();
   if (typeof MSK_Contabilita !== 'undefined') MSK_Contabilita.init();
   if (typeof MSK_Tariffe    !== 'undefined') MSK_Tariffe.init();
+  if (typeof MSK_Prenotazioni !== 'undefined') MSK_Prenotazioni.init();
 
   TONIO_setModule('anagrafiche', false);
   TONIO_showPage('clienti');
