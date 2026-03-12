@@ -2,7 +2,7 @@
    TONIO — Msk_Tariffe.js
    Modulo Tariffe — Tipo Tariffa, Trattamento, Unità di Misura,
                     Tariffario (unica maschera inline)
-   v4.3 — Sconti: full-screen, campi in riga unica, Descrizione ×2/×5, sticky fino a Condizioni, Sconti Salvati in scroll
+   v4.4 — Sconti: pulsanti affiancati a Descrizione, sticky esteso alle intestazioni tabella condizioni
    ================================================================ */
 
 var MSK_Tariffe = (function () {
@@ -987,7 +987,7 @@ var MSK_Tariffe = (function () {
 
     ov.innerHTML =
       /* ══════════════════════════════════════════════════════════
-         STRUTTURA MODALE SCONTI v4.3 — FULL SCREEN
+         STRUTTURA MODALE SCONTI v4.4 — FULL SCREEN
          ┌──────────────────────────────────────────────────────┐
          │ HEADER fisso   🏷️ Sconti                       [×]  │
          ├──────────────────────────────────────────────────────┤
@@ -1038,25 +1038,29 @@ var MSK_Tariffe = (function () {
 
           /* ─ BOX DATI SCONTO ─ */
           '<div style="background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:16px 20px">' +
-            '<div style="' +
-                'font-size:11px;font-weight:700;color:#1e3a5f;' +
-                'letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px' +
-            '">📌 Dati Sconto</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">' +
+              '📌 Dati Sconto' +
+            '</div>' +
 
-            /* ── RIGA UNICA: [ID 60px] + [Nome ×1] + [Descrizione ×2, h=180px]
-               flex-wrap: su schermi stretti (< ~600px) i campi vanno in colonna ── */
-            '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px">' +
+            /* ── RIGA UNICA con 4 colonne:
+               1. ID (60px)
+               2. Nome Sconto (flex:1)
+               3. Descrizione (flex:2, textarea alta 180px)
+               4. Pulsanti (auto, colonna verticale allineata al fondo della textarea)
+               align-items:flex-end → tutti i bottoms allineati al bordo inferiore
+               della textarea (l'elemento più alto della riga) ── */
+            '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">' +
 
-              /* ID — larghezza fissa 60px */
-              '<div class="form-group" style="flex:0 0 60px;min-width:60px">' +
+              /* 1 — ID */
+              '<div class="form-group" style="flex:0 0 60px;min-width:60px;margin-bottom:0">' +
                 '<label class="form-label" style="font-size:11px">ID</label>' +
                 '<input class="form-input" type="text" id="sc-id"' +
                   ' value="' + (curSc.id !== undefined ? curSc.id : '') + '" readonly' +
                   ' style="background:#f8fafc;color:#94a3b8;cursor:default;height:36px;font-size:13px;width:100%">' +
               '</div>' +
 
-              /* Nome Sconto — flex:1 (proporzionale) */
-              '<div class="form-group" style="flex:1 1 160px;min-width:140px">' +
+              /* 2 — Nome Sconto */
+              '<div class="form-group" style="flex:1 1 160px;min-width:140px;margin-bottom:0">' +
                 '<label class="form-label" style="font-size:11px">Nome Sconto <span class="req">*</span></label>' +
                 '<input class="form-input" type="text" id="sc-nome"' +
                   ' value="' + TONIO_escapeHtml(curSc.nome_sconto || '') + '"' +
@@ -1064,34 +1068,36 @@ var MSK_Tariffe = (function () {
                   ' style="height:36px;font-size:13px;width:100%">' +
               '</div>' +
 
-              /* Descrizione Sconto — flex:2 (doppio larghezza), height:180px (5×36) */
-              '<div class="form-group" style="flex:2 1 320px;min-width:200px">' +
+              /* 3 — Descrizione Sconto: flex:2, textarea 180px = 5×36px */
+              '<div class="form-group" style="flex:2 1 320px;min-width:200px;margin-bottom:0">' +
                 '<label class="form-label" style="font-size:11px">Descrizione Sconto</label>' +
                 '<textarea class="form-input" id="sc-desc"' +
                   ' placeholder="Descrivi le condizioni: periodo prenotabile, date scontate, acconto, rimborso..."' +
-                  ' style="font-size:13px;width:100%;height:180px;min-height:180px;resize:vertical;padding:8px 10px;line-height:1.5;box-sizing:border-box">' +
+                  ' style="font-size:13px;width:100%;height:180px;min-height:180px;resize:vertical;padding:8px 10px;line-height:1.5;box-sizing:border-box;display:block">' +
                   TONIO_escapeHtml(curSc.descrizione_sconto || '') +
                 '</textarea>' +
               '</div>' +
-            '</div>' + /* fine riga campi */
 
-            /* Pulsanti */
-            '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-              '<button class="btn btn-primary" style="font-size:13px" onclick="MSK_Tariffe._nuovoSconto()">' +
-                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px">' +
-                  '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' +
-                '</svg>Nuovo Sconto</button>' +
-              '<button class="btn btn-warning" style="font-size:13px" onclick="MSK_Tariffe._salvaSconto()">' +
-                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px">' +
-                  '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>' +
-                  '<polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/>' +
-                '</svg>Salva Sconto</button>' +
-              '<button class="btn btn-ghost" style="font-size:13px" onclick="MSK_Tariffe._annullaSconto()">Annulla</button>' +
-            '</div>' +
+              /* 4 — Pulsanti: colonna verticale, allineati al fondo della textarea
+                 grazie ad align-items:flex-end sul contenitore padre ── */
+              '<div style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px;justify-content:flex-end">' +
+                '<button class="btn btn-primary" style="font-size:13px;white-space:nowrap" onclick="MSK_Tariffe._nuovoSconto()">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px">' +
+                    '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' +
+                  '</svg>Nuovo Sconto</button>' +
+                '<button class="btn btn-warning" style="font-size:13px;white-space:nowrap" onclick="MSK_Tariffe._salvaSconto()">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px">' +
+                    '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>' +
+                    '<polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/>' +
+                  '</svg>Salva Sconto</button>' +
+                '<button class="btn btn-ghost" style="font-size:13px;white-space:nowrap" onclick="MSK_Tariffe._annullaSconto()">Annulla</button>' +
+              '</div>' +
+
+            '</div>' + /* fine riga campi + pulsanti */
           '</div>' + /* fine box dati sconto */
 
-          /* ─ BARRA CONDIZIONI (rimane fissa con i Dati Sconto) ─ */
-          '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">' +
+          /* ─ BARRA CONDIZIONI + intestazioni tabella: tutto fisso ─ */
+          '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0 6px">' +
             '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase">' +
               '📋 Condizioni Sconto' +
             '</div>' +
@@ -1101,14 +1107,11 @@ var MSK_Tariffe = (function () {
             '</button>' +
           '</div>' +
 
-        '</div>' + /* fine zona fissa */
-
-        /* ══ AREA SCROLL: tabella condizioni + [Salva Condizioni] + Sconti Salvati ══ */
-        '<div style="flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 24px 32px">' +
-
-          /* Tabella condizioni — scroll orizzontale interno */
-          '<div style="overflow-x:auto;margin-top:12px">' +
-            '<table class="data-table" style="min-width:1050px;font-size:12px;width:100%">' +
+          /* ── Intestazioni tabella condizioni nella zona fissa ──
+             Stessa struttura della tabella nel body, ma solo <thead>.
+             Usa overflow-x:auto allineato con il body sotto. ── */
+          '<div style="overflow-x:auto;border-bottom:1px solid #e2e8f0" id="sc-thead-wrap">' +
+            '<table class="data-table" style="min-width:1050px;font-size:12px;width:100%;margin-bottom:0">' +
               '<thead>' +
                 '<tr>' +
                   '<th colspan="2" style="text-align:center;background:#dbeafe;color:#1d4ed8;border-bottom:2px solid #93c5fd;font-size:10px">Sconto Prenotabile</th>' +
@@ -1132,6 +1135,19 @@ var MSK_Tariffe = (function () {
                   '<th style="width:40px"></th>' +
                 '</tr>' +
               '</thead>' +
+              '<tbody></tbody>' + /* tbody vuoto per validità HTML */
+            '</table>' +
+          '</div>' +
+
+        '</div>' + /* fine zona fissa */
+
+        /* ══ AREA SCROLL: solo <tbody> condizioni + Salva + Sconti Salvati ══
+           scroll orizzontale sincronizzato con thead tramite JS onscroll ══ */
+        '<div style="flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 24px 32px" id="sc-scroll-area">' +
+
+          /* Solo il tbody — senza thead (quella è nella zona fissa sopra) */
+          '<div style="overflow-x:auto;margin-top:0" id="sc-tbody-wrap">' +
+            '<table class="data-table" style="min-width:1050px;font-size:12px;width:100%;border-top:none">' +
               '<tbody id="sc-righe-tbody">' + righeHtml + '</tbody>' +
             '</table>' +
           '</div>' +
@@ -1176,6 +1192,16 @@ var MSK_Tariffe = (function () {
 
       '</div>'; /* fine modal full-screen */
     ov.classList.add('open');
+    /* Sync scroll orizzontale: thead fissa segue lo scroll del tbody */
+    setTimeout(function() {
+      var tbodyWrap = document.getElementById('sc-tbody-wrap');
+      var theadWrap = document.getElementById('sc-thead-wrap');
+      if (tbodyWrap && theadWrap) {
+        tbodyWrap.addEventListener('scroll', function() {
+          theadWrap.scrollLeft = tbodyWrap.scrollLeft;
+        });
+      }
+    }, 50);
   }
 
   function _clickSconto(id) { _editSconto = id; _renderModalSconti(); }
