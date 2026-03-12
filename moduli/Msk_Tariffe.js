@@ -2,7 +2,7 @@
    TONIO — Msk_Tariffe.js
    Modulo Tariffe — Tipo Tariffa, Trattamento, Unità di Misura,
                     Tariffario (unica maschera inline)
-   v4.2 — Sconti: responsive mobile-first, campi orizzontali, textarea alta, sticky, Sconti Salvati sotto
+   v4.3 — Sconti: full-screen, campi in riga unica, Descrizione ×2/×5, sticky fino a Condizioni, Sconti Salvati in scroll
    ================================================================ */
 
 var MSK_Tariffe = (function () {
@@ -920,7 +920,14 @@ var MSK_Tariffe = (function () {
     _sconti = saved ? saved : (typeof TONIO_TARIFFE_SCONTI !== 'undefined' ? JSON.parse(JSON.stringify(TONIO_TARIFFE_SCONTI)) : []);
   }
 
-  function openModalSconti() { _initSconti(); _editSconto = null; _renderModalSconti(); }
+  function openModalSconti() {
+    _initSconti(); _editSconto = null;
+    /* Forza overlay a zero padding → modale occupa tutto lo schermo */
+    var ov = document.getElementById('modal-tar-sconti');
+    if (!ov) { ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'modal-tar-sconti'; document.body.appendChild(ov); }
+    ov.style.padding = '0';
+    _renderModalSconti();
+  }
 
   /* ── Righe condizioni dello sconto selezionato ── */
   function _buildScontiRighe(sc) {
@@ -980,69 +987,93 @@ var MSK_Tariffe = (function () {
 
     ov.innerHTML =
       /* ══════════════════════════════════════════════════════════
-         STRUTTURA MODALE SCONTI v4.2
-         ┌─────────────────────────────────────────────────────┐
-         │ HEADER sticky (titolo + ×)                          │
-         ├─────────────────────────────────────────────────────┤
-         │ DATI SCONTO sticky                                  │
-         │  [ID] [Nome Sconto ×1] [Descrizione ×2, alto ×6]   │
-         │  [Nuovo] [Salva] [Annulla]                          │
-         ├─────────────────────────────────────────────────────┤
-         │ BARRA CONDIZIONI sticky                             │
-         │  📋 Condizioni Sconto    [＋ Aggiungi Condizione]   │
-         ├─────────────────────────────────────────────────────┤
-         │ AREA SCROLL: tabella condizioni                     │
-         ├─────────────────────────────────────────────────────┤
-         │ AREA SCROLL: 📂 Sconti Salvati                      │
-         ├─────────────────────────────────────────────────────┤
-         │ FOOTER sticky (Chiudi)                              │
-         └─────────────────────────────────────────────────────┘
+         STRUTTURA MODALE SCONTI v4.3 — FULL SCREEN
+         ┌──────────────────────────────────────────────────────┐
+         │ HEADER fisso   🏷️ Sconti                       [×]  │
+         ├──────────────────────────────────────────────────────┤
+         │ ZONA FISSA (flex-shrink:0)                           │
+         │  ┌ DATI SCONTO (#f0f4ff, bordo, radius) ──────────┐  │
+         │  │ [ID 60px]  [Nome ×1]  [Descrizione ×2, h=180] │  │
+         │  │ [Nuovo Sconto] [Salva Sconto] [Annulla]        │  │
+         │  └────────────────────────────────────────────────┘  │
+         │  📋 Condizioni Sconto   [＋ Aggiungi Condizione]     │
+         ├──────────────────────────────────────────────────────┤
+         │ AREA SCROLL (flex:1, overflow-y:auto)                │
+         │  tabella condizioni                                  │
+         │  [Salva Condizioni]                                  │
+         │  📂 Sconti Salvati                                    │
+         ├──────────────────────────────────────────────────────┤
+         │ FOOTER fisso                            [Chiudi]     │
+         └──────────────────────────────────────────────────────┘
       ══════════════════════════════════════════════════════════ */
-      '<div class="modal" style="max-width:1400px;width:96vw;display:flex;flex-direction:column;max-height:92vh;overflow:hidden">' +
 
-        /* ── HEADER fisso ── */
-        '<div class="modal-header" style="flex-shrink:0;background:#fff;border-bottom:1px solid #e2e8f0;z-index:20">' +
+      /* ── div.modal sovrascritto per full-screen ── */
+      '<div class="modal" style="' +
+          'width:100vw;max-width:100vw;' +
+          'height:100vh;max-height:100vh;' +
+          'border-radius:0;border:none;box-shadow:none;' +
+          'display:flex;flex-direction:column;overflow:hidden' +
+      '">' +
+
+        /* ══ HEADER fisso ══ */
+        '<div class="modal-header" style="' +
+            'flex-shrink:0;' +
+            'background:#fff;' +
+            'border-bottom:1px solid #e2e8f0;' +
+            'padding:14px 24px' +
+        '">' +
           '<span style="font-size:19px">🏷️</span>' +
           '<div class="modal-title">Sconti</div>' +
           '<button class="modal-close" onclick="MSK_Tariffe.closeModalSconti()">×</button>' +
         '</div>' +
 
-        /* ── ZONA STICKY: Dati Sconto + Barra Condizioni ── */
-        '<div style="flex-shrink:0;background:#fff;border-bottom:2px solid #e2e8f0;padding:16px 20px 12px;display:flex;flex-direction:column;gap:12px">' +
+        /* ══ ZONA FISSA: Dati Sconto + barra Condizioni ══ */
+        '<div style="' +
+            'flex-shrink:0;' +
+            'background:#fff;' +
+            'border-bottom:2px solid #e2e8f0;' +
+            'padding:16px 24px 12px;' +
+            'display:flex;flex-direction:column;gap:12px' +
+        '">' +
 
-          /* DATI SCONTO */
+          /* ─ BOX DATI SCONTO ─ */
           '<div style="background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:16px 20px">' +
-            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">📌 Dati Sconto</div>' +
+            '<div style="' +
+                'font-size:11px;font-weight:700;color:#1e3a5f;' +
+                'letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px' +
+            '">📌 Dati Sconto</div>' +
 
-            /* ── Campi in riga: ID + Nome + Descrizione ──
-               Proporzioni: ID=60px fisso | Nome=flex:1 | Descrizione=flex:2
-               Su mobile (< 600px) vanno in colonna grazie a flex-wrap + media query inline  */
+            /* ── RIGA UNICA: [ID 60px] + [Nome ×1] + [Descrizione ×2, h=180px]
+               flex-wrap: su schermi stretti (< ~600px) i campi vanno in colonna ── */
             '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px">' +
 
-              /* ID */
+              /* ID — larghezza fissa 60px */
               '<div class="form-group" style="flex:0 0 60px;min-width:60px">' +
                 '<label class="form-label" style="font-size:11px">ID</label>' +
-                '<input class="form-input" type="text" id="sc-id" value="' + (curSc.id !== undefined ? curSc.id : '') + '" readonly ' +
-                  'style="background:#f8fafc;color:#94a3b8;cursor:default;height:36px;font-size:13px;width:100%">' +
+                '<input class="form-input" type="text" id="sc-id"' +
+                  ' value="' + (curSc.id !== undefined ? curSc.id : '') + '" readonly' +
+                  ' style="background:#f8fafc;color:#94a3b8;cursor:default;height:36px;font-size:13px;width:100%">' +
               '</div>' +
 
-              /* Nome Sconto — flex:1 */
-              '<div class="form-group" style="flex:1 1 140px;min-width:140px">' +
+              /* Nome Sconto — flex:1 (proporzionale) */
+              '<div class="form-group" style="flex:1 1 160px;min-width:140px">' +
                 '<label class="form-label" style="font-size:11px">Nome Sconto <span class="req">*</span></label>' +
-                '<input class="form-input" type="text" id="sc-nome" value="' + TONIO_escapeHtml(curSc.nome_sconto || '') + '" placeholder="Es. Prenota Presto" ' +
-                  'style="height:36px;font-size:13px;width:100%">' +
+                '<input class="form-input" type="text" id="sc-nome"' +
+                  ' value="' + TONIO_escapeHtml(curSc.nome_sconto || '') + '"' +
+                  ' placeholder="Es. Prenota Presto"' +
+                  ' style="height:36px;font-size:13px;width:100%">' +
               '</div>' +
 
-              /* Descrizione Sconto — flex:2, alta 6× = 6×36px = 216px */
-              '<div class="form-group" style="flex:2 1 280px;min-width:200px">' +
+              /* Descrizione Sconto — flex:2 (doppio larghezza), height:180px (5×36) */
+              '<div class="form-group" style="flex:2 1 320px;min-width:200px">' +
                 '<label class="form-label" style="font-size:11px">Descrizione Sconto</label>' +
-                '<textarea class="form-input" id="sc-desc" ' +
-                  'placeholder="Descrivi le condizioni: periodo prenotabile, date scontate, acconto, rimborso..." ' +
-                  'style="font-size:13px;width:100%;height:216px;min-height:216px;resize:vertical;padding:8px 10px;line-height:1.5;box-sizing:border-box">' +
+                '<textarea class="form-input" id="sc-desc"' +
+                  ' placeholder="Descrivi le condizioni: periodo prenotabile, date scontate, acconto, rimborso..."' +
+                  ' style="font-size:13px;width:100%;height:180px;min-height:180px;resize:vertical;padding:8px 10px;line-height:1.5;box-sizing:border-box">' +
                   TONIO_escapeHtml(curSc.descrizione_sconto || '') +
                 '</textarea>' +
               '</div>' +
-            '</div>' +
+            '</div>' + /* fine riga campi */
 
             /* Pulsanti */
             '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
@@ -1057,20 +1088,26 @@ var MSK_Tariffe = (function () {
                 '</svg>Salva Sconto</button>' +
               '<button class="btn btn-ghost" style="font-size:13px" onclick="MSK_Tariffe._annullaSconto()">Annulla</button>' +
             '</div>' +
+          '</div>' + /* fine box dati sconto */
+
+          /* ─ BARRA CONDIZIONI (rimane fissa con i Dati Sconto) ─ */
+          '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">' +
+            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase">' +
+              '📋 Condizioni Sconto' +
+            '</div>' +
+            '<button class="btn btn-ghost" style="font-size:12px;padding:5px 10px"' +
+              ' onclick="MSK_Tariffe._addRigaSconto()"' + (!hasEdit ? ' disabled' : '') + '>' +
+              '＋ Aggiungi Condizione' +
+            '</button>' +
           '</div>' +
 
-          /* BARRA Condizioni Sconto (sticky, sopra la tabella) */
-          '<div style="display:flex;justify-content:space-between;align-items:center">' +
-            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase">📋 Condizioni Sconto</div>' +
-            '<button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="MSK_Tariffe._addRigaSconto()"' + (!hasEdit ? ' disabled' : '') + '>＋ Aggiungi Condizione</button>' +
-          '</div>' +
-        '</div>' +
+        '</div>' + /* fine zona fissa */
 
-        /* ── AREA SCROLL: tabella condizioni + Sconti Salvati ── */
-        '<div style="flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 20px 20px">' +
+        /* ══ AREA SCROLL: tabella condizioni + [Salva Condizioni] + Sconti Salvati ══ */
+        '<div style="flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 24px 32px">' +
 
-          /* Tabella Condizioni */
-          '<div style="overflow-x:auto;margin-top:10px">' +
+          /* Tabella condizioni — scroll orizzontale interno */
+          '<div style="overflow-x:auto;margin-top:12px">' +
             '<table class="data-table" style="min-width:1050px;font-size:12px;width:100%">' +
               '<thead>' +
                 '<tr>' +
@@ -1101,16 +1138,21 @@ var MSK_Tariffe = (function () {
 
           /* Pulsante Salva Condizioni */
           '<div style="margin-top:14px">' +
-            '<button class="btn btn-primary" style="font-size:13px' + (!hasEdit ? ';display:none' : '') + '" id="sc-btn-salva-righe" onclick="MSK_Tariffe._salvaRigheSconto()">' +
+            '<button class="btn btn-primary"' +
+              ' style="font-size:13px' + (!hasEdit ? ';display:none' : '') + '"' +
+              ' id="sc-btn-salva-righe" onclick="MSK_Tariffe._salvaRigheSconto()">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px">' +
                 '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>' +
                 '<polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/>' +
-              '</svg>Salva Condizioni</button>' +
+              '</svg>Salva Condizioni' +
+            '</button>' +
           '</div>' +
 
-          /* ══ SCONTI SALVATI — SOTTO le condizioni ══ */
-          '<div style="margin-top:28px">' +
-            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">📂 Sconti Salvati</div>' +
+          /* 📂 SCONTI SALVATI — primo elemento nella zona scroll */
+          '<div style="margin-top:32px">' +
+            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">' +
+              '📂 Sconti Salvati' +
+            '</div>' +
             '<div style="overflow-x:auto">' +
               '<table class="data-table" style="min-width:580px;width:100%">' +
                 '<thead><tr>' +
@@ -1127,11 +1169,12 @@ var MSK_Tariffe = (function () {
 
         '</div>' + /* fine area scroll */
 
-        /* ── FOOTER fisso ── */
+        /* ══ FOOTER fisso ══ */
         '<div class="modal-footer" style="flex-shrink:0;background:#fff;border-top:1px solid #e2e8f0">' +
           '<button class="btn btn-ghost" onclick="MSK_Tariffe.closeModalSconti()">Chiudi</button>' +
         '</div>' +
-      '</div>';
+
+      '</div>'; /* fine modal full-screen */
     ov.classList.add('open');
   }
 
@@ -1217,7 +1260,8 @@ var MSK_Tariffe = (function () {
   }
 
   function closeModalSconti() {
-    var ov = document.getElementById('modal-tar-sconti'); if (ov) ov.classList.remove('open');
+    var ov = document.getElementById('modal-tar-sconti');
+    if (ov) { ov.classList.remove('open'); ov.style.padding = ''; }
     _editSconto = null;
   }
 
