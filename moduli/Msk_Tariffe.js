@@ -2,7 +2,7 @@
    TONIO — Msk_Tariffe.js
    Modulo Tariffe — Tipo Tariffa, Trattamento, Unità di Misura,
                     Tariffario (unica maschera inline)
-   v2.0 — Tariffario inline, lookup da modulo Immobili
+   v3.0 — Lookup live da localStorage + FK by ID + ordinamento + sticky + label
    ================================================================ */
 
 var MSK_Tariffe = (function () {
@@ -19,6 +19,42 @@ var MSK_Tariffe = (function () {
   var _editTariffId = null;
   /* contatore indici righe dettaglio */
   var _righeCount   = 0;
+
+  /* ================================================================
+     HELPER LOOKUP — legge sempre dal localStorage (dati aggiornati
+     dall'utente in Msk_Immobili) con fallback alla variabile globale
+     statica di Dati_Immobili.js. Risultato ordinato per campo ordine.
+  ================================================================ */
+  function _getSuperProdotti() {
+    var d = TONIO_Storage.load('immobili_superprodotti');
+    if (!d || !d.length) d = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
+    return d.slice().sort(function(a,b){ return (a.ordine||0)-(b.ordine||0); });
+  }
+  function _getProdotti() {
+    var d = TONIO_Storage.load('immobili_prodotti');
+    if (!d || !d.length) d = (typeof TONIO_IMMOBILI_PRODOTTI !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI : [];
+    return d.slice().sort(function(a,b){ return (a.ordine||0)-(b.ordine||0); });
+  }
+  function _getTipiImmobile() {
+    var d = TONIO_Storage.load('immobili_tipi');
+    if (!d || !d.length) d = (typeof TONIO_IMMOBILI_TIPI !== 'undefined') ? TONIO_IMMOBILI_TIPI : [];
+    return d.slice().sort(function(a,b){ return (a.ordine||0)-(b.ordine||0); });
+  }
+  /* Risolve ID → nome leggibile nell'array dato */
+  function _nomeById(arr, id) {
+    if (!id && id !== 0) return '—';
+    var f = arr.find(function(x){ return String(x.id) === String(id); });
+    return f ? f.nome : '—';
+  }
+  /* Costruisce <option value="ID">nome</option> (per FK verso Immobili) */
+  function _optsById(arr, selectedId) {
+    var h = '<option value="">— Seleziona —</option>';
+    arr.forEach(function(item) {
+      var sel = (String(item.id) === String(selectedId)) ? ' selected' : '';
+      h += '<option value="' + item.id + '"' + sel + '>' + TONIO_escapeHtml(item.nome) + '</option>';
+    });
+    return h;
+  }
 
   /* ================================================================
      INIT
@@ -51,7 +87,7 @@ var MSK_Tariffe = (function () {
     var c = document.getElementById('page-tariffe');
     if (!c) return;
 
-    /* ── helper: <option> list ── */
+    /* ── helper: <option> value=nome (archivi interni: TipoTariffa, Trattamento, UnitaMisura) ── */
     function opts(arr, selected) {
       var h = '<option value="">— Seleziona —</option>';
       arr.forEach(function (item) {
@@ -61,9 +97,14 @@ var MSK_Tariffe = (function () {
       return h;
     }
 
-    /* Lookup da modulo Immobili */
-    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
-    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
+    /* ── Lookup live (localStorage → globale → []) già ordinati per ordine ── */
+    var superProds = _getSuperProdotti();
+    var prods      = _getProdotti();
+
+    /* ── Valori FK correnti per preselezione in editing ── */
+    var _curRec  = (_editTariffId !== null) ? (_tariffario.find(function(r){ return r.id === _editTariffId; }) || null) : null;
+    var _curSPid = _curRec ? (_curRec.id_superprodotto || '') : '';
+    var _curPid  = _curRec ? (_curRec.id_prodotto       || '') : '';
 
     /* Costruisci le righe esistenti del tariffario */
     var righeHtml = _buildTariffRigheHtml();
@@ -71,8 +112,8 @@ var MSK_Tariffe = (function () {
     c.innerHTML =
       '<div class="list-page">' +
 
-        /* ── BLOCCO STICKY: header + form dati + barra "Righe / Aggiungi Tariffa" ── */
-        '<div style="position:sticky;top:0;z-index:100;background:#fff;padding-bottom:8px;margin-bottom:0;border-bottom:2px solid #e2e8f0;margin-left:-24px;margin-right:-24px;padding-left:24px;padding-right:24px">' +
+        /* ── STICKY: header + form dati + barra righe sempre visibili ── */
+        '<div style="position:sticky;top:0;z-index:100;background:#fff;padding-bottom:8px;border-bottom:2px solid #e2e8f0;margin-left:-24px;margin-right:-24px;padding-left:24px;padding-right:24px">' +
 
         /* ── HEADER: "CREA TARIFFE" a sinistra, pulsanti lookup verso il margine destro ── */
         '<div class="list-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">' +
@@ -112,11 +153,11 @@ var MSK_Tariffe = (function () {
             '</div>' +
             '<div class="form-group" style="flex:1 1 130px">' +
               '<label class="form-label" style="font-size:11px">Super Prodotto</label>' +
-              '<select class="form-input" id="tf-superprod" style="height:36px;font-size:13px">' + opts(superProds, '') + '</select>' +
+              '<select class="form-input" id="tf-superprod" style="height:36px;font-size:13px">' + _optsById(superProds, _curSPid) + '</select>' +
             '</div>' +
             '<div class="form-group" style="flex:1 1 130px">' +
               '<label class="form-label" style="font-size:11px">Prodotto</label>' +
-              '<select class="form-input" id="tf-prod" style="height:36px;font-size:13px">' + opts(prods, '') + '</select>' +
+              '<select class="form-input" id="tf-prod" style="height:36px;font-size:13px">' + _optsById(prods, _curPid) + '</select>' +
             '</div>' +
             '<div class="form-group" style="flex:1 1 130px">' +
               '<label class="form-label" style="font-size:11px">Unità di Misura</label>' +
@@ -156,7 +197,7 @@ var MSK_Tariffe = (function () {
         '</div>' +
         '</div>' +
 
-        /* ── FINE BLOCCO STICKY — da qui scorre ── */
+        /* ── FINE STICKY — da qui scorre ── */
         '<div style="overflow-x:auto">' +
           '<table class="data-table" style="min-width:1100px;font-size:12px">' +
             '<thead>' +
@@ -239,11 +280,13 @@ var MSK_Tariffe = (function () {
 
   /* ── Costruisce una singola riga TR ── */
   function _buildRigaHtml(riga, idx) {
-    var tipiImmobile = (typeof TONIO_IMMOBILI_TIPI !== 'undefined') ? TONIO_IMMOBILI_TIPI : [];
+    /* ★ Legge da localStorage, ordinato, con fallback globale */
+    var tipiImmobile = _getTipiImmobile();
+    var curTIid = riga ? (riga.id_tipo_immobile || '') : '';
     var optsImmobile = '<option value="">— Seleziona —</option>';
     tipiImmobile.forEach(function (item) {
-      var v = item.nome;
-      optsImmobile += '<option value="' + TONIO_escapeHtml(v) + '"' + (riga && v === riga.tipo_immobile ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
+      var sel = (String(item.id) === String(curTIid)) ? ' selected' : '';
+      optsImmobile += '<option value="' + item.id + '"' + sel + '>' + TONIO_escapeHtml(item.nome) + '</option>';
     });
 
     return (
@@ -280,16 +323,21 @@ var MSK_Tariffe = (function () {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#94a3b8">Nessuna tariffa salvata</td></tr>';
       return;
     }
+    var _spArr = _getSuperProdotti();
+    var _pArr  = _getProdotti();
     var html = '';
     list.forEach(function (r) {
       var nRighe = (r.righe || []).length;
       var isActive = r.id === _editTariffId;
+      /* Risolve FK → nome leggibile; compatibile con vecchio schema stringa */
+      var nomeSP = r.id_superprodotto ? _nomeById(_spArr, r.id_superprodotto) : (r.super_prodotto || '—');
+      var nomeP  = r.id_prodotto      ? _nomeById(_pArr,  r.id_prodotto)      : (r.prodotto       || '—');
       html +=
         '<tr class="data-row' + (isActive ? ' active-row' : '') + '" onclick="MSK_Tariffe.caricaTariffa(' + r.id + ')" style="' + (isActive ? 'background:#eff6ff;font-weight:600' : '') + '">' +
           '<td><strong>' + TONIO_escapeHtml(r.tipo_tariffa || '—') + '</strong></td>' +
-          '<td>' + TONIO_escapeHtml(r.trattamento   || '—') + '</td>' +
-          '<td>' + TONIO_escapeHtml(r.super_prodotto || '—') + '</td>' +
-          '<td>' + TONIO_escapeHtml(r.prodotto       || '—') + '</td>' +
+          '<td>' + TONIO_escapeHtml(r.trattamento || '—') + '</td>' +
+          '<td>' + TONIO_escapeHtml(nomeSP) + '</td>' +
+          '<td>' + TONIO_escapeHtml(nomeP)  + '</td>' +
           '<td>' + TONIO_escapeHtml(r.unita_misura   || '—') + '</td>' +
           '<td style="text-align:center">' + (r.iva_perc !== undefined ? r.iva_perc + '%' : '—') + '</td>' +
           '<td style="text-align:center">' +
@@ -339,8 +387,8 @@ var MSK_Tariffe = (function () {
     _s('tf-id',        rec.id);
     _s('tf-tipo',      rec.tipo_tariffa  || '');
     _s('tf-tratt',     rec.trattamento   || '');
-    _s('tf-superprod', rec.super_prodotto || '');
-    _s('tf-prod',      rec.prodotto      || '');
+    _s('tf-superprod', rec.id_superprodotto || '');
+    _s('tf-prod',      rec.id_prodotto       || '');
     _s('tf-unita',     rec.unita_misura  || '');
     _s('tf-iva',       rec.iva_perc      !== undefined ? rec.iva_perc : '');
 
@@ -379,14 +427,17 @@ var MSK_Tariffe = (function () {
 
   /* ── Legge i valori dell'header dal DOM ── */
   function _leggiHeader() {
-    var gv = function (id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+    var gv  = function (id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+    var spv = gv('tf-superprod');
+    var pv  = gv('tf-prod');
     return {
-      tipo_tariffa:  gv('tf-tipo'),
-      trattamento:   gv('tf-tratt'),
-      super_prodotto: gv('tf-superprod'),
-      prodotto:      gv('tf-prod'),
-      unita_misura:  gv('tf-unita'),
-      iva_perc:      parseFloat(gv('tf-iva')) || 0
+      tipo_tariffa:     gv('tf-tipo'),
+      trattamento:      gv('tf-tratt'),
+      /* ★ FK: salva ID numerico (non la stringa nome) */
+      id_superprodotto: spv ? parseInt(spv, 10) : null,
+      id_prodotto:      pv  ? parseInt(pv,  10) : null,
+      unita_misura:     gv('tf-unita'),
+      iva_perc:         parseFloat(gv('tf-iva')) || 0
     };
   }
 
@@ -398,11 +449,11 @@ var MSK_Tariffe = (function () {
     if (_editTariffId === null) {
       /* Nuovo record */
       var newId = _tariffario.length > 0 ? Math.max.apply(null, _tariffario.map(function (r) { return r.id; })) + 1 : 1;
-      _tariffario.push({ id: newId, tipo_tariffa: h.tipo_tariffa, trattamento: h.trattamento, super_prodotto: h.super_prodotto, prodotto: h.prodotto, unita_misura: h.unita_misura, iva_perc: h.iva_perc, righe: [] });
+      _tariffario.push({ id: newId, tipo_tariffa: h.tipo_tariffa, trattamento: h.trattamento, id_superprodotto: h.id_superprodotto, id_prodotto: h.id_prodotto, unita_misura: h.unita_misura, iva_perc: h.iva_perc, righe: [] });
       _editTariffId = newId;
     } else {
       var rec = _tariffario.find(function (r) { return r.id === _editTariffId; });
-      if (rec) { rec.tipo_tariffa = h.tipo_tariffa; rec.trattamento = h.trattamento; rec.super_prodotto = h.super_prodotto; rec.prodotto = h.prodotto; rec.unita_misura = h.unita_misura; rec.iva_perc = h.iva_perc; }
+      if (rec) { rec.tipo_tariffa = h.tipo_tariffa; rec.trattamento = h.trattamento; rec.id_superprodotto = h.id_superprodotto; rec.id_prodotto = h.id_prodotto; rec.unita_misura = h.unita_misura; rec.iva_perc = h.iva_perc; }
     }
 
     TONIO_Storage.save('tariffe_tariffario', _tariffario);
@@ -437,8 +488,9 @@ var MSK_Tariffe = (function () {
       var idx = parseInt(row.getAttribute('data-idx'), 10);
       var gv = function (id) { var el = document.getElementById(id + '-' + idx); return el ? el.value : ''; };
       var gc = function (id) { var el = document.getElementById(id + '-' + idx); return el ? el.checked : false; };
+      var tiv = gv('tr-tipo-imm');
       righe.push({
-        tipo_immobile:  gv('tr-tipo-imm'),
+        id_tipo_immobile: tiv ? parseInt(tiv, 10) : null,
         dal:            gv('tr-dal'),
         al:             gv('tr-al'),
         importo:        parseFloat(gv('tr-importo')) || 0,
@@ -493,11 +545,16 @@ var MSK_Tariffe = (function () {
 
   /* ── Live search ── */
   function filterTariff() {
-    var q = (document.getElementById('tar-search') ? document.getElementById('tar-search').value : '').toLowerCase();
+    var q     = (document.getElementById('tar-search') ? document.getElementById('tar-search').value : '').toLowerCase();
+    var _spArr = _getSuperProdotti();
+    var _pArr  = _getProdotti();
     _renderListaTariffe(_tariffario.filter(function (r) {
-      return (r.tipo_tariffa  || '').toLowerCase().indexOf(q) !== -1 ||
-             (r.trattamento   || '').toLowerCase().indexOf(q) !== -1 ||
-             (r.prodotto      || '').toLowerCase().indexOf(q) !== -1;
+      var nomeSP = r.id_superprodotto ? _nomeById(_spArr, r.id_superprodotto).toLowerCase() : (r.super_prodotto || '').toLowerCase();
+      var nomeP  = r.id_prodotto      ? _nomeById(_pArr,  r.id_prodotto).toLowerCase()      : (r.prodotto       || '').toLowerCase();
+      return (r.tipo_tariffa || '').toLowerCase().indexOf(q) !== -1 ||
+             (r.trattamento  || '').toLowerCase().indexOf(q) !== -1 ||
+             nomeSP.indexOf(q) !== -1 ||
+             nomeP.indexOf(q)  !== -1;
     }));
   }
 
@@ -834,23 +891,27 @@ var MSK_Tariffe = (function () {
      AGGIORNA SELECT NELL'HEADER dopo modifica lookup
   ================================================================ */
   function _refreshHeaderSelects() {
-    function setOpts(elId, arr, curVal) {
-      var el = document.getElementById(elId);
-      if (!el) return;
+    function setOptsByNome(elId, arr, curNome) {
+      var el = document.getElementById(elId); if (!el) return;
       var h = '<option value="">— Seleziona —</option>';
-      arr.forEach(function (item) {
-        var v = item.nome;
-        h += '<option value="' + TONIO_escapeHtml(v) + '"' + (v === curVal ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
+      arr.forEach(function(item) {
+        h += '<option value="' + TONIO_escapeHtml(item.nome) + '"' + (item.nome === curNome ? ' selected' : '') + '>' + TONIO_escapeHtml(item.nome) + '</option>';
       });
       el.innerHTML = h;
     }
-    var superProds = (typeof TONIO_IMMOBILI_SUPERPRODOTTI !== 'undefined') ? TONIO_IMMOBILI_SUPERPRODOTTI : [];
-    var prods      = (typeof TONIO_IMMOBILI_PRODOTTI      !== 'undefined') ? TONIO_IMMOBILI_PRODOTTI      : [];
-    setOpts('tf-tipo',      _tipoTariffa, document.getElementById('tf-tipo')      ? document.getElementById('tf-tipo').value      : '');
-    setOpts('tf-tratt',     _trattamento, document.getElementById('tf-tratt')     ? document.getElementById('tf-tratt').value     : '');
-    setOpts('tf-superprod', superProds,   document.getElementById('tf-superprod') ? document.getElementById('tf-superprod').value : '');
-    setOpts('tf-prod',      prods,        document.getElementById('tf-prod')      ? document.getElementById('tf-prod').value      : '');
-    setOpts('tf-unita',     _unitaMisura, document.getElementById('tf-unita')     ? document.getElementById('tf-unita').value     : '');
+    function setOptsById(elId, arr, curId) {
+      var el = document.getElementById(elId); if (!el) return;
+      el.innerHTML = _optsById(arr, curId);
+    }
+    var superProds = _getSuperProdotti();
+    var prods      = _getProdotti();
+    var elSP = document.getElementById('tf-superprod');
+    var elP  = document.getElementById('tf-prod');
+    setOptsByNome('tf-tipo',      _tipoTariffa, document.getElementById('tf-tipo')  ? document.getElementById('tf-tipo').value  : '');
+    setOptsByNome('tf-tratt',     _trattamento, document.getElementById('tf-tratt') ? document.getElementById('tf-tratt').value : '');
+    setOptsById('tf-superprod',   superProds,   elSP ? elSP.value : '');
+    setOptsById('tf-prod',        prods,        elP  ? elP.value  : '');
+    setOptsByNome('tf-unita',     _unitaMisura, document.getElementById('tf-unita') ? document.getElementById('tf-unita').value : '');
   }
 
   /* ================================================================
