@@ -2,7 +2,7 @@
    TONIO — Msk_Tariffe.js
    Modulo Tariffe — Tipo Tariffa, Trattamento, Unità di Misura,
                     Tariffario (unica maschera inline)
-   v3.0 — Lookup live da localStorage + FK by ID + ordinamento + sticky + label
+   v4.0 — Lookup live localStorage + FK by ID + ordinamento + sticky + label + Maschera Sconti
    ================================================================ */
 
 var MSK_Tariffe = (function () {
@@ -21,9 +21,8 @@ var MSK_Tariffe = (function () {
   var _righeCount   = 0;
 
   /* ================================================================
-     HELPER LOOKUP — legge sempre dal localStorage (dati aggiornati
-     dall'utente in Msk_Immobili) con fallback alla variabile globale
-     statica di Dati_Immobili.js. Risultato ordinato per campo ordine.
+     HELPER LOOKUP — legge dal localStorage (live) con fallback globale,
+     ordinato per campo ordine
   ================================================================ */
   function _getSuperProdotti() {
     var d = TONIO_Storage.load('immobili_superprodotti');
@@ -40,13 +39,11 @@ var MSK_Tariffe = (function () {
     if (!d || !d.length) d = (typeof TONIO_IMMOBILI_TIPI !== 'undefined') ? TONIO_IMMOBILI_TIPI : [];
     return d.slice().sort(function(a,b){ return (a.ordine||0)-(b.ordine||0); });
   }
-  /* Risolve ID → nome leggibile nell'array dato */
   function _nomeById(arr, id) {
     if (!id && id !== 0) return '—';
     var f = arr.find(function(x){ return String(x.id) === String(id); });
     return f ? f.nome : '—';
   }
-  /* Costruisce <option value="ID">nome</option> (per FK verso Immobili) */
   function _optsById(arr, selectedId) {
     var h = '<option value="">— Seleziona —</option>';
     arr.forEach(function(item) {
@@ -87,21 +84,15 @@ var MSK_Tariffe = (function () {
     var c = document.getElementById('page-tariffe');
     if (!c) return;
 
-    /* ── helper: <option> value=nome (archivi interni: TipoTariffa, Trattamento, UnitaMisura) ── */
     function opts(arr, selected) {
       var h = '<option value="">— Seleziona —</option>';
-      arr.forEach(function (item) {
-        var v = item.nome;
+      arr.forEach(function (item) { var v = item.nome;
         h += '<option value="' + TONIO_escapeHtml(v) + '"' + (v === selected ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
       });
       return h;
     }
-
-    /* ── Lookup live (localStorage → globale → []) già ordinati per ordine ── */
     var superProds = _getSuperProdotti();
     var prods      = _getProdotti();
-
-    /* ── Valori FK correnti per preselezione in editing ── */
     var _curRec  = (_editTariffId !== null) ? (_tariffario.find(function(r){ return r.id === _editTariffId; }) || null) : null;
     var _curSPid = _curRec ? (_curRec.id_superprodotto || '') : '';
     var _curPid  = _curRec ? (_curRec.id_prodotto       || '') : '';
@@ -111,8 +102,6 @@ var MSK_Tariffe = (function () {
 
     c.innerHTML =
       '<div class="list-page">' +
-
-        /* ── STICKY: header + form dati + barra righe sempre visibili ── */
         '<div style="position:sticky;top:0;z-index:100;background:#fff;padding-bottom:8px;border-bottom:2px solid #e2e8f0;margin-left:-24px;margin-right:-24px;padding-left:24px;padding-right:24px">' +
 
         /* ── HEADER: "CREA TARIFFE" a sinistra, pulsanti lookup verso il margine destro ── */
@@ -131,6 +120,9 @@ var MSK_Tariffe = (function () {
             '</button>' +
             '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalUnita()">' +
               '📐 Unità di Misura' +
+            '</button>' +
+            '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;white-space:nowrap" onclick="MSK_Tariffe.openModalSconti()">' +
+              '🏷️ Sconti' +
             '</button>' +
           '</div>' +
         '</div>' +
@@ -196,8 +188,6 @@ var MSK_Tariffe = (function () {
           '</button>' +
         '</div>' +
         '</div>' +
-
-        /* ── FINE STICKY — da qui scorre ── */
         '<div style="overflow-x:auto">' +
           '<table class="data-table" style="min-width:1100px;font-size:12px">' +
             '<thead>' +
@@ -280,7 +270,6 @@ var MSK_Tariffe = (function () {
 
   /* ── Costruisce una singola riga TR ── */
   function _buildRigaHtml(riga, idx) {
-    /* ★ Legge da localStorage, ordinato, con fallback globale */
     var tipiImmobile = _getTipiImmobile();
     var curTIid = riga ? (riga.id_tipo_immobile || '') : '';
     var optsImmobile = '<option value="">— Seleziona —</option>';
@@ -329,7 +318,6 @@ var MSK_Tariffe = (function () {
     list.forEach(function (r) {
       var nRighe = (r.righe || []).length;
       var isActive = r.id === _editTariffId;
-      /* Risolve FK → nome leggibile; compatibile con vecchio schema stringa */
       var nomeSP = r.id_superprodotto ? _nomeById(_spArr, r.id_superprodotto) : (r.super_prodotto || '—');
       var nomeP  = r.id_prodotto      ? _nomeById(_pArr,  r.id_prodotto)      : (r.prodotto       || '—');
       html +=
@@ -427,13 +415,11 @@ var MSK_Tariffe = (function () {
 
   /* ── Legge i valori dell'header dal DOM ── */
   function _leggiHeader() {
-    var gv  = function (id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
-    var spv = gv('tf-superprod');
-    var pv  = gv('tf-prod');
+    var gv = function (id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+    var spv = gv('tf-superprod'); var pv = gv('tf-prod');
     return {
       tipo_tariffa:     gv('tf-tipo'),
       trattamento:      gv('tf-tratt'),
-      /* ★ FK: salva ID numerico (non la stringa nome) */
       id_superprodotto: spv ? parseInt(spv, 10) : null,
       id_prodotto:      pv  ? parseInt(pv,  10) : null,
       unita_misura:     gv('tf-unita'),
@@ -545,16 +531,12 @@ var MSK_Tariffe = (function () {
 
   /* ── Live search ── */
   function filterTariff() {
-    var q     = (document.getElementById('tar-search') ? document.getElementById('tar-search').value : '').toLowerCase();
-    var _spArr = _getSuperProdotti();
-    var _pArr  = _getProdotti();
+    var q = (document.getElementById('tar-search') ? document.getElementById('tar-search').value : '').toLowerCase();
+    var _spArr = _getSuperProdotti(); var _pArr = _getProdotti();
     _renderListaTariffe(_tariffario.filter(function (r) {
-      var nomeSP = r.id_superprodotto ? _nomeById(_spArr, r.id_superprodotto).toLowerCase() : (r.super_prodotto || '').toLowerCase();
-      var nomeP  = r.id_prodotto      ? _nomeById(_pArr,  r.id_prodotto).toLowerCase()      : (r.prodotto       || '').toLowerCase();
-      return (r.tipo_tariffa || '').toLowerCase().indexOf(q) !== -1 ||
-             (r.trattamento  || '').toLowerCase().indexOf(q) !== -1 ||
-             nomeSP.indexOf(q) !== -1 ||
-             nomeP.indexOf(q)  !== -1;
+      var nSP = r.id_superprodotto ? _nomeById(_spArr, r.id_superprodotto).toLowerCase() : (r.super_prodotto||'').toLowerCase();
+      var nP  = r.id_prodotto      ? _nomeById(_pArr,  r.id_prodotto).toLowerCase()      : (r.prodotto||'').toLowerCase();
+      return (r.tipo_tariffa||'').toLowerCase().indexOf(q)!==-1 || (r.trattamento||'').toLowerCase().indexOf(q)!==-1 || nSP.indexOf(q)!==-1 || nP.indexOf(q)!==-1;
     }));
   }
 
@@ -891,27 +873,20 @@ var MSK_Tariffe = (function () {
      AGGIORNA SELECT NELL'HEADER dopo modifica lookup
   ================================================================ */
   function _refreshHeaderSelects() {
-    function setOptsByNome(elId, arr, curNome) {
+    function setN(elId, arr, cur) {
       var el = document.getElementById(elId); if (!el) return;
       var h = '<option value="">— Seleziona —</option>';
-      arr.forEach(function(item) {
-        h += '<option value="' + TONIO_escapeHtml(item.nome) + '"' + (item.nome === curNome ? ' selected' : '') + '>' + TONIO_escapeHtml(item.nome) + '</option>';
-      });
+      arr.forEach(function(i){ h += '<option value="'+TONIO_escapeHtml(i.nome)+'"'+(i.nome===cur?' selected':'')+'>'+TONIO_escapeHtml(i.nome)+'</option>'; });
       el.innerHTML = h;
     }
-    function setOptsById(elId, arr, curId) {
-      var el = document.getElementById(elId); if (!el) return;
-      el.innerHTML = _optsById(arr, curId);
-    }
-    var superProds = _getSuperProdotti();
-    var prods      = _getProdotti();
-    var elSP = document.getElementById('tf-superprod');
-    var elP  = document.getElementById('tf-prod');
-    setOptsByNome('tf-tipo',      _tipoTariffa, document.getElementById('tf-tipo')  ? document.getElementById('tf-tipo').value  : '');
-    setOptsByNome('tf-tratt',     _trattamento, document.getElementById('tf-tratt') ? document.getElementById('tf-tratt').value : '');
-    setOptsById('tf-superprod',   superProds,   elSP ? elSP.value : '');
-    setOptsById('tf-prod',        prods,        elP  ? elP.value  : '');
-    setOptsByNome('tf-unita',     _unitaMisura, document.getElementById('tf-unita') ? document.getElementById('tf-unita').value : '');
+    function setI(elId, arr, curId) { var el = document.getElementById(elId); if (!el) return; el.innerHTML = _optsById(arr, curId); }
+    var sp = _getSuperProdotti(); var p = _getProdotti();
+    var elSP = document.getElementById('tf-superprod'); var elP = document.getElementById('tf-prod');
+    setN('tf-tipo',  _tipoTariffa, document.getElementById('tf-tipo')  ? document.getElementById('tf-tipo').value  : '');
+    setN('tf-tratt', _trattamento, document.getElementById('tf-tratt') ? document.getElementById('tf-tratt').value : '');
+    setI('tf-superprod', sp, elSP ? elSP.value : '');
+    setI('tf-prod',      p,  elP  ? elP.value  : '');
+    setN('tf-unita', _unitaMisura, document.getElementById('tf-unita') ? document.getElementById('tf-unita').value : '');
   }
 
   /* ================================================================
@@ -926,6 +901,267 @@ var MSK_Tariffe = (function () {
       document.body.appendChild(ov);
     }
     return ov;
+  }
+
+
+  /* ================================================================
+     MASCHERA SCONTI — storage key: 'tariffe_sconti'
+     Struttura record: { id, nome_sconto, descrizione_sconto, righe[] }
+     Struttura riga:   { preno_dal, preno_al, date_dal, date_al,
+                         min_notti, min_anticipo, max_anticipo,
+                         sc_tot_perc, sc_tot_eur,
+                         sc_notte_perc, sc_notte_eur }
+  ================================================================ */
+  var _sconti     = [];
+  var _editSconto = null;   /* id sconto in editing, null = nessuno */
+
+  function _initSconti() {
+    var saved = TONIO_Storage.load('tariffe_sconti');
+    _sconti = saved ? saved : (typeof TONIO_TARIFFE_SCONTI !== 'undefined' ? JSON.parse(JSON.stringify(TONIO_TARIFFE_SCONTI)) : []);
+  }
+
+  function openModalSconti() { _initSconti(); _editSconto = null; _renderModalSconti(); }
+
+  /* ── Righe condizioni dello sconto selezionato ── */
+  function _buildScontiRighe(sc) {
+    var html = '';
+    (sc.righe || []).forEach(function(r, i) {
+      html +=
+        '<tr class="tariff-riga" data-sc-idx="' + i + '">' +
+          /* Sconto Prenotabile */
+          '<td><input class="form-input form-input-sm" type="date" id="sc-r-pdal-' + i + '" value="' + (r.preno_dal||'') + '" style="min-width:130px"></td>' +
+          '<td><input class="form-input form-input-sm" type="date" id="sc-r-pal-'  + i + '" value="' + (r.preno_al||'')  + '" style="min-width:130px"></td>' +
+          /* Date Scontate */
+          '<td><input class="form-input form-input-sm" type="date" id="sc-r-ddal-' + i + '" value="' + (r.date_dal||'') + '" style="min-width:130px"></td>' +
+          '<td><input class="form-input form-input-sm" type="date" id="sc-r-dal-'  + i + '" value="' + (r.date_al||'')  + '" style="min-width:130px"></td>' +
+          /* Notti + anticipi */
+          '<td><input class="form-input form-input-sm" type="number" id="sc-r-mn-'  + i + '" value="' + (r.min_notti||'')    + '" min="0" placeholder="GG" style="width:60px;text-align:right"></td>' +
+          '<td><input class="form-input form-input-sm" type="number" id="sc-r-mia-' + i + '" value="' + (r.min_anticipo||'') + '" min="0" placeholder="GG" style="width:60px;text-align:right"></td>' +
+          '<td><input class="form-input form-input-sm" type="number" id="sc-r-mxa-' + i + '" value="' + (r.max_anticipo||'') + '" min="0" placeholder="GG" style="width:60px;text-align:right"></td>' +
+          /* Importi sconto */
+          '<td><input class="form-input form-input-sm" type="number" id="sc-r-stp-' + i + '" value="' + (r.sc_tot_perc||'')   + '" min="0" max="100" step="0.1" placeholder="%" style="width:68px;text-align:right"></td>' +
+          '<td><input class="form-input form-input-sm" type="number" id="sc-r-ste-' + i + '" value="' + (r.sc_tot_eur||'')    + '" min="0" step="0.01" placeholder="€"  style="width:78px;text-align:right"></td>' +
+          '<td><input class="form-input form-input-sm" type="number" id="sc-r-snp-' + i + '" value="' + (r.sc_notte_perc||'') + '" min="0" max="100" step="0.1" placeholder="%" style="width:68px;text-align:right"></td>' +
+          '<td><input class="form-input form-input-sm" type="number" id="sc-r-sne-' + i + '" value="' + (r.sc_notte_eur||'')  + '" min="0" step="0.01" placeholder="€"  style="width:78px;text-align:right"></td>' +
+          '<td style="text-align:center;padding:2px 4px">' +
+            '<button class="btn-icon btn-danger" title="Rimuovi" onclick="MSK_Tariffe._removeRigaSconto(' + i + ')" style="padding:3px 5px">' +
+              '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/></svg>' +
+            '</button>' +
+          '</td>' +
+        '</tr>';
+    });
+    return html;
+  }
+
+  function _renderModalSconti() {
+    var ov = _getOrCreateOverlay('modal-tar-sconti');
+
+    /* Lista sconti */
+    var listHtml = '';
+    _sconti.forEach(function(sc) {
+      var isActive = _editSconto === sc.id;
+      listHtml +=
+        '<tr class="data-row' + (isActive ? ' active-row' : '') + '" onclick="MSK_Tariffe._clickSconto(' + sc.id + ')" style="' + (isActive ? 'background:#eff6ff;font-weight:600;cursor:pointer' : 'cursor:pointer') + '">' +
+          '<td><span class="id-badge">' + sc.id + '</span></td>' +
+          '<td><strong>' + TONIO_escapeHtml(sc.nome_sconto || '') + '</strong></td>' +
+          '<td style="color:#64748b;font-size:12px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + TONIO_escapeHtml(sc.descrizione_sconto || '') + '</td>' +
+          '<td style="text-align:center">' + ((sc.righe||[]).length) + '</td>' +
+          '<td onclick="event.stopPropagation()">' +
+            '<button class="btn-icon btn-danger" onclick="MSK_Tariffe._eliminaSconto(' + sc.id + ')">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/></svg>' +
+            '</button>' +
+          '</td>' +
+        '</tr>';
+    });
+
+    var curSc   = (_editSconto !== null) ? (_sconti.find(function(x){ return x.id === _editSconto; }) || {}) : {};
+    var righeHtml = curSc.righe ? _buildScontiRighe(curSc) : '';
+    var hasEdit   = _editSconto !== null;
+
+    ov.innerHTML =
+      '<div class="modal" style="max-width:1380px;width:96vw">' +
+        '<div class="modal-header">' +
+          '<span style="font-size:19px">🏷️</span>' +
+          '<div class="modal-title">Sconti</div>' +
+          '<button class="modal-close" onclick="MSK_Tariffe.closeModalSconti()">×</button>' +
+        '</div>' +
+        '<div class="modal-body" style="padding:0">' +
+
+          /* ── DATI SCONTO ── */
+          '<div style="background:#f0f4ff;border-bottom:1px solid #c7d7f5;padding:14px 20px">' +
+            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">📌 Dati Sconto</div>' +
+            '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
+              '<div class="form-group" style="flex:0 0 55px">' +
+                '<label class="form-label" style="font-size:11px">ID</label>' +
+                '<input class="form-input" type="text" id="sc-id" value="' + (curSc.id !== undefined ? curSc.id : '') + '" readonly style="background:#f8fafc;color:#94a3b8;cursor:default;height:34px;font-size:13px;width:100%">' +
+              '</div>' +
+              '<div class="form-group" style="flex:1 1 210px">' +
+                '<label class="form-label" style="font-size:11px">Nome Sconto <span class="req">*</span></label>' +
+                '<input class="form-input" type="text" id="sc-nome" value="' + TONIO_escapeHtml(curSc.nome_sconto || '') + '" placeholder="Es. Prenota Presto" style="height:34px;font-size:13px;width:100%">' +
+              '</div>' +
+              '<div class="form-group" style="flex:4 1 420px">' +
+                '<label class="form-label" style="font-size:11px">Descrizione Sconto</label>' +
+                '<input class="form-input" type="text" id="sc-desc" value="' + TONIO_escapeHtml(curSc.descrizione_sconto || '') + '" placeholder="Condizioni, periodo, acconto..." style="height:34px;font-size:13px;width:100%">' +
+              '</div>' +
+            '</div>' +
+            '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
+              '<button class="btn btn-primary" style="font-size:12px" onclick="MSK_Tariffe._nuovoSconto()">' +
+                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuovo Sconto</button>' +
+              '<button class="btn btn-warning" style="font-size:12px" onclick="MSK_Tariffe._salvaSconto()">' +
+                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Sconto</button>' +
+              '<button class="btn btn-ghost"   style="font-size:12px" onclick="MSK_Tariffe._annullaSconto()">Annulla</button>' +
+            '</div>' +
+          '</div>' +
+
+          /* ── LISTA SCONTI SALVATI ── */
+          '<div style="padding:12px 20px 6px">' +
+            '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">📂 Sconti Salvati</div>' +
+            '<div style="overflow-x:auto">' +
+              '<table class="data-table" style="min-width:580px;font-size:12px">' +
+                '<thead><tr>' +
+                  '<th style="width:50px">ID</th>' +
+                  '<th>Nome Sconto</th>' +
+                  '<th>Descrizione</th>' +
+                  '<th style="width:58px;text-align:center">Righe</th>' +
+                  '<th style="width:40px"></th>' +
+                '</tr></thead>' +
+                '<tbody>' + listHtml + '</tbody>' +
+              '</table>' +
+            '</div>' +
+          '</div>' +
+
+          /* ── CONDIZIONI SCONTO ── */
+          '<div style="padding:8px 20px 16px">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+              '<div style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:.5px;text-transform:uppercase">📋 Condizioni Sconto</div>' +
+              '<button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="MSK_Tariffe._addRigaSconto()"' + (!hasEdit ? ' disabled' : '') + '>＋ Aggiungi Condizione</button>' +
+            '</div>' +
+            '<div style="overflow-x:auto">' +
+              '<table class="data-table" style="min-width:1050px;font-size:11px">' +
+                '<thead>' +
+                  '<tr>' +
+                    '<th colspan="2" style="text-align:center;background:#dbeafe;color:#1d4ed8;border-bottom:2px solid #93c5fd;font-size:10px;padding:4px">Sconto Prenotabile</th>' +
+                    '<th colspan="2" style="text-align:center;background:#dcfce7;color:#166534;border-bottom:2px solid #86efac;font-size:10px;padding:4px">Date Scontate</th>' +
+                    '<th colspan="3" style="text-align:center;background:#fef9c3;color:#854d0e;border-bottom:2px solid #fde047;font-size:10px;padding:4px">Anticipo / Notti</th>' +
+                    '<th colspan="4" style="text-align:center;background:#fff0f0;color:#b91c1c;border-bottom:2px solid #fca5a5;font-size:10px;padding:4px">Importo Sconto</th>' +
+                    '<th style="width:34px"></th>' +
+                  '</tr>' +
+                  '<tr style="background:#f1f5f9">' +
+                    '<th style="background:#dbeafe;text-align:center;font-size:10px;padding:4px 6px">Dal</th>' +
+                    '<th style="background:#dbeafe;text-align:center;font-size:10px;padding:4px 6px">Al</th>' +
+                    '<th style="background:#dcfce7;text-align:center;font-size:10px;padding:4px 6px">Dal</th>' +
+                    '<th style="background:#dcfce7;text-align:center;font-size:10px;padding:4px 6px">Al</th>' +
+                    '<th style="background:#fef9c3;text-align:center;font-size:10px;padding:4px 6px">Min.<br>Notti<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
+                    '<th style="background:#fef9c3;text-align:center;font-size:10px;padding:4px 6px">Min.<br>Anticipo<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
+                    '<th style="background:#fef9c3;text-align:center;font-size:10px;padding:4px 6px">Max<br>Anticipo<br><span style=\'font-weight:400;color:#92400e\'>GG</span></th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Totale<br>Loc. %</th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Totale<br>Loc. €</th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Notte<br>%</th>' +
+                    '<th style="background:#fff0f0;text-align:center;font-size:10px;padding:4px 6px">Sc. Notte<br>€</th>' +
+                    '<th style="width:34px"></th>' +
+                  '</tr>' +
+                '</thead>' +
+                '<tbody id="sc-righe-tbody">' + righeHtml + '</tbody>' +
+              '</table>' +
+            '</div>' +
+            '<div style="margin-top:10px">' +
+              '<button class="btn btn-primary" style="font-size:12px' + (!hasEdit ? ';display:none' : '') + '" id="sc-btn-salva-righe" onclick="MSK_Tariffe._salvaRigheSconto()">' +
+                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Condizioni</button>' +
+            '</div>' +
+          '</div>' +
+
+        '</div>' +
+        '<div class="modal-footer">' +
+          '<button class="btn btn-ghost" onclick="MSK_Tariffe.closeModalSconti()">Chiudi</button>' +
+        '</div>' +
+      '</div>';
+    ov.classList.add('open');
+  }
+
+  function _clickSconto(id) { _editSconto = id; _renderModalSconti(); }
+
+  function _nuovoSconto() { _editSconto = null; _renderModalSconti(); }
+
+  function _salvaSconto() {
+    var nome = (document.getElementById('sc-nome') ? document.getElementById('sc-nome').value||'' : '').trim();
+    var desc = (document.getElementById('sc-desc') ? document.getElementById('sc-desc').value||'' : '').trim();
+    if (!nome) { alert('⚠️ Inserire il Nome Sconto.'); return; }
+    if (_editSconto === null) {
+      var nid = _sconti.length > 0 ? Math.max.apply(null, _sconti.map(function(x){ return x.id; })) + 1 : 1;
+      _sconti.push({ id: nid, nome_sconto: nome, descrizione_sconto: desc, righe: [] });
+      _editSconto = nid;
+    } else {
+      var sc = _sconti.find(function(x){ return x.id === _editSconto; });
+      if (sc) { sc.nome_sconto = nome; sc.descrizione_sconto = desc; }
+    }
+    TONIO_Storage.save('tariffe_sconti', _sconti);
+    _renderModalSconti();
+    _showToast('Sconto salvato ✓');
+  }
+
+  function _annullaSconto() { _editSconto = null; _renderModalSconti(); }
+
+  function _eliminaSconto(id) {
+    var sc = _sconti.find(function(x){ return x.id === id; });
+    if (!sc) return;
+    if (!confirm('Eliminare lo sconto "' + (sc.nome_sconto || id) + '"?')) return;
+    _sconti = _sconti.filter(function(x){ return x.id !== id; });
+    TONIO_Storage.save('tariffe_sconti', _sconti);
+    if (_editSconto === id) _editSconto = null;
+    _renderModalSconti();
+  }
+
+  function _addRigaSconto() {
+    if (_editSconto === null) { alert('⚠️ Prima salva il nome dello sconto.'); return; }
+    var sc = _sconti.find(function(x){ return x.id === _editSconto; });
+    if (!sc) return;
+    sc.righe = sc.righe || [];
+    sc.righe.push({ preno_dal:'', preno_al:'', date_dal:'', date_al:'', min_notti:'', min_anticipo:'', max_anticipo:'', sc_tot_perc:'', sc_tot_eur:'', sc_notte_perc:'', sc_notte_eur:'' });
+    TONIO_Storage.save('tariffe_sconti', _sconti);
+    _renderModalSconti();
+  }
+
+  function _removeRigaSconto(idx) {
+    if (_editSconto === null) return;
+    var sc = _sconti.find(function(x){ return x.id === _editSconto; });
+    if (!sc || !sc.righe) return;
+    if (!confirm('Rimuovere questa condizione?')) return;
+    sc.righe.splice(idx, 1);
+    TONIO_Storage.save('tariffe_sconti', _sconti);
+    _renderModalSconti();
+  }
+
+  function _salvaRigheSconto() {
+    if (_editSconto === null) { alert('⚠️ Prima salva il nome dello sconto.'); return; }
+    var sc = _sconti.find(function(x){ return x.id === _editSconto; });
+    if (!sc) return;
+    var rows = document.querySelectorAll('#sc-righe-tbody .tariff-riga[data-sc-idx]');
+    sc.righe = [];
+    rows.forEach(function(row) {
+      var i = row.getAttribute('data-sc-idx');
+      var g = function(pfx) { var el = document.getElementById(pfx + i); return el ? el.value.trim() : ''; };
+      sc.righe.push({
+        preno_dal:     g('sc-r-pdal-'),
+        preno_al:      g('sc-r-pal-'),
+        date_dal:      g('sc-r-ddal-'),
+        date_al:       g('sc-r-dal-'),
+        min_notti:     g('sc-r-mn-')  ? parseInt(g('sc-r-mn-'), 10)    : '',
+        min_anticipo:  g('sc-r-mia-') ? parseInt(g('sc-r-mia-'), 10)   : '',
+        max_anticipo:  g('sc-r-mxa-') ? parseInt(g('sc-r-mxa-'), 10)   : '',
+        sc_tot_perc:   g('sc-r-stp-') ? parseFloat(g('sc-r-stp-'))     : '',
+        sc_tot_eur:    g('sc-r-ste-') ? parseFloat(g('sc-r-ste-'))     : '',
+        sc_notte_perc: g('sc-r-snp-') ? parseFloat(g('sc-r-snp-'))     : '',
+        sc_notte_eur:  g('sc-r-sne-') ? parseFloat(g('sc-r-sne-'))     : ''
+      });
+    });
+    TONIO_Storage.save('tariffe_sconti', _sconti);
+    _renderModalSconti();
+    _showToast('Condizioni salvate ✓');
+  }
+
+  function closeModalSconti() {
+    var ov = document.getElementById('modal-tar-sconti'); if (ov) ov.classList.remove('open');
+    _editSconto = null;
   }
 
   /* ================================================================
@@ -962,7 +1198,18 @@ var MSK_Tariffe = (function () {
     salvaUnita:       salvaUnita,
     annullaUnita:     annullaUnita,
     eliminaUnita:     eliminaUnita,
-    closeModalUnita:  closeModalUnita
+    closeModalUnita:  closeModalUnita,
+    /* Sconti */
+    openModalSconti:   openModalSconti,
+    closeModalSconti:  closeModalSconti,
+    _clickSconto:      _clickSconto,
+    _nuovoSconto:      _nuovoSconto,
+    _salvaSconto:      _salvaSconto,
+    _annullaSconto:    _annullaSconto,
+    _eliminaSconto:    _eliminaSconto,
+    _addRigaSconto:    _addRigaSconto,
+    _removeRigaSconto: _removeRigaSconto,
+    _salvaRigheSconto: _salvaRigheSconto
   };
 
 })();
