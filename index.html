@@ -34,12 +34,14 @@
     <button class="sb-btn" onclick="TONIO_showPage('incassi');TONIO_closeSidebar()">💰 Incassi</button>
     <button class="sb-btn" onclick="TONIO_showPage('spese');TONIO_closeSidebar()">📊 Spese</button>
     <button class="sb-btn" onclick="TONIO_showPage('budget');TONIO_closeSidebar()">📈 Budget</button>
-    <button class="sb-btn" onclick="TONIO_showPage('modalita_pagamento');TONIO_closeSidebar()">💳 Modalità di Pagamento</button>
   </div>
   <div class="sb-section">
     <div class="sb-section-title">Immobili &amp; Tariffe</div>
     <button class="sb-btn" onclick="TONIO_showPage('immobili');TONIO_closeSidebar()">🏠 Immobili</button>
     <button class="sb-btn" onclick="TONIO_showPage('tariffe');TONIO_closeSidebar()">💶 Tariffe</button>
+    <button class="sb-btn" onclick="TONIO_showPage('sconti');TONIO_closeSidebar()">🏷️ Sconti</button>
+    <button class="sb-btn" onclick="TONIO_showPage('modalita_pagamento');TONIO_closeSidebar()">💳 Modalità di Pagamento</button>
+    <button class="sb-btn" onclick="TONIO_showPage('politiche_cancellazione');TONIO_closeSidebar()">📋 Politiche di Cancellazione</button>
   </div>
   <div class="sb-section">
     <div class="sb-section-title">Gestione</div>
@@ -81,9 +83,14 @@
   <div id="page-incassi"      class="page"><div class="coming-soon"><div class="cs-icon">💰</div><h2>Incassi</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-spese"        class="page"><div class="coming-soon"><div class="cs-icon">📊</div><h2>Spese</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-budget"       class="page"><div class="coming-soon"><div class="cs-icon">📈</div><h2>Budget</h2><p>Modulo in sviluppo</p></div></div>
-  <div id="page-modalita_pagamento" class="page"></div>
   <!-- TARIFFE — gestito da Msk_Tariffe.js -->
   <div id="page-tariffe" class="page"></div>
+  <!-- SCONTI — gestito da Msk_Tariffe.js (modale) -->
+  <div id="page-sconti" class="page"><div class="coming-soon"><div class="cs-icon">🏷️</div><h2>Sconti</h2><p>Apri dal menu Tariffe &gt; pulsante Sconti.</p></div></div>
+  <!-- MODALITA PAGAMENTO — gestito da Msk_Contabilita.js -->
+  <div id="page-modalita_pagamento" class="page"></div>
+  <!-- POLITICHE CANCELLAZIONE — gestito da Msk_Contabilita.js -->
+  <div id="page-politiche_cancellazione" class="page"></div>
   <div id="page-manutenzioni" class="page"><div class="coming-soon"><div class="cs-icon">🔨</div><h2>Manutenzioni</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-documenti"    class="page"><div class="coming-soon"><div class="cs-icon">📁</div><h2>Documenti</h2><p>Modulo in sviluppo</p></div></div>
   <div id="page-impostazioni" class="page"><div class="coming-soon"><div class="cs-icon">⚙️</div><h2>Impostazioni</h2><p>Modulo in sviluppo</p></div></div>
