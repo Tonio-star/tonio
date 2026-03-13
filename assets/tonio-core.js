@@ -25,14 +25,16 @@ var TONIO_NAV = {
       { label: '💰 Incassi',               page: 'incassi' },
       { label: '📊 Spese',                 page: 'spese' },
       { label: '📈 Budget',                page: 'budget' },
-      { label: '💳 Modalità di Pagamento', page: 'modalita_pagamento' },
     ]
   },
   immobili_tariffe: {
     label: '🏠 Immobili & Tariffe',
     subs: [
-      { label: '🏠 Immobili', page: 'immobili' },
-      { label: '💶 Tariffe',  page: 'tariffe' },
+      { label: '🏠 Immobili',                  page: 'immobili' },
+      { label: '💶 Tariffe',                   page: 'tariffe' },
+      { label: '🏷️ Sconti',                    page: 'sconti' },
+      { label: '💳 Modalità di Pagamento',     page: 'modalita_pagamento' },
+      { label: '📋 Politiche di Cancellazione', page: 'politiche_cancellazione' },
     ]
   },
   gestione: {
@@ -51,9 +53,11 @@ var TONIO_PAGE_ACTIONS = {
   fornitori:           '<button class="nav-action-btn primary" onclick="MSK_Fornitori.nuovoFornitore()">＋ Nuovo Fornitore</button>',
   ospiti:              '<button class="nav-action-btn primary" onclick="MSK_Ospiti.nuovoOspite()">＋ Nuovo Ospite</button>',
   immobili:            '<button class="nav-action-btn primary" onclick="MSK_Immobili.nuovoImmobile()">＋ Nuovo Immobile</button>',
-  modalita_pagamento:  '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaModalita()">＋ Nuova Modalità</button>',
-  prenotazioni:        '<button class="nav-action-btn primary" onclick="MSK_Prenotazioni.nuovaPrenotazione()">＋ Nuova Prenotazione</button>',
-  tariffe:             ''
+  modalita_pagamento:       '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaModalitaPagamento()">＋ Nuova Modalità</button>',
+  politiche_cancellazione:  '<button class="nav-action-btn primary" onclick="MSK_Contabilita.nuovaPolitica()">＋ Nuova Politica</button>',
+  sconti:                   '',
+  prenotazioni:             '<button class="nav-action-btn primary" onclick="MSK_Prenotazioni.nuovaPrenotazione()">＋ Nuova Prenotazione</button>',
+  tariffe:                  ''
 };
 
 var TONIO_currentModule = 'anagrafiche';
