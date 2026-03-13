@@ -88,3 +88,37 @@ var TONIO_TARIFFARIO = [
     ]
   }
 ];
+
+/* ================================================================
+   ACCONTI — tipi di acconto per le modalità di pagamento
+   ================================================================ */
+var TONIO_TARIFFE_ACCONTI = [
+  { id: 1, ordine: 1, nome: '1° Acconto' },
+  { id: 2, ordine: 2, nome: '2° Acconto' },
+  { id: 3, ordine: 3, nome: '3° Acconto' },
+  { id: 4, ordine: 4, nome: 'Saldo' },
+];
+
+/* ================================================================
+   POLITICHE DI CANCELLAZIONE
+   ================================================================ */
+var TONIO_TARIFFE_POLITICHE_CANCELLAZIONE = [
+  {
+    id: 1,
+    ordine: 1,
+    nome:        'Gratuita',
+    descrizione: 'Cancellazione gratuita fino a 30 giorni prima dell\'arrivo. Oltre tale termine si applica una penale pari al 50% del totale.'
+  },
+  {
+    id: 2,
+    ordine: 2,
+    nome:        'Non Rimborsabile',
+    descrizione: 'Prenotazione non rimborsabile. In caso di cancellazione o no-show il costo totale non verrà restituito.'
+  },
+  {
+    id: 3,
+    ordine: 3,
+    nome:        'Flessibile',
+    descrizione: 'Cancellazione gratuita fino a 7 giorni prima. Da 7 giorni a 1 giorno prima penale del 30%. No-show: 100% del totale.'
+  },
+];
