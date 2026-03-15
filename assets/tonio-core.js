@@ -4,6 +4,13 @@
    ================================================================ */
 
 var TONIO_NAV = {
+  prenotazioni_menu: {
+    label: '📅 Prenotazioni',
+    subs: [
+      { label: '📅 Prenotazioni', page: 'prenotazioni' },
+      { label: '📄 Contratti',    page: 'contratti' },
+    ]
+  },
   anagrafiche: {
     label: '👤 Anagrafiche',
     subs: [
@@ -13,9 +20,8 @@ var TONIO_NAV = {
     ]
   },
   operativo: {
-    label: '📅 Operativo',
+    label: '🗂 Operativo',
     subs: [
-      { label: '📅 Prenotazioni', page: 'prenotazioni' },
       { label: '📄 Contratti',    page: 'contratti' },
     ]
   },
@@ -60,10 +66,13 @@ var TONIO_PAGE_ACTIONS = {
   tariffe:                  ''
 };
 
-var TONIO_currentModule = 'anagrafiche';
-var TONIO_currentPage   = 'clienti';
+var TONIO_currentModule = 'prenotazioni_menu';
+var TONIO_currentPage   = 'prenotazioni';
 
 document.addEventListener('DOMContentLoaded', function() {
+  /* ---- Costruisce dinamicamente la riga 1 del menu principale ---- */
+  _buildNavRow1();
+
   /* ---- Avvio centralizzato di tutti i moduli ---- */
   if (typeof MSK_Clienti   !== 'undefined') MSK_Clienti.init();
   if (typeof MSK_Fornitori !== 'undefined') MSK_Fornitori.init();
@@ -73,9 +82,19 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof MSK_Tariffe    !== 'undefined') MSK_Tariffe.init();
   if (typeof MSK_Prenotazioni !== 'undefined') MSK_Prenotazioni.init();
 
-  TONIO_setModule('anagrafiche', false);
-  TONIO_showPage('clienti');
+  TONIO_setModule('prenotazioni_menu', false);
+  TONIO_showPage('prenotazioni');
 });
+
+function _buildNavRow1() {
+  var r1 = document.getElementById('nav-r1');
+  if (!r1) return; /* se non esiste il contenitore, esce senza errori */
+  var html = '';
+  for (var key in TONIO_NAV) {
+    html += '<button class="nav-main-btn" id="nav-main-' + key + '" onclick="TONIO_setModule(\'' + key + '\')">' + TONIO_NAV[key].label + '</button>';
+  }
+  r1.innerHTML = html;
+}
 
 function TONIO_setModule(mod, navigate) {
   if (navigate === undefined) navigate = true;
