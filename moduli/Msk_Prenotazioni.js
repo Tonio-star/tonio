@@ -170,10 +170,10 @@ var MSK_Prenotazioni = (function () {
     '.cau-box input{font-size:11px;border:1px solid #d1d5db;border-radius:4px;padding:3px 6px;height:26px}',
     /* Azioni flottanti */
     '.pre-actions{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px}',
-    /* Sfondo prenotazione confermata — verde tenue */
-    '.pre-wrap-conf{background:#f0fdf4;border-radius:8px;padding:4px}',
-    /* Sfondo prenotazione annullata — rosso tenue */
-    '.pre-wrap-ann{background:#fff5f5;border-radius:8px;padding:4px}',
+    /* Sfondo prenotazione confermata — verde molto visibile */
+    '.pre-wrap-conf{background:#bbf7d0!important;border-radius:8px;padding:4px}',
+    /* Sfondo prenotazione annullata — rosso molto visibile */
+    '.pre-wrap-ann{background:#fecaca!important;border-radius:8px;padding:4px}',
     /* Maschera bloccata — tutti i campi non editabili */
     '.pre-locked input:not([id="pre-numero"]):not([id="pre-stato"]):not([id="pre-locked"]):not(.bold-blue){pointer-events:none!important;background:#f8fafc!important;color:#64748b!important;border-color:#e2e8f0!important}',
     '.pre-locked select{pointer-events:none!important;background:#f8fafc!important;color:#64748b!important;border-color:#e2e8f0!important}',
@@ -420,9 +420,9 @@ var MSK_Prenotazioni = (function () {
     var roAttr    = isLocked ? ' readonly' : '';
     var disAttr   = isLocked ? ' disabled' : '';
 
-    /* Colore sfondo maschera in base allo stato */
-    var bgMaschera = vStato === 'Confermata' ? '#f0fdf4' :
-                     vStato === 'Annullata'  ? '#fff5f5' : '#ffffff';
+    /* Colore sfondo maschera in base allo stato — molto visibile */
+    var bgMaschera = vStato === 'Confermata' ? '#bbf7d0' :
+                     vStato === 'Annullata'  ? '#fecaca' : '#ffffff';
 
     /* Helper field — rispetta modalità locked */
     function fld(label, content, grow) {
@@ -435,51 +435,65 @@ var MSK_Prenotazioni = (function () {
       var ro = isLocked ? ' readonly' : '';
       return '<input type="' + t + '" id="' + id + '" value="' + TONIO_escapeHtml(String(val||'')) + '"' + ro + (extra||'') + '>';
     }
-    /* Input DATA — type=text, formato GG/MM/AA */
+    /* Input DATA — testo GG/MM/AA + icona calendario che apre date picker nativo nascosto */
     function inpDate(id, isoVal, extra) {
       var displayVal = _fmtDate(isoVal || '');
       var ro = isLocked ? ' readonly' : '';
-      return '<input type="text" id="' + id + '" value="' + TONIO_escapeHtml(displayVal) + '" placeholder="GG/MM/AA"' + ro + (extra||'') + ' style="width:90px">';
+      var cal = isLocked ? '' :
+        '<input type="date" id="' + id + '-cal" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none" ' +
+          'onchange="(function(){var d=document.getElementById(\'' + id + '-cal\');var t=document.getElementById(\'' + id + '\');if(d&&t){var p=d.value.split(\'-\');t.value=p[2]+\'/\'+p[1]+\'/\'+p[0].slice(-2);t.dispatchEvent(new Event(\'change\'));}})()">' +
+        '<button type="button" onclick="document.getElementById(\'' + id + '-cal\').showPicker&&document.getElementById(\'' + id + '-cal\').showPicker()" ' +
+          'style="height:28px;width:24px;padding:0;border:1px solid #d1d5db;border-left:none;border-radius:0 4px 4px 0;background:#f8fafc;cursor:pointer;font-size:12px" title="Calendario">📅</button>';
+      return '<div style="display:flex;position:relative">' +
+        '<input type="text" id="' + id + '" value="' + TONIO_escapeHtml(displayVal) + '" placeholder="GG/MM/AA"' + ro + (extra||'') +
+          ' style="width:82px;border-radius:' + (isLocked ? '4px' : '4px 0 0 4px') + '">' +
+        cal +
+      '</div>';
     }
     function sel(id, optsHtml, extra) {
       var dis = isLocked ? ' disabled' : '';
       return '<select id="' + id + '"' + dis + (extra||'') + '>' + optsHtml + '</select>';
     }
 
-    /* --------- SEZIONE 1: HEADER + PULSANTI --------- */
-    var labelNum = isNew ? ('Prenotazione — ' + _nuovoNumero()) : ('Prenotazione — ' + TONIO_escapeHtml(vNum));
-
-    /* Badge stato */
+    /* --------- BARRA TITOLO — RIGA 1: label + M + stati --------- */
     var badgeConf = '<span id="badge-conf" class="' + (vStato==='Confermata' ? 'pre-badge-conf' : 'pre-badge-neu') + '" onclick="MSK_Prenotazioni._setStato(\'Confermata\')" style="cursor:pointer">CONFERMATA</span>';
     var badgeAnn  = '<span id="badge-ann"  class="' + (vStato==='Annullata'  ? 'pre-badge-ann'  : 'pre-badge-neu') + '" onclick="MSK_Prenotazioni._setStato(\'Annullata\')"  style="cursor:pointer">ANNULLATA</span>';
+
+    var labelNum = isNew ? ('Prenotazione — ' + _nuovoNumero()) : ('Prenotazione — ' + TONIO_escapeHtml(vNum));
+
+    var barraRiga1 =
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;background:#1e3a5f;border-radius:6px 6px 0 0">' +
+        '<span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap" id="pre-label-num">📅 ' + labelNum + '</span>' +
+        '<div style="flex:1"></div>' +
+        (isLocked
+          ? '<button style="background:#dc2626;color:#fff;border:2px solid #991b1b;border-radius:4px;height:30px;padding:0 14px;font-size:13px;font-weight:900;cursor:pointer;letter-spacing:1px" onclick="MSK_Prenotazioni._sblocca()" title="Clicca per modificare">M</button>'
+          : '<button style="background:#16a34a;color:#fff;border:1px solid #15803d;border-radius:4px;height:28px;padding:0 10px;font-size:11px;cursor:pointer" onclick="MSK_Prenotazioni._blocca()">🔒 Blocca</button>'
+        ) +
+        '<span style="margin-left:6px">' + badgeConf + '&nbsp;' + badgeAnn + '</span>' +
+        '&nbsp;<span style="color:rgba(255,255,255,.3);font-size:12px">|</span>&nbsp;' +
+        '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaParziale()" style="cursor:pointer">COPIA PARZIALE</span>&nbsp;' +
+        '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaTutto()" style="cursor:pointer">COPIA TUTTO</span>' +
+      '</div>';
+
+    /* --------- BARRA PULSANTI — RIGA 2: SALVA / STAMPA / ELIMINA / LISTA --------- */
+    var barraRiga2 =
+      '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:#0f2847;border-bottom:3px solid ' +
+        (vStato === 'Confermata' ? '#16a34a' : vStato === 'Annullata' ? '#dc2626' : '#334155') + '">' +
+        '<button style="background:#2563eb;color:#fff;border:1px solid #1d4ed8;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px" onclick="MSK_Prenotazioni.salva()">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>' +
+          'SALVA PRENOTAZIONE' +
+        '</button>' +
+        '<button style="background:#0f766e;color:#fff;border:1px solid #0d9488;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer" onclick="MSK_Prenotazioni._stampa()">🖨 STAMPA</button>' +
+        (!isNew ? '<button style="background:#dc2626;color:#fff;border:1px solid #b91c1c;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer" onclick="MSK_Prenotazioni.elimina(' + _editId + ')">🗑 ELIMINA</button>' : '') +
+        '<div style="flex:1"></div>' +
+        '<button style="background:#475569;color:#fff;border:1px solid #334155;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer" onclick="MSK_Prenotazioni._tornaLista()">← TORNA ALLA LISTA</button>' +
+      '</div>';
 
     var secGenerale =
       '<input type="hidden" id="pre-stato" value="' + TONIO_escapeHtml(vStato) + '">' +
       '<input type="hidden" id="pre-locked" value="' + (isLocked ? '1' : '0') + '">' +
-
-      /* ── BARRA TITOLO con pulsanti inline ── */
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;background:#1e3a5f;border-radius:6px 6px 0 0;margin-bottom:6px">' +
-        '<span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap" id="pre-label-num">' + labelNum + '</span>' +
-        '<div style="flex:1"></div>' +
-        /* Pulsante M (Modifica) — rosso */
-        (isLocked
-          ? '<button class="btn" style="background:#dc2626;color:#fff;border-color:#dc2626;height:28px;padding:0 12px;font-size:12px;font-weight:700" onclick="MSK_Prenotazioni._sblocca()" title="Modifica">M</button>'
-          : '<button class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;color:#fff;border-color:rgba(255,255,255,0.4)" onclick="MSK_Prenotazioni._blocca()">🔒 Blocca</button>'
-        ) +
-        /* Stato badges */
-        '<span style="margin-left:4px">' + badgeConf + '&nbsp;' + badgeAnn + '</span>' +
-        '&nbsp;<span style="font-size:9px;opacity:.5">|</span>&nbsp;' +
-        '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaParziale()" style="cursor:pointer">COPIA PARZIALE</span>&nbsp;' +
-        '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaTutto()" style="cursor:pointer">COPIA TUTTO</span>' +
-        '&nbsp;<span style="font-size:9px;opacity:.5">|</span>&nbsp;' +
-        /* Pulsanti azione inline */
-        '<button class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px" onclick="MSK_Prenotazioni.salva()">' +
-          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>SALVA' +
-        '</button>' +
-        '<button class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;color:#fff;border-color:rgba(255,255,255,0.4)" onclick="MSK_Prenotazioni._stampa()">🖨 STAMPA</button>' +
-        (!isNew ? '<button class="btn btn-danger" style="height:28px;padding:0 10px;font-size:11px" onclick="MSK_Prenotazioni.elimina(' + _editId + ')">🗑 ELIMINA</button>' : '') +
-        '<button class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;color:#fff;border-color:rgba(255,255,255,0.4)" onclick="MSK_Prenotazioni._tornaLista()">← LISTA</button>' +
-      '</div>' +
+      barraRiga1 +
+      barraRiga2 +
 
       /* ── SEZIONE DATI GENERALI ── */
       '<div class="pre-section">' +
@@ -608,16 +622,15 @@ var MSK_Prenotazioni = (function () {
     /* --------- SEZIONE 6 & 7: PAGAMENTI OSPITE + CLIENTE --------- */
     var secPagamenti = _buildSectionPagamenti(vPagOsp, vPagCli, modPag);
 
-    /* Sfondo wrapper in base allo stato */
-    var wrapClass = vStato === 'Confermata' ? 'pre-wrap-conf' :
-                    vStato === 'Annullata'  ? 'pre-wrap-ann'  : '';
-    /* Classe lock: bloccata se non nuova e non in editMode */
+    /* Sfondo diretto in base allo stato — molto visibile */
+    var bgInline = vStato === 'Confermata' ? '#bbf7d0' :
+                   vStato === 'Annullata'  ? '#fecaca' : '#f8fafc';
     var lockClass = (!isNew && !_editMode) ? 'pre-locked' : '';
 
-    /* Assembla tutto — nessuna barra azioni separata: i pulsanti sono nell'header */
+    /* Assembla tutto — due barre header sempre visibili */
     c.innerHTML =
       '<style>' + _CSS + '</style>' +
-      '<div class="list-page ' + wrapClass + '" style="padding:10px 12px">' +
+      '<div class="list-page" style="padding:10px 12px;background:' + bgInline + ';min-height:200px;border-radius:8px">' +
         '<div id="pre-maschera-wrap" class="' + lockClass + '">' +
           secGenerale +
           secRichiesto +
@@ -628,7 +641,7 @@ var MSK_Prenotazioni = (function () {
         '</div>' +
       '</div>';
 
-    /* Applica colore sfondo dinamico in base allo stato corrente */
+    /* Aggiorna sfondo dinamicamente anche quando cambia stato via badge */
     _aggiornaWrapStato(vStato);
   }
 
@@ -1039,14 +1052,16 @@ var MSK_Prenotazioni = (function () {
   }
 
   function _aggiornaWrapStato(stato) {
-    var wrap = document.getElementById('pre-maschera-wrap');
-    if (!wrap) return;
-    var parent = wrap.parentElement;
-    if (parent) {
-      parent.classList.remove('pre-wrap-conf', 'pre-wrap-ann');
-      if (stato === 'Confermata') parent.classList.add('pre-wrap-conf');
-      else if (stato === 'Annullata') parent.classList.add('pre-wrap-ann');
+    /* Aggiorna il background della pagina intera */
+    var page = document.querySelector('#page-prenotazioni .list-page');
+    if (page) {
+      page.style.background =
+        stato === 'Confermata' ? '#bbf7d0' :
+        stato === 'Annullata'  ? '#fecaca' : '#f8fafc';
     }
+    /* Aggiorna il bordo inferiore della barra pulsanti */
+    var barra2 = document.querySelector('#page-prenotazioni .list-page > div > div:nth-child(3)');
+    /* non necessario — il colore è già impostato al render */
   }
 
   /* ================================================================
