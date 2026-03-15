@@ -78,12 +78,12 @@ var MSK_Prenotazioni = (function () {
     return Math.max(0, Math.round((d2 - d1) / 86400000));
   }
   function _nuovoNumero() {
-    var anno = new Date().getFullYear(), max = 0;
+    var anno = new Date().getFullYear().toString().slice(-2), max = 0;
     _prenotazioni.forEach(function (p) {
       var m = (p.numero_prenotazione || '').match(/(\d+)$/);
       if (m) max = Math.max(max, parseInt(m[1], 10));
     });
-    return 'PRE-' + anno + '-' + String(max + 1).padStart(3, '0');
+    return 'PZ-' + anno + '-' + (max + 1);
   }
 
   /* CSS condiviso per la maschera */
@@ -215,10 +215,10 @@ var MSK_Prenotazioni = (function () {
       var nomeCli  = _nomeByIdAnag(clienti, p.cliente_id);
       var nomeOsp  = _nomeByIdAnag(ospiti, p.ospite_id);
       var nomeImm  = _nomeByIdImm(immobili, p.via_immobile_id);
-      var dalFmt   = p.dal ? p.dal.replace('T',' ').substring(0,16) : '—';
-      var alFmt    = p.al  ? p.al.replace('T',' ').substring(0,16)  : '—';
-      var dataPren = p.data_prenotazione ? p.data_prenotazione.substring(0,10) : '—';
-      var stato    = p.stato || 'Aperta';
+      var dalFmt   = _fmtDate(p.dal  ? p.dal.substring(0,10)  : '');
+      var alFmt    = _fmtDate(p.al   ? p.al.substring(0,10)   : '');
+      var dataPren = _fmtDate(p.data_prenotazione ? p.data_prenotazione.substring(0,10) : '');
+      var stato    = p.stato || 'Confermata';
       var statoCol = stato === 'Confermata' ? '#dcfce7;color:#166534' :
                      stato === 'Annullata'  ? '#fee2e2;color:#991b1b' : '#f1f5f9;color:#475569';
 
@@ -298,13 +298,13 @@ var MSK_Prenotazioni = (function () {
     var vRifRich   = r.rif_richiesta       || '';
     var vRifGruppo = r.rif_gruppo          || '';
     var vPrevNum   = r.preventivo_num      || '';
-    var vStato     = r.stato               || 'Aperta';
+    var vStato     = r.stato               || 'Confermata';
 
     /* Soggiorno richiesto */
     var vDalRich   = r.dal_richiesto       || '';
-    var vOraDalR   = r.ora_dal_richiesto   || '';
+    var vOraDalR   = r.ora_dal_richiesto   || '17:00';
     var vAlRich    = r.al_richiesto        || '';
-    var vOraAlR    = r.ora_al_richiesto    || '';
+    var vOraAlR    = r.ora_al_richiesto    || '09:30';
     var vNottiR    = r.notti_richieste     || 0;
     var vSpR       = r.sp_richiesto_id     || '';
     var vProdR     = r.prod_richiesto_id   || '';
@@ -359,38 +359,82 @@ var MSK_Prenotazioni = (function () {
 
     /* ---- HTML MASCHERA ---- */
 
-    /* Helper field */
+    /* Modalità: bloccata di default, si sblocca con M */
+    var isLocked  = !isNew; /* nuova prenotazione parte in edit, esistente in view */
+    var roAttr    = isLocked ? ' readonly' : '';
+    var disAttr   = isLocked ? ' disabled' : '';
+
+    /* Colore sfondo maschera in base allo stato */
+    var bgMaschera = vStato === 'Confermata' ? '#f0fdf4' :
+                     vStato === 'Annullata'  ? '#fff5f5' : '#ffffff';
+
+    /* Helper field — rispetta modalità locked */
     function fld(label, content, grow) {
       return '<div class="pre-field" style="flex:' + (grow || '0 0 auto') + '">' +
                '<label>' + label + '</label>' + content + '</div>';
     }
+    /* Input testo generico */
     function inp(id, val, type, extra) {
-      return '<input type="' + (type||'text') + '" id="' + id + '" value="' + TONIO_escapeHtml(String(val||'')) + '"' + (extra||'') + '>';
+      var t = type || 'text';
+      var ro = isLocked ? ' readonly' : '';
+      return '<input type="' + t + '" id="' + id + '" value="' + TONIO_escapeHtml(String(val||'')) + '"' + ro + (extra||'') + '>';
+    }
+    /* Input DATA — type=text, formato GG/MM/AA */
+    function inpDate(id, isoVal, extra) {
+      var displayVal = _fmtDate(isoVal || '');
+      var ro = isLocked ? ' readonly' : '';
+      return '<input type="text" id="' + id + '" value="' + TONIO_escapeHtml(displayVal) + '" placeholder="GG/MM/AA"' + ro + (extra||'') + ' style="width:90px">';
     }
     function sel(id, optsHtml, extra) {
-      return '<select id="' + id + '"' + (extra||'') + '>' + optsHtml + '</select>';
+      var dis = isLocked ? ' disabled' : '';
+      return '<select id="' + id + '"' + dis + (extra||'') + '>' + optsHtml + '</select>';
     }
 
-    /* --------- SEZIONE 1: GENERALE RICHIESTA --------- */
+    /* --------- SEZIONE 1: HEADER + PULSANTI --------- */
+    var labelNum = isNew ? ('Prenotazione — ' + _nuovoNumero()) : ('Prenotazione — ' + TONIO_escapeHtml(vNum));
+
+    /* Badge stato */
+    var badgeConf = '<span id="badge-conf" class="' + (vStato==='Confermata' ? 'pre-badge-conf' : 'pre-badge-neu') + '" onclick="MSK_Prenotazioni._setStato(\'Confermata\')" style="cursor:pointer">CONFERMATA</span>';
+    var badgeAnn  = '<span id="badge-ann"  class="' + (vStato==='Annullata'  ? 'pre-badge-ann'  : 'pre-badge-neu') + '" onclick="MSK_Prenotazioni._setStato(\'Annullata\')"  style="cursor:pointer">ANNULLATA</span>';
+
     var secGenerale =
+      '<input type="hidden" id="pre-stato" value="' + TONIO_escapeHtml(vStato) + '">' +
+      '<input type="hidden" id="pre-locked" value="' + (isLocked ? '1' : '0') + '">' +
+
+      /* ── BARRA TITOLO con pulsanti inline ── */
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;background:#1e3a5f;border-radius:6px 6px 0 0;margin-bottom:6px">' +
+        '<span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap" id="pre-label-num">' + labelNum + '</span>' +
+        '<div style="flex:1"></div>' +
+        /* Pulsante M (Modifica) — rosso */
+        (isLocked
+          ? '<button class="btn" style="background:#dc2626;color:#fff;border-color:#dc2626;height:28px;padding:0 12px;font-size:12px;font-weight:700" onclick="MSK_Prenotazioni._sblocca()" title="Modifica">M</button>'
+          : '<button class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;color:#fff;border-color:rgba(255,255,255,0.4)" onclick="MSK_Prenotazioni._blocca()">🔒 Blocca</button>'
+        ) +
+        /* Stato badges */
+        '<span style="margin-left:4px">' + badgeConf + '&nbsp;' + badgeAnn + '</span>' +
+        '&nbsp;<span style="font-size:9px;opacity:.5">|</span>&nbsp;' +
+        '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaParziale()" style="cursor:pointer">COPIA PARZIALE</span>&nbsp;' +
+        '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaTutto()" style="cursor:pointer">COPIA TUTTO</span>' +
+        '&nbsp;<span style="font-size:9px;opacity:.5">|</span>&nbsp;' +
+        /* Pulsanti azione inline */
+        '<button class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px" onclick="MSK_Prenotazioni.salva()">' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>SALVA' +
+        '</button>' +
+        '<button class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;color:#fff;border-color:rgba(255,255,255,0.4)" onclick="MSK_Prenotazioni._stampa()">🖨 STAMPA</button>' +
+        (!isNew ? '<button class="btn btn-danger" style="height:28px;padding:0 10px;font-size:11px" onclick="MSK_Prenotazioni.elimina(' + _editId + ')">🗑 ELIMINA</button>' : '') +
+        '<button class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;color:#fff;border-color:rgba(255,255,255,0.4)" onclick="MSK_Prenotazioni._tornaLista()">← LISTA</button>' +
+      '</div>' +
+
+      /* ── SEZIONE DATI GENERALI ── */
       '<div class="pre-section">' +
         '<div class="pre-section-head">📋 GENERALE RICHIESTA' +
           (isNew ? '' : '&nbsp;&nbsp;<span style="font-size:9px;opacity:.8">ID ' + _editId + '</span>') +
-          '<div style="flex:1"></div>' +
-          /* Stato buttons */
-          '<span id="badge-aperta"  class="' + (vStato==='Aperta'     ? 'pre-badge-neu'  : 'pre-badge-neu')  + '" onclick="MSK_Prenotazioni._setStato(\'Aperta\')"   style="cursor:pointer">APERTA</span>&nbsp;' +
-          '<span id="badge-conf"    class="' + (vStato==='Confermata' ? 'pre-badge-conf' : 'pre-badge-neu') + '" onclick="MSK_Prenotazioni._setStato(\'Confermata\')" style="cursor:pointer">CONFERMATA</span>&nbsp;' +
-          '<span id="badge-ann"     class="' + (vStato==='Annullata'  ? 'pre-badge-ann'  : 'pre-badge-neu')  + '" onclick="MSK_Prenotazioni._setStato(\'Annullata\')"  style="cursor:pointer">ANNULLATA</span>&nbsp;&nbsp;' +
-          '<span style="font-size:9px;opacity:.7">|</span>&nbsp;&nbsp;' +
-          '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaParziale()" style="cursor:pointer">COPIA PARZIALE</span>&nbsp;' +
-          '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaTutto()" style="cursor:pointer">COPIA TUTTO</span>' +
         '</div>' +
         '<div class="pre-section-body">' +
-          '<input type="hidden" id="pre-stato" value="' + TONIO_escapeHtml(vStato) + '">' +
           '<div class="pre-row">' +
-            fld('Data', inp('pre-data', vData, 'date'), '0 0 120px') +
-            fld('N° Prenotazione', inp('pre-numero', vNum, 'text', ' placeholder="Auto"'), '0 0 140px') +
-            fld('Redatto', inp('pre-redatto', vRedatto), '1 1 120px') +
+            fld('Data', inpDate('pre-data', vData), '0 0 100px') +
+            fld('N° Prenotazione', '<input type="text" id="pre-numero" value="' + TONIO_escapeHtml(vNum) + '" readonly placeholder="Auto" style="background:#f1f5f9;color:#475569;cursor:default">', '0 0 130px') +
+            fld('Redatto', inp('pre-redatto', vRedatto), '1 1 110px') +
             fld('Cliente', sel('pre-cliente', _optsAnag(clienti, parseInt(vCliente,10))), '1 1 160px') +
             fld('Contatto', inp('pre-contatto', vContatto), '1 1 130px') +
             fld('Telefono', inp('pre-telefono', vTelefono), '1 1 120px') +
@@ -405,13 +449,13 @@ var MSK_Prenotazioni = (function () {
 
     /* --------- SEZIONE 2: SOGGIORNO RICHIESTO --------- */
     var secRichiesto =
-      '<div class="pre-section">' +
-        '<div class="pre-section-head">📅 SOGGIORNO RICHIESTO</div>' +
-        '<div class="pre-section-body">' +
+      '<div class="pre-section" style="background:#fefce8;border-color:#fde68a">' +
+        '<div class="pre-section-head" style="background:#ca8a04">📅 SOGGIORNO RICHIESTO</div>' +
+        '<div class="pre-section-body" style="background:#fefce8">' +
           '<div class="pre-row">' +
-            fld('Dal — Data', inp('pre-dal-rich', vDalRich, 'date', ' onchange="MSK_Prenotazioni.aggiornaNottiR()"'), '0 0 120px') +
+            fld('Dal — Data', inpDate('pre-dal-rich', vDalRich, ' onchange="MSK_Prenotazioni.aggiornaNottiR()"'), '0 0 100px') +
             fld('Ora', inp('pre-ora-dal-rich', vOraDalR, 'time'), '0 0 80px') +
-            fld('Al — Data', inp('pre-al-rich', vAlRich, 'date', ' onchange="MSK_Prenotazioni.aggiornaNottiR()"'), '0 0 120px') +
+            fld('Al — Data', inpDate('pre-al-rich', vAlRich, ' onchange="MSK_Prenotazioni.aggiornaNottiR()"'), '0 0 100px') +
             fld('Ora', inp('pre-ora-al-rich', vOraAlR, 'time'), '0 0 80px') +
             fld('Notti', '<input type="text" id="pre-notti-rich" value="' + vNottiR + '" class="bold-blue" readonly>', '0 0 55px') +
             fld('Super Prodotto', sel('pre-sp-rich', _optsById(superProds, parseInt(vSpR,10))), '1 1 130px') +
@@ -508,33 +552,28 @@ var MSK_Prenotazioni = (function () {
     /* --------- SEZIONE 6 & 7: PAGAMENTI OSPITE + CLIENTE --------- */
     var secPagamenti = _buildSectionPagamenti(vPagOsp, vPagCli, modPag);
 
-    /* --------- PULSANTI AZIONE --------- */
-    var secAzioni =
-      '<div class="pre-actions">' +
-        '<button class="btn btn-primary" onclick="MSK_Prenotazioni.salva()">' +
-          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>Salva Prenotazione' +
-        '</button>' +
-        '<button class="btn btn-ghost" onclick="MSK_Prenotazioni._stampa()">🖨 Stampa</button>' +
-        (!isNew ? '<button class="btn btn-danger" onclick="MSK_Prenotazioni.elimina(' + _editId + ')">🗑 Elimina</button>' : '') +
-        '<button class="btn btn-ghost" onclick="MSK_Prenotazioni._tornaLista()">← Torna alla Lista</button>' +
-      '</div>';
+    /* Sfondo wrapper in base allo stato */
+    var wrapClass = vStato === 'Confermata' ? 'pre-wrap-conf' :
+                    vStato === 'Annullata'  ? 'pre-wrap-ann'  : '';
+    /* Classe lock: bloccata se non nuova e non in editMode */
+    var lockClass = (!isNew && !_editMode) ? 'pre-locked' : '';
 
-    /* Assembla tutto */
+    /* Assembla tutto — nessuna barra azioni separata: i pulsanti sono nell'header */
     c.innerHTML =
       '<style>' + _CSS + '</style>' +
-      '<div class="list-page" style="padding:10px 12px">' +
-        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
-          '<h1 class="list-title" style="margin:0;font-size:16px">📅 ' + (isNew ? 'Nuova Prenotazione' : 'Prenotazione — ' + TONIO_escapeHtml(vNum)) + '</h1>' +
+      '<div class="list-page ' + wrapClass + '" style="padding:10px 12px">' +
+        '<div id="pre-maschera-wrap" class="' + lockClass + '">' +
+          secGenerale +
+          secRichiesto +
+          secConfermato +
+          secServizi +
+          secCauzione +
+          secPagamenti +
         '</div>' +
-        secAzioni +
-        secGenerale +
-        secRichiesto +
-        secConfermato +
-        secServizi +
-        secCauzione +
-        secPagamenti +
-        secAzioni +
       '</div>';
+
+    /* Applica colore sfondo dinamico in base allo stato corrente */
+    _aggiornaWrapStato(vStato);
   }
 
   /* ================================================================
@@ -932,28 +971,83 @@ var MSK_Prenotazioni = (function () {
   function _setStato(stato) {
     var el = document.getElementById('pre-stato');
     if (el) el.value = stato;
-    ['Aperta','Confermata','Annullata'].forEach(function(s) {
-      var key = s === 'Aperta' ? 'aperta' : s === 'Confermata' ? 'conf' : 'ann';
+    ['Confermata','Annullata'].forEach(function(s) {
+      var key = s === 'Confermata' ? 'conf' : 'ann';
       var badge = document.getElementById('badge-' + key);
       if (!badge) return;
       badge.className = (s === stato)
-        ? (s === 'Confermata' ? 'pre-badge-conf' : s === 'Annullata' ? 'pre-badge-ann' : 'pre-badge-neu')
+        ? (s === 'Confermata' ? 'pre-badge-conf' : 'pre-badge-ann')
         : 'pre-badge-neu';
     });
+    _aggiornaWrapStato(stato);
   }
+
+  function _aggiornaWrapStato(stato) {
+    var wrap = document.getElementById('pre-maschera-wrap');
+    if (!wrap) return;
+    var parent = wrap.parentElement;
+    if (parent) {
+      parent.classList.remove('pre-wrap-conf', 'pre-wrap-ann');
+      if (stato === 'Confermata') parent.classList.add('pre-wrap-conf');
+      else if (stato === 'Annullata') parent.classList.add('pre-wrap-ann');
+    }
+  }
+
+  /* ================================================================
+     SBLOCCA / BLOCCA MASCHERA
+  ================================================================ */
+  function _sblocca() {
+    /* Attiva la modalità modifica senza ricaricare la pagina */
+    _editMode = true;
+    var wrap = document.getElementById('pre-maschera-wrap');
+    if (wrap) wrap.classList.remove('pre-locked');
+    /* Riabilita tutti i campi disabilitati */
+    if (wrap) {
+      wrap.querySelectorAll('input[readonly]:not([id="pre-numero"]):not([class*="bold-blue"])').forEach(function(el){ el.removeAttribute('readonly'); });
+      wrap.querySelectorAll('select[disabled]').forEach(function(el){ el.removeAttribute('disabled'); });
+      wrap.querySelectorAll('textarea[readonly]').forEach(function(el){ el.removeAttribute('readonly'); });
+    }
+    /* Cambia il pulsante M in Blocca */
+    var lockedEl = document.getElementById('pre-locked');
+    if (lockedEl) lockedEl.value = '0';
+    /* Sostituisce pulsante M con pulsante Blocca nella barra */
+    var barra = wrap ? wrap.querySelector('[onclick*="_sblocca"]') : null;
+    if (barra) {
+      barra.style.background   = '#e2e8f0';
+      barra.style.color        = '#374151';
+      barra.style.borderColor  = '#9ca3af';
+      barra.style.fontSize     = '11px';
+      barra.style.fontWeight   = '400';
+      barra.innerHTML          = '🔓 Modifica';
+      barra.setAttribute('onclick', 'MSK_Prenotazioni._blocca()');
+      barra.title = 'Blocca';
+    }
+  }
+
+  function _blocca() {
+    _editMode = false;
+    _renderMaschera();
+  }
+
+  /* Alias per compatibilità con vecchie chiamate _attivaModifica */
+  function _attivaModifica() { _sblocca(); }
 
   /* ================================================================
      CALCOLO NOTTI REAL-TIME
   ================================================================ */
   function aggiornaNotti() {
-    var dal   = (document.getElementById('pre-dal')   || {}).value || '';
-    var al    = (document.getElementById('pre-al')    || {}).value || '';
+    var dalRaw = (document.getElementById('pre-dal')   || {}).value || '';
+    var alRaw  = (document.getElementById('pre-al')    || {}).value || '';
+    /* pre-dal è type=date (sezione 3 — confermato), già in ISO */
     var notti = document.getElementById('pre-notti');
-    if (notti) notti.value = _calcolaNotti(dal, al);
+    if (notti) notti.value = _calcolaNotti(dalRaw, alRaw);
   }
   function aggiornaNottiR() {
-    var dal   = (document.getElementById('pre-dal-rich') || {}).value || '';
-    var al    = (document.getElementById('pre-al-rich')  || {}).value || '';
+    var dalRaw = (document.getElementById('pre-dal-rich') || {}).value || '';
+    var alRaw  = (document.getElementById('pre-al-rich')  || {}).value || '';
+    /* pre-dal-rich è type=text con formato GG/MM/AA — converti prima di calcolare */
+    var dal = _displayToIso(dalRaw);
+    var al  = _displayToIso(alRaw);
     var notti = document.getElementById('pre-notti-rich');
     if (notti) notti.value = _calcolaNotti(dal, al);
   }
@@ -963,6 +1057,24 @@ var MSK_Prenotazioni = (function () {
   ================================================================ */
   function _today() {
     return new Date().toISOString().substring(0,10);
+  }
+
+  /* Converte ISO (YYYY-MM-DD) → GG/MM/AA per la visualizzazione */
+  function _fmtDate(iso) {
+    if (!iso) return '';
+    var p = iso.split('-');
+    if (p.length < 3) return iso;
+    return p[2].substring(0,2) + '/' + p[1] + '/' + p[0].slice(-2);
+  }
+
+  /* Converte GG/MM/AA → YYYY-MM-DD per i campi input[type=date] */
+  function _displayToIso(d) {
+    if (!d) return '';
+    if (d.indexOf('-') !== -1) return d; /* già ISO */
+    var p = d.split('/');
+    if (p.length < 3) return d;
+    var yy = p[2].length === 2 ? '20' + p[2] : p[2];
+    return yy + '-' + p[1] + '-' + p[0];
   }
 
   function _readServizi() {
@@ -1053,20 +1165,23 @@ var MSK_Prenotazioni = (function () {
   ================================================================ */
   function salva() {
     function v(id) { var e=document.getElementById(id); return e?(e.value||''):''; }
+    /* Converte i campi data testuali (GG/MM/AA) in ISO (YYYY-MM-DD) */
+    function vd(id) { return _displayToIso(v(id)); }
 
-    var dal = v('pre-dal');
-    var al  = v('pre-al');
+    var dal = vd('pre-dal');
+    var al  = vd('pre-al');
 
     if (dal && al && new Date(al) <= new Date(dal)) {
       alert('⚠️ La data Check-Out deve essere successiva al Check-In.');
       return;
     }
 
-    var numero = v('pre-numero') || _nuovoNumero();
+    /* Numero prenotazione: per nuove prenotazioni genera automaticamente */
+    var numero = (_editId === null) ? _nuovoNumero() : (v('pre-numero') || _nuovoNumero());
 
     var data = {
       numero_prenotazione:  numero,
-      data_prenotazione:    v('pre-data'),
+      data_prenotazione:    vd('pre-data'),
       protocollo:           v('pre-protocollo'),
       redatto:              v('pre-redatto'),
       cliente_id:           v('pre-cliente')    ? parseInt(v('pre-cliente'),10)    : null,
@@ -1076,11 +1191,11 @@ var MSK_Prenotazioni = (function () {
       rif_richiesta:        v('pre-rif-rich'),
       rif_gruppo:           v('pre-rif-gruppo'),
       preventivo_num:       v('pre-prev-num'),
-      stato:                v('pre-stato') || 'Aperta',
+      stato:                v('pre-stato') || 'Confermata',
       /* Soggiorno richiesto */
-      dal_richiesto:        v('pre-dal-rich'),
+      dal_richiesto:        vd('pre-dal-rich'),
       ora_dal_richiesto:    v('pre-ora-dal-rich'),
-      al_richiesto:         v('pre-al-rich'),
+      al_richiesto:         vd('pre-al-rich'),
       ora_al_richiesto:     v('pre-ora-al-rich'),
       notti_richieste:      parseInt(v('pre-notti-rich'),10) || 0,
       sp_richiesto_id:      v('pre-sp-rich')    ? parseInt(v('pre-sp-rich'),10)    : null,
@@ -1249,6 +1364,9 @@ var MSK_Prenotazioni = (function () {
     _removeSrv:         _removeSrv,
     _inserisciObbligatori: _inserisciObbligatori,
     _setStato:          _setStato,
+    _attivaModifica:    _attivaModifica,
+    _sblocca:           _sblocca,
+    _blocca:            _blocca,
     _sceltaImmobile:    _sceltaImmobile,
     _vediImmobile:      _vediImmobile,
     _checkDisponibilita: _checkDisponibilita,
