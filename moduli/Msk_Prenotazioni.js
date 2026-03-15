@@ -461,8 +461,11 @@ var MSK_Prenotazioni = (function () {
 
     var labelNum = isNew ? ('Prenotazione — ' + _nuovoNumero()) : ('Prenotazione — ' + TONIO_escapeHtml(vNum));
 
+    /* BARRA STICKY — resterà sempre visibile durante lo scroll */
+    var barraStickyStyle = 'position:sticky;top:0;z-index:100;';
+
     var barraRiga1 =
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;background:#1e3a5f;border-radius:6px 6px 0 0">' +
+      '<div style="' + barraStickyStyle + 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;background:#1e3a5f;border-radius:6px 6px 0 0">' +
         '<span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap" id="pre-label-num">📅 ' + labelNum + '</span>' +
         '<div style="flex:1"></div>' +
         (isLocked
@@ -475,18 +478,19 @@ var MSK_Prenotazioni = (function () {
         '<span class="pre-badge-neu" onclick="MSK_Prenotazioni._copiaTutto()" style="cursor:pointer">COPIA TUTTO</span>' +
       '</div>';
 
-    /* --------- BARRA PULSANTI — RIGA 2: SALVA / STAMPA / ELIMINA / LISTA --------- */
+    /* BARRA PULSANTI AZIONE — SALVA / STAMPA / ELIMINA / LISTA — sticky */
+    var borderCol = vStato === 'Confermata' ? '#16a34a' : vStato === 'Annullata' ? '#dc2626' : '#334155';
     var barraRiga2 =
-      '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:#0f2847;border-bottom:3px solid ' +
-        (vStato === 'Confermata' ? '#16a34a' : vStato === 'Annullata' ? '#dc2626' : '#334155') + '">' +
-        '<button style="background:#2563eb;color:#fff;border:1px solid #1d4ed8;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px" onclick="MSK_Prenotazioni.salva()">' +
-          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>' +
-          'SALVA PRENOTAZIONE' +
-        '</button>' +
-        '<button style="background:#0f766e;color:#fff;border:1px solid #0d9488;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer" onclick="MSK_Prenotazioni._stampa()">🖨 STAMPA</button>' +
-        (!isNew ? '<button style="background:#dc2626;color:#fff;border:1px solid #b91c1c;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer" onclick="MSK_Prenotazioni.elimina(' + _editId + ')">🗑 ELIMINA</button>' : '') +
+      '<div id="pre-barra-azioni" style="' + barraStickyStyle + 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;background:#0f2847;border-bottom:4px solid ' + borderCol + ';margin-bottom:8px">' +
+        /* SALVA */
+        '<button style="background:#2563eb;color:#fff;border:1px solid #1d4ed8;border-radius:4px;height:32px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer" onclick="MSK_Prenotazioni.salva()">💾 SALVA</button>' +
+        /* STAMPA */
+        '<button style="background:#0f766e;color:#fff;border:1px solid #0d9488;border-radius:4px;height:32px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer" onclick="MSK_Prenotazioni._stampa()">🖨 STAMPA</button>' +
+        /* ELIMINA — solo su record esistenti */
+        (!isNew ? '<button style="background:#dc2626;color:#fff;border:1px solid #b91c1c;border-radius:4px;height:32px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer" onclick="MSK_Prenotazioni.elimina(' + _editId + ')">🗑 ELIMINA</button>' : '') +
         '<div style="flex:1"></div>' +
-        '<button style="background:#475569;color:#fff;border:1px solid #334155;border-radius:4px;height:30px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer" onclick="MSK_Prenotazioni._tornaLista()">← TORNA ALLA LISTA</button>' +
+        /* TORNA ALLA LISTA */
+        '<button style="background:#475569;color:#fff;border:1px solid #334155;border-radius:4px;height:32px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer" onclick="MSK_Prenotazioni._tornaLista()">← TORNA ALLA LISTA</button>' +
       '</div>';
 
     var secGenerale =
@@ -1059,9 +1063,13 @@ var MSK_Prenotazioni = (function () {
         stato === 'Confermata' ? '#bbf7d0' :
         stato === 'Annullata'  ? '#fecaca' : '#f8fafc';
     }
-    /* Aggiorna il bordo inferiore della barra pulsanti */
-    var barra2 = document.querySelector('#page-prenotazioni .list-page > div > div:nth-child(3)');
-    /* non necessario — il colore è già impostato al render */
+    /* Aggiorna il bordo della barra azioni */
+    var barra = document.getElementById('pre-barra-azioni');
+    if (barra) {
+      barra.style.borderBottomColor =
+        stato === 'Confermata' ? '#16a34a' :
+        stato === 'Annullata'  ? '#dc2626' : '#334155';
+    }
   }
 
   /* ================================================================
