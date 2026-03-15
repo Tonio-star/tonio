@@ -56,6 +56,51 @@ var MSK_Prenotazioni = (function () {
     });
     return h;
   }
+
+  /* Costruisce le opzioni per Contatto/Telefono/Mail dal cliente selezionato */
+  function _optsCollab(clienteId, field, selectedVal) {
+    var clienti = _getClienti();
+    var cliente = clienti.find(function(c){ return c.id === parseInt(clienteId, 10); });
+    var h = '<option value="">— Seleziona —</option>';
+    if (!cliente) return h;
+    var vals = [];
+    if (field === 'contatto') {
+      /* Aggiunge nome collaboratori */
+      (cliente.collaboratori || []).forEach(function(col){
+        if (col.nome) vals.push(col.nome);
+      });
+      /* Aggiunge il nominativo stesso */
+      if (cliente.nominativo) vals.unshift(cliente.nominativo);
+    } else if (field === 'telefono') {
+      [cliente.cellulare, cliente.cellulare2, cliente.telefono, cliente.telefono2].forEach(function(t){ if (t) vals.push(t); });
+      (cliente.collaboratori || []).forEach(function(col){
+        if (col.cellulare) vals.push(col.cellulare);
+        if (col.telefono)  vals.push(col.telefono);
+      });
+    } else if (field === 'mail') {
+      [cliente.mail, cliente.mail2, cliente.pec].forEach(function(m){ if (m) vals.push(m); });
+      (cliente.collaboratori || []).forEach(function(col){
+        if (col.mail) vals.push(col.mail);
+      });
+    }
+    /* deduplicazione */
+    vals = vals.filter(function(v, i, a){ return v && a.indexOf(v) === i; });
+    vals.forEach(function(v){
+      h += '<option value="' + TONIO_escapeHtml(v) + '"' + (v === selectedVal ? ' selected' : '') + '>' + TONIO_escapeHtml(v) + '</option>';
+    });
+    return h;
+  }
+
+  /* Chiamata onchange del campo Cliente — aggiorna i dropdown dipendenti */
+  function _onClienteChange() {
+    var cliId = (document.getElementById('pre-cliente') || {}).value || '';
+    var selCont = document.getElementById('pre-contatto');
+    var selTel  = document.getElementById('pre-telefono');
+    var selMail = document.getElementById('pre-mail');
+    if (selCont) selCont.innerHTML = _optsCollab(cliId, 'contatto', '');
+    if (selTel)  selTel.innerHTML  = _optsCollab(cliId, 'telefono', '');
+    if (selMail) selMail.innerHTML = _optsCollab(cliId, 'mail', '');
+  }
   function _nomeById(arr, id) {
     if (!id) return '—';
     var found = arr.find(function (x) { return x.id === id || x.id === parseInt(id, 10); });
@@ -125,6 +170,15 @@ var MSK_Prenotazioni = (function () {
     '.cau-box input{font-size:11px;border:1px solid #d1d5db;border-radius:4px;padding:3px 6px;height:26px}',
     /* Azioni flottanti */
     '.pre-actions{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px}',
+    /* Sfondo prenotazione confermata — verde tenue */
+    '.pre-wrap-conf{background:#f0fdf4;border-radius:8px;padding:4px}',
+    /* Sfondo prenotazione annullata — rosso tenue */
+    '.pre-wrap-ann{background:#fff5f5;border-radius:8px;padding:4px}',
+    /* Maschera bloccata — tutti i campi non editabili */
+    '.pre-locked input:not([id="pre-numero"]):not([id="pre-stato"]):not([id="pre-locked"]):not(.bold-blue){pointer-events:none!important;background:#f8fafc!important;color:#64748b!important;border-color:#e2e8f0!important}',
+    '.pre-locked select{pointer-events:none!important;background:#f8fafc!important;color:#64748b!important;border-color:#e2e8f0!important}',
+    '.pre-locked textarea{pointer-events:none!important;background:#f8fafc!important;color:#64748b!important;border-color:#e2e8f0!important}',
+    '.pre-locked input[type=checkbox]{pointer-events:none!important;opacity:.5}',
   ].join('');
 
   /* ================================================================
@@ -252,12 +306,14 @@ var MSK_Prenotazioni = (function () {
      APRI MASCHERA COMPLETA (in overlay / full page)
   ================================================================ */
   function apriMaschera(id) {
-    _editId = (id !== undefined && id !== null) ? id : null;
+    _editId   = (id !== undefined && id !== null) ? id : null;
+    _editMode = false; /* sempre bloccata all'apertura — si sblocca con M */
     _renderMaschera();
   }
 
   function nuovaPrenotazione() {
-    _editId = null;
+    _editId   = null;
+    _editMode = true;  /* nuova prenotazione parte già in modalità edit */
     _renderMaschera();
   }
 
@@ -435,10 +491,10 @@ var MSK_Prenotazioni = (function () {
             fld('Data', inpDate('pre-data', vData), '0 0 100px') +
             fld('N° Prenotazione', '<input type="text" id="pre-numero" value="' + TONIO_escapeHtml(vNum) + '" readonly placeholder="Auto" style="background:#f1f5f9;color:#475569;cursor:default">', '0 0 130px') +
             fld('Redatto', inp('pre-redatto', vRedatto), '1 1 110px') +
-            fld('Cliente', sel('pre-cliente', _optsAnag(clienti, parseInt(vCliente,10))), '1 1 160px') +
-            fld('Contatto', inp('pre-contatto', vContatto), '1 1 130px') +
-            fld('Telefono', inp('pre-telefono', vTelefono), '1 1 120px') +
-            fld('Mail', inp('pre-mail', vMail, 'email'), '1 1 150px') +
+            fld('Cliente', sel('pre-cliente', _optsAnag(clienti, parseInt(vCliente,10)), ' onchange="MSK_Prenotazioni._onClienteChange()"'), '1 1 160px') +
+            fld('Contatto', '<select id="pre-contatto"' + (isLocked ? ' disabled' : '') + '>' + _optsCollab(vCliente, 'contatto', vContatto) + '</select>', '1 1 130px') +
+            fld('Telefono', '<select id="pre-telefono"' + (isLocked ? ' disabled' : '') + '>' + _optsCollab(vCliente, 'telefono', vTelefono) + '</select>', '1 1 130px') +
+            fld('Mail',     '<select id="pre-mail"' + (isLocked ? ' disabled' : '') + '>' + _optsCollab(vCliente, 'mail', vMail) + '</select>', '1 1 150px') +
             fld('Rif. Richiesta', inp('pre-rif-rich', vRifRich), '1 1 120px') +
             fld('Rif. Gruppo', inp('pre-rif-gruppo', vRifGruppo), '1 1 120px') +
             fld('Preventivo N°', inp('pre-prev-num', vPrevNum), '0 0 110px') +
@@ -476,9 +532,9 @@ var MSK_Prenotazioni = (function () {
         '<div class="pre-section-body">' +
           /* Riga date + immobile */
           '<div class="pre-row">' +
-            fld('Check-In Data', inp('pre-dal', vDal, 'date', ' onchange="MSK_Prenotazioni.aggiornaNotti()"'), '0 0 120px') +
+            fld('Check-In Data', inpDate('pre-dal', vDal, ' onchange="MSK_Prenotazioni.aggiornaNotti()"'), '0 0 100px') +
             fld('Ora', inp('pre-ora-dal', vOraDal, 'time'), '0 0 80px') +
-            fld('Check-Out Data', inp('pre-al', vAl, 'date', ' onchange="MSK_Prenotazioni.aggiornaNotti()"'), '0 0 120px') +
+            fld('Check-Out Data', inpDate('pre-al', vAl, ' onchange="MSK_Prenotazioni.aggiornaNotti()"'), '0 0 100px') +
             fld('Ora', inp('pre-ora-al', vOraAl, 'time'), '0 0 80px') +
             fld('Notti', '<input type="text" id="pre-notti" value="' + vNotti + '" class="bold-blue" readonly>', '0 0 55px') +
             fld('Super Prodotto', sel('pre-superprod', _optsById(superProds, parseInt(vSP,10))), '1 1 130px') +
@@ -1036,11 +1092,13 @@ var MSK_Prenotazioni = (function () {
      CALCOLO NOTTI REAL-TIME
   ================================================================ */
   function aggiornaNotti() {
-    var dalRaw = (document.getElementById('pre-dal')   || {}).value || '';
-    var alRaw  = (document.getElementById('pre-al')    || {}).value || '';
-    /* pre-dal è type=date (sezione 3 — confermato), già in ISO */
+    var dalRaw = (document.getElementById('pre-dal') || {}).value || '';
+    var alRaw  = (document.getElementById('pre-al')  || {}).value || '';
+    /* anche pre-dal/pre-al ora sono type=text con GG/MM/AA */
+    var dal = _displayToIso(dalRaw);
+    var al  = _displayToIso(alRaw);
     var notti = document.getElementById('pre-notti');
-    if (notti) notti.value = _calcolaNotti(dalRaw, alRaw);
+    if (notti) notti.value = _calcolaNotti(dal, al);
   }
   function aggiornaNottiR() {
     var dalRaw = (document.getElementById('pre-dal-rich') || {}).value || '';
@@ -1367,6 +1425,7 @@ var MSK_Prenotazioni = (function () {
     _attivaModifica:    _attivaModifica,
     _sblocca:           _sblocca,
     _blocca:            _blocca,
+    _onClienteChange:   _onClienteChange,
     _sceltaImmobile:    _sceltaImmobile,
     _vediImmobile:      _vediImmobile,
     _checkDisponibilita: _checkDisponibilita,
